@@ -4,6 +4,7 @@
   "description": "Api rest para Rest. Sorpresa",
   "main": "index.js",
   "scripts": {
+    "dev": "concurrently \"tsc --watch\" \"nodemon dist/index.js\"",
     "build": "tsc"
   },
   "author": "esphinx",
@@ -11,11 +12,13 @@
   "dependencies": {
     "express": "^4.17.1",
     "morgan": "^1.10.0",
-    "mysql2": "^2.1.0"
+    "mysql2": "^2.1.0",
+    "concurrently": "^5.2.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.7",
     "@types/morgan": "^1.9.1",
-    "@types/mysql2": "github:types/mysql2"
+    "@types/mysql2": "github:types/mysql2",
+    "concurrently": "^5.2.0"
   }
 }

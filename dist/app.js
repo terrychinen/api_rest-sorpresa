@@ -15,18 +15,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.App = void 0;
 const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
+const index_routes_1 = __importDefault(require("./routes/index.routes"));
+const category_routes_1 = __importDefault(require("./routes/category.routes"));
 class App {
     constructor(port) {
         this.app = express_1.default();
         this.port = port;
         this.settings();
         this.middlewares();
+        this.routes();
     }
     settings() {
         this.app.set('port', this.port || process.env.PORT || 3000);
     }
     middlewares() {
         this.app.use(morgan_1.default('dev'));
+        this.app.use(express_1.default.urlencoded({ extended: false }));
+    }
+    routes() {
+        this.app.use(index_routes_1.default);
+        this.app.use('/category', category_routes_1.default);
     }
     listen() {
         return __awaiter(this, void 0, void 0, function* () {
