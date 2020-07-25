@@ -1,7 +1,6 @@
 import { createPool, Pool } from 'mysql2/promise';
 
 
-
 export async function connect() {
 
    const connection: Pool = await createPool({
@@ -11,8 +10,6 @@ export async function connect() {
         database: 'sorpresa',
         connectionLimit: 10
     });
-
-    
 
     return connection;
 

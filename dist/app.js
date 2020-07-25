@@ -13,10 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.App = void 0;
+require('./config/config');
 const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const index_routes_1 = __importDefault(require("./routes/index.routes"));
 const category_routes_1 = __importDefault(require("./routes/category.routes"));
+const login_routes_1 = __importDefault(require("./routes/login.routes"));
+const authentication_1 = require("./middlewares/authentication");
 class App {
     constructor(port) {
         this.app = express_1.default();
@@ -34,7 +37,8 @@ class App {
     }
     routes() {
         this.app.use(index_routes_1.default);
-        this.app.use('/category', category_routes_1.default);
+        this.app.use('/login', login_routes_1.default);
+        this.app.use('/category', authentication_1.tokenValidation, category_routes_1.default);
     }
     listen() {
         return __awaiter(this, void 0, void 0, function* () {

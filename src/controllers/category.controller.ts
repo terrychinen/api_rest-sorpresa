@@ -1,6 +1,8 @@
-import {Request, Response } from 'express';
 import { connect } from '../database';
+import { Request, Response } from 'express';
 import { Category } from '../interfaces/category.interface';
+
+
 
 
 
@@ -96,6 +98,7 @@ export async function updateCategory(req: Request, res: Response) {
         });
     }
 }
+
 
 //================== ELIMINAR UNA CATEGORIA POR SU ID ==================//
 export async function deleteCategory(req: Request, res: Response) {

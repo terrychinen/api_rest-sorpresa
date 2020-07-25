@@ -1,8 +1,11 @@
+require('./config/config');
 import express, { Application } from 'express';
 import morgan from 'morgan';
 
 import IndexRoutes from './routes/index.routes';
 import CategoryRoutes from './routes/category.routes';
+import LoginRoutes from './routes/login.routes';
+import { tokenValidation } from './middlewares/authentication';
 
 
 export class App {
@@ -30,7 +33,8 @@ export class App {
 
     routes() {
         this.app.use(IndexRoutes);
-        this.app.use('/category', CategoryRoutes);
+        this.app.use('/login', LoginRoutes);
+        this.app.use('/category', tokenValidation, CategoryRoutes);
     }
 
     public async listen() {

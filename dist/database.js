@@ -11,21 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.connect = void 0;
 const promise_1 = require("mysql2/promise");
-class Mysql {
-    constructor() {
-        this.connection = promise_1.createPool({
-            host: 'localhost',
-            user: 'root',
-            password: '',
-            database: 'sorpresa',
-            connectionLimit: 10
-        });
-    }
-    static get instance() {
-        return this._instance || (this._instance = new this());
-    }
-}
-exports.default = Mysql;
 function connect() {
     return __awaiter(this, void 0, void 0, function* () {
         const connection = yield promise_1.createPool({
