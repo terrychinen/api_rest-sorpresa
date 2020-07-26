@@ -9,18 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategory = exports.getCategories = void 0;
+exports.deleteUnit = exports.updateUnit = exports.createUnit = exports.getUnit = exports.getUnits = void 0;
 const database_1 = require("../database");
-//================== OBTENER TODAS LAS CATEGORIAS ==================//
-function getCategories(req, res) {
+//================== OBTENER TODAS LAS UNIDADES ==================//
+function getUnits(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const conn = yield database_1.connect();
-            const categories = yield conn.query('SELECT * FROM category');
+            const units = yield conn.query('SELECT * FROM unit');
             return res.status(200).json({
                 ok: true,
                 message: 'Query successful',
-                Categories: categories[0]
+                Units: units[0]
             });
         }
         catch (error) {
@@ -32,18 +32,18 @@ function getCategories(req, res) {
         }
     });
 }
-exports.getCategories = getCategories;
-//================== OBTENER UNA CATEGORIA POR SU ID ==================//
-function getCategory(req, res) {
+exports.getUnits = getUnits;
+//================== OBTENER UNA UNIDAD POR SU ID ==================//
+function getUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const id = req.params.category_id;
+            const id = req.params.unit_id;
             const conn = yield database_1.connect();
-            const category = yield conn.query('SELECT * FROM category WHERE category_id = ?', [id]);
+            const unit = yield conn.query('SELECT * FROM unit WHERE category_id = ?', [id]);
             return res.status(200).json({
                 ok: true,
                 message: 'Query successful',
-                category: category[0]
+                unit: unit[0]
             });
         }
         catch (error) {
@@ -55,18 +55,18 @@ function getCategory(req, res) {
         }
     });
 }
-exports.getCategory = getCategory;
-//================== CREAR UNA CATEGORIA ==================//
-function createCategory(req, res) {
+exports.getUnit = getUnit;
+//================== CREAR UNA UNIDAD ==================//
+function createUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const category = req.body;
+            const unit = req.body;
             const conn = yield database_1.connect();
-            yield conn.query('INSERT INTO category SET ?', category);
+            yield conn.query('INSERT INTO unit SET ?', unit);
             return res.status(200).json({
                 ok: true,
-                message: 'Category created',
-                category
+                message: 'Unit created',
+                unit
             });
         }
         catch (error) {
@@ -78,19 +78,19 @@ function createCategory(req, res) {
         }
     });
 }
-exports.createCategory = createCategory;
-//================== ACTUALIZAR UNA CATEGORIA ==================//
-function updateCategory(req, res) {
+exports.createUnit = createUnit;
+//================== ACTUALIZAR UNA UNIDAD ==================//
+function updateUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const id = req.params.category_id;
-            const updateCategory = req.body;
+            const id = req.params.unit_id;
+            const updateUnit = req.body;
             const conn = yield database_1.connect();
-            yield conn.query('UPDATE category SET ? WHERE category_id = ?', [updateCategory, id]);
+            yield conn.query('UPDATE unit SET ? WHERE unit_id = ?', [updateUnit, id]);
             return res.status(200).json({
                 ok: true,
-                message: 'Category updated',
-                category: id
+                message: 'Unit updated',
+                unit: id
             });
         }
         catch (error) {
@@ -102,17 +102,17 @@ function updateCategory(req, res) {
         }
     });
 }
-exports.updateCategory = updateCategory;
-//================== ELIMINAR UNA CATEGORIA POR SU ID ==================//
-function deleteCategory(req, res) {
+exports.updateUnit = updateUnit;
+//================== ELIMINAR UNA UNIDAD POR SU ID ==================//
+function deleteUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const id = req.params.category_id;
+            const id = req.params.unit_id;
             const conn = yield database_1.connect();
-            yield conn.query('DELETE FROM category WHERE category_id = ?', [id]);
+            yield conn.query('DELETE FROM unit WHERE unit_id = ?', [id]);
             return res.json({
-                message: 'Category deleted',
-                category: id
+                message: 'Unit deleted',
+                unit: id
             });
         }
         catch (error) {
@@ -124,4 +124,4 @@ function deleteCategory(req, res) {
         }
     });
 }
-exports.deleteCategory = deleteCategory;
+exports.deleteUnit = deleteUnit;

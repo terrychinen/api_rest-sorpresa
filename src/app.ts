@@ -1,11 +1,16 @@
 require('./config/config');
+
 import express, { Application } from 'express';
 import morgan from 'morgan';
 
-import IndexRoutes from './routes/index.routes';
-import CategoryRoutes from './routes/category.routes';
-import LoginRoutes from './routes/login.routes';
 import { tokenValidation } from './middlewares/authentication';
+
+
+import IndexRoutes from './routes/index.routes';
+import LoginRoutes from './routes/login.routes';
+import UnitRoutes from './routes/unit.routes';
+import CategoryRoutes from './routes/category.routes';
+
 
 
 export class App {
@@ -31,15 +36,18 @@ export class App {
         this.app.use(express.urlencoded({extended: false}));
     }
 
-    routes() {
-        this.app.use(IndexRoutes);
-        this.app.use('/login', LoginRoutes);
-        this.app.use('/category', tokenValidation, CategoryRoutes);
-    }
-
     public async listen() {
         await this.app.listen(this.app.get('port'));
         console.log('Server on port', this.app.get('port'));
+    }
+
+
+    routes() {
+        this.app.use(IndexRoutes);
+
+        this.app.use('/login', LoginRoutes);
+        this.app.use('/unit', tokenValidation, UnitRoutes);
+        this.app.use('/category', tokenValidation, CategoryRoutes);
     }
 
 }

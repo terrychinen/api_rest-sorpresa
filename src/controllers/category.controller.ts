@@ -82,7 +82,7 @@ export async function updateCategory(req: Request, res: Response) {
         const updateCategory: Category = req.body;
         const conn = await connect();
     
-        await conn.query('UPDATE category SET ? WHERE id = ?', [updateCategory, id]);
+        await conn.query('UPDATE category SET ? WHERE category_id = ?', [updateCategory, id]);
     
         return res.status(200).json({
             ok: true,

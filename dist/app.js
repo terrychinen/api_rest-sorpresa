@@ -16,10 +16,11 @@ exports.App = void 0;
 require('./config/config');
 const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
-const index_routes_1 = __importDefault(require("./routes/index.routes"));
-const category_routes_1 = __importDefault(require("./routes/category.routes"));
-const login_routes_1 = __importDefault(require("./routes/login.routes"));
 const authentication_1 = require("./middlewares/authentication");
+const index_routes_1 = __importDefault(require("./routes/index.routes"));
+const login_routes_1 = __importDefault(require("./routes/login.routes"));
+const unit_routes_1 = __importDefault(require("./routes/unit.routes"));
+const category_routes_1 = __importDefault(require("./routes/category.routes"));
 class App {
     constructor(port) {
         this.app = express_1.default();
@@ -35,16 +36,17 @@ class App {
         this.app.use(morgan_1.default('dev'));
         this.app.use(express_1.default.urlencoded({ extended: false }));
     }
-    routes() {
-        this.app.use(index_routes_1.default);
-        this.app.use('/login', login_routes_1.default);
-        this.app.use('/category', authentication_1.tokenValidation, category_routes_1.default);
-    }
     listen() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.app.listen(this.app.get('port'));
             console.log('Server on port', this.app.get('port'));
         });
+    }
+    routes() {
+        this.app.use(index_routes_1.default);
+        this.app.use('/login', login_routes_1.default);
+        this.app.use('/unit', authentication_1.tokenValidation, unit_routes_1.default);
+        this.app.use('/category', authentication_1.tokenValidation, category_routes_1.default);
     }
 }
 exports.App = App;
