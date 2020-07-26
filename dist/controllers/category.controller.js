@@ -62,11 +62,30 @@ function createCategory(req, res) {
         try {
             const category = req.body;
             const conn = yield database_1.connect();
-            yield conn.query('INSERT INTO category SET ?', category);
-            return res.status(200).json({
-                ok: true,
-                message: 'Category created',
-                category
+            yield conn.query({
+                sql: 'SELECT * FROM categorys WHERE category_name = ? limit 1',
+                values: category.category_name
+            }, function (error, categoryDB) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (error) {
+                        return res.status(500).json({
+                            ok: false,
+                            message: 'Internal Server error'
+                        });
+                    }
+                    if (categoryDB[0]) {
+                        return res.status(400).json({
+                            ok: false,
+                            message: 'Category name already exists',
+                        });
+                    }
+                    yield conn.query('INSERT INTO category SET ?', category);
+                    return res.status(200).json({
+                        ok: true,
+                        message: 'Category created',
+                        category
+                    });
+                });
             });
         }
         catch (error) {
@@ -86,11 +105,30 @@ function updateCategory(req, res) {
             const id = req.params.category_id;
             const updateCategory = req.body;
             const conn = yield database_1.connect();
-            yield conn.query('UPDATE category SET ? WHERE category_id = ?', [updateCategory, id]);
-            return res.status(200).json({
-                ok: true,
-                message: 'Category updated',
-                category: id
+            yield conn.query({
+                sql: 'SELECT * FROM category WHERE category_id = ?',
+                values: id
+            }, function (error, categoryDB) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (error) {
+                        return res.status(500).json({
+                            ok: false,
+                            message: 'Internal Server error'
+                        });
+                    }
+                    if (!categoryDB[0]) {
+                        return res.status(400).json({
+                            ok: false,
+                            message: 'The category does not exist'
+                        });
+                    }
+                    yield conn.query('UPDATE category SET ? WHERE category_id = ?', [updateCategory, id]);
+                    return res.status(200).json({
+                        ok: true,
+                        message: 'Category updated',
+                        category: id
+                    });
+                });
             });
         }
         catch (error) {
@@ -109,10 +147,30 @@ function deleteCategory(req, res) {
         try {
             const id = req.params.category_id;
             const conn = yield database_1.connect();
-            yield conn.query('DELETE FROM category WHERE category_id = ?', [id]);
-            return res.json({
-                message: 'Category deleted',
-                category: id
+            yield conn.query({
+                sql: 'SELECT * FROM category WHERE category_id = ? limit 1',
+                values: id
+            }, function (error, categoryDB) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (error) {
+                        return res.status(500).json({
+                            ok: false,
+                            message: 'Internal Server error'
+                        });
+                    }
+                    if (!categoryDB[0]) {
+                        return res.status(400).json({
+                            ok: false,
+                            message: 'The category does not exist'
+                        });
+                    }
+                    yield conn.query('DELETE FROM category WHERE category_id = ?', [id]);
+                    return res.json({
+                        ok: true,
+                        message: 'Category deleted',
+                        category: id
+                    });
+                });
             });
         }
         catch (error) {
