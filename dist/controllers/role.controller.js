@@ -9,18 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUnit = exports.updateUnit = exports.createUnit = exports.getUnit = exports.getUnits = void 0;
+exports.deleteRole = exports.updateRole = exports.createRole = exports.getRole = exports.getRoles = void 0;
 const database_1 = require("../database");
-//================== OBTENER TODAS LAS UNIDADES ==================//
-function getUnits(req, res) {
+//================== OBTENER TODAS LOS ROLES ==================//
+function getRoles(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const conn = yield database_1.connect();
-            const units = yield conn.query('SELECT * FROM unit');
+            const roles = yield conn.query('SELECT * FROM role');
             return res.status(200).json({
                 ok: true,
                 message: 'Query successful',
-                Units: units[0]
+                Roles: roles[0]
             });
         }
         catch (error) {
@@ -32,18 +32,18 @@ function getUnits(req, res) {
         }
     });
 }
-exports.getUnits = getUnits;
-//================== OBTENER UNA UNIDAD POR SU ID ==================//
-function getUnit(req, res) {
+exports.getRoles = getRoles;
+//================== OBTENER UN ROL POR SU ID ==================//
+function getRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const id = req.params.unit_id;
+            const id = req.params.role_id;
             const conn = yield database_1.connect();
-            const unit = yield conn.query('SELECT * FROM unit WHERE unit_id = ?', [id]);
+            const role = yield conn.query('SELECT * FROM role WHERE role_id = ?', [id]);
             return res.status(200).json({
                 ok: true,
                 message: 'Query successful',
-                unit: unit[0]
+                role: role[0]
             });
         }
         catch (error) {
@@ -55,17 +55,17 @@ function getUnit(req, res) {
         }
     });
 }
-exports.getUnit = getUnit;
-//================== CREAR UNA UNIDAD ==================//
-function createUnit(req, res) {
+exports.getRole = getRole;
+//================== CREAR UN ROL ==================//
+function createRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const unit = req.body;
+            const role = req.body;
             const conn = yield database_1.connect();
             yield conn.query({
-                sql: 'SELECT * FROM unit WHERE unit_name = ? LIMIT 1',
-                values: unit.unit_name
-            }, function (error, unitDB) {
+                sql: 'SELECT * FROM role WHERE role_name = ? LIMIT 1',
+                values: role.role_name
+            }, function (error, roleDB) {
                 return __awaiter(this, void 0, void 0, function* () {
                     if (error) {
                         return res.status(500).json({
@@ -73,17 +73,17 @@ function createUnit(req, res) {
                             message: 'Internal Server error'
                         });
                     }
-                    if (unitDB[0]) {
+                    if (roleDB[0]) {
                         return res.status(400).json({
                             ok: false,
-                            message: 'Unit name already exists',
+                            message: 'Role already exists',
                         });
                     }
-                    yield conn.query('INSERT INTO unit SET ?', unit);
+                    yield conn.query('INSERT INTO role SET ?', role);
                     return res.status(200).json({
                         ok: true,
-                        message: 'Unit created',
-                        unit
+                        message: 'Role created',
+                        role
                     });
                 });
             });
@@ -97,18 +97,18 @@ function createUnit(req, res) {
         }
     });
 }
-exports.createUnit = createUnit;
-//================== ACTUALIZAR UNA UNIDAD ==================//
-function updateUnit(req, res) {
+exports.createRole = createRole;
+//================== ACTUALIZAR UN ROL ==================//
+function updateRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const id = req.params.unit_id;
-            const updateUnit = req.body;
+            const id = req.params.role_id;
+            const updateRole = req.body;
             const conn = yield database_1.connect();
             yield conn.query({
-                sql: 'SELECT * FROM unit WHERE unit_id = ? LIMIT 1',
+                sql: 'SELECT * FROM role WHERE role_id = ? LIMIT 1',
                 values: id
-            }, function (error, unitDB) {
+            }, function (error, roleDB) {
                 return __awaiter(this, void 0, void 0, function* () {
                     if (error) {
                         return res.status(500).json({
@@ -116,13 +116,13 @@ function updateUnit(req, res) {
                             message: 'Internal Server error'
                         });
                     }
-                    if (!unitDB[0]) {
+                    if (!roleDB[0]) {
                         return res.status(400).json({
                             ok: false,
-                            message: 'The unit does not exist'
+                            message: 'The role does not exist'
                         });
                     }
-                    yield conn.query('UPDATE unit SET ? WHERE unit_id = ?', [updateUnit, id]);
+                    yield conn.query('UPDATE role SET ? WHERE role_id = ?', [updateRole, id]);
                     return res.status(200).json({
                         ok: true,
                         message: 'Unit updated',
@@ -140,17 +140,17 @@ function updateUnit(req, res) {
         }
     });
 }
-exports.updateUnit = updateUnit;
-//================== ELIMINAR UNA UNIDAD POR SU ID ==================//
-function deleteUnit(req, res) {
+exports.updateRole = updateRole;
+//================== ELIMINAR UN ROL POR SU ID ==================//
+function deleteRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const id = req.params.unit_id;
+            const id = req.params.role_id;
             const conn = yield database_1.connect();
             conn.query({
-                sql: 'SELECT * FROM unit WHERE unit_id = ? LIMIT 1',
+                sql: 'SELECT * FROM role WHERE role_id = ? LIMIT 1',
                 values: id
-            }, function (error, unitDB) {
+            }, function (error, roleDB) {
                 return __awaiter(this, void 0, void 0, function* () {
                     if (error) {
                         return res.status(500).json({
@@ -158,17 +158,17 @@ function deleteUnit(req, res) {
                             message: 'Internal Server error'
                         });
                     }
-                    if (!unitDB[0]) {
+                    if (!roleDB[0]) {
                         return res.status(400).json({
                             ok: false,
-                            message: 'The unit does not exist'
+                            message: 'The role does not exist'
                         });
                     }
-                    yield conn.query('DELETE FROM unit WHERE unit_id = ?', [id]);
+                    yield conn.query('DELETE FROM role WHERE role_id = ?', [id]);
                     return res.json({
                         ok: true,
-                        message: 'Unit deleted',
-                        unit: id
+                        message: 'Role deleted',
+                        role: id
                     });
                 });
             });
@@ -182,4 +182,4 @@ function deleteUnit(req, res) {
         }
     });
 }
-exports.deleteUnit = deleteUnit;
+exports.deleteRole = deleteRole;

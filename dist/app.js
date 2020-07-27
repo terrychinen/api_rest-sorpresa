@@ -19,6 +19,7 @@ const morgan_1 = __importDefault(require("morgan"));
 const authentication_1 = require("./middlewares/authentication");
 const index_routes_1 = __importDefault(require("./routes/index.routes"));
 const login_routes_1 = __importDefault(require("./routes/login.routes"));
+const role_routes_1 = __importDefault(require("./routes/role.routes"));
 const unit_routes_1 = __importDefault(require("./routes/unit.routes"));
 const category_routes_1 = __importDefault(require("./routes/category.routes"));
 class App {
@@ -45,6 +46,7 @@ class App {
     routes() {
         this.app.use(index_routes_1.default);
         this.app.use('/login', login_routes_1.default);
+        this.app.use('/role', authentication_1.tokenValidation, role_routes_1.default);
         this.app.use('/unit', authentication_1.tokenValidation, unit_routes_1.default);
         this.app.use('/category', authentication_1.tokenValidation, category_routes_1.default);
     }

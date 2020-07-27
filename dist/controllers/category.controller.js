@@ -63,7 +63,7 @@ function createCategory(req, res) {
             const category = req.body;
             const conn = yield database_1.connect();
             yield conn.query({
-                sql: 'SELECT * FROM categorys WHERE category_name = ? limit 1',
+                sql: 'SELECT * FROM category WHERE category_name = ? limit 1',
                 values: category.category_name
             }, function (error, categoryDB) {
                 return __awaiter(this, void 0, void 0, function* () {

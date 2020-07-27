@@ -58,7 +58,7 @@ export async function createCategory(req: Request, res: Response) {
         const conn = await connect();
 
         await conn.query({
-            sql: 'SELECT * FROM categorys WHERE category_name = ? limit 1',
+            sql: 'SELECT * FROM category WHERE category_name = ? limit 1',
             values: category.category_name
         }, async function(error, categoryDB: Category[]) {
 

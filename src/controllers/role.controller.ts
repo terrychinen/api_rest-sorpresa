@@ -1,20 +1,18 @@
 import { connect } from '../database';
 import { Request, Response } from 'express';
-import { Unit } from '../interfaces/unit.interfaces';
+import { Role } from '../interfaces/role.interface';
 
 
-
-
-//================== OBTENER TODAS LAS UNIDADES ==================//
-export async function getUnits(req: Request, res: Response): Promise<Response> {
+//================== OBTENER TODAS LOS ROLES ==================//
+export async function getRoles(req: Request, res: Response): Promise<Response> {
     try{
         const conn = await connect();
-        const units = await conn.query('SELECT * FROM unit');
+        const roles = await conn.query('SELECT * FROM role');
     
         return res.status(200).json({
             ok: true,
             message: 'Query successful',
-            Units: units[0]
+            Roles: roles[0]
         });    
 
     }catch(error) {
@@ -28,17 +26,17 @@ export async function getUnits(req: Request, res: Response): Promise<Response> {
 
 
 
-//================== OBTENER UNA UNIDAD POR SU ID ==================//
-export async function getUnit(req: Request, res: Response): Promise<Response> {
+//================== OBTENER UN ROL POR SU ID ==================//
+export async function getRole(req: Request, res: Response): Promise<Response> {
     try{
-        const id = req.params.unit_id;
+        const id = req.params.role_id;
         const conn = await connect();
-        const unit = await conn.query('SELECT * FROM unit WHERE unit_id = ?', [id]);
+        const role = await conn.query('SELECT * FROM role WHERE role_id = ?', [id]);
     
         return res.status(200).json({
             ok: true,
             message: 'Query successful',
-            unit: unit[0]
+            role: role[0]
         });
 
     }catch(error) {
@@ -51,16 +49,17 @@ export async function getUnit(req: Request, res: Response): Promise<Response> {
 }
 
 
-//================== CREAR UNA UNIDAD ==================//
-export async function createUnit(req: Request, res: Response) {
+
+//================== CREAR UN ROL ==================//
+export async function createRole(req: Request, res: Response) {
     try{
-        const unit: Unit = req.body;
+        const role: Role = req.body;
         const conn = await connect();
 
         await conn.query({
-            sql: 'SELECT * FROM unit WHERE unit_name = ? LIMIT 1',
-            values: unit.unit_name
-        }, async function(error, unitDB: Unit[]) {
+            sql: 'SELECT * FROM role WHERE role_name = ? LIMIT 1',
+            values: role.role_name
+        }, async function(error, roleDB: Role[]) {
             if(error) {
                 return res.status(500).json({
                     ok: false,
@@ -68,21 +67,20 @@ export async function createUnit(req: Request, res: Response) {
                 });
             }
 
-            if(unitDB[0]) {
+            if(roleDB[0]) {
                 return res.status(400).json({
                     ok :false,
-                    message: 'Unit name already exists',
+                    message: 'Role already exists',
                 });
             }
 
-            await conn.query('INSERT INTO unit SET ?', unit);
+            await conn.query('INSERT INTO role SET ?', role);
     
             return res.status(200).json({
                 ok: true,
-                message: 'Unit created',
-                unit
+                message: 'Role created',
+                role
             });
-
         });
     
  
@@ -96,17 +94,17 @@ export async function createUnit(req: Request, res: Response) {
 }
 
 
-//================== ACTUALIZAR UNA UNIDAD ==================//
-export async function updateUnit(req: Request, res: Response) {
+//================== ACTUALIZAR UN ROL ==================//
+export async function updateRole(req: Request, res: Response) {
     try{
-        const id = req.params.unit_id;
-        const updateUnit = req.body;
+        const id = req.params.role_id;
+        const updateRole = req.body;
         const conn = await connect();
 
         await conn.query({
-            sql: 'SELECT * FROM unit WHERE unit_id = ? LIMIT 1',
+            sql: 'SELECT * FROM role WHERE role_id = ? LIMIT 1',
             values: id 
-        }, async function(error, unitDB: Unit[]) {
+        }, async function(error, roleDB: Role[]) {
             if(error) {
                 return res.status(500).json({
                     ok: false,
@@ -114,14 +112,14 @@ export async function updateUnit(req: Request, res: Response) {
                 });
             }
 
-            if(!unitDB[0]) {
+            if(!roleDB[0]) {
                 return res.status(400).json({
                     ok: false,
-                    message: 'The unit does not exist'
+                    message: 'The role does not exist'
                 });
             }
             
-            await conn.query('UPDATE unit SET ? WHERE unit_id = ?', [updateUnit, id]);
+            await conn.query('UPDATE role SET ? WHERE role_id = ?', [updateRole, id]);
     
             return res.status(200).json({
                 ok: true,
@@ -140,16 +138,16 @@ export async function updateUnit(req: Request, res: Response) {
 }
 
 
-//================== ELIMINAR UNA UNIDAD POR SU ID ==================//
-export async function deleteUnit(req: Request, res: Response) {
+//================== ELIMINAR UN ROL POR SU ID ==================//
+export async function deleteRole(req: Request, res: Response) {
     try{
-        const id = req.params.unit_id;
+        const id = req.params.role_id;
         const conn = await connect();
 
         conn.query({
-            sql: 'SELECT * FROM unit WHERE unit_id = ? LIMIT 1',
+            sql: 'SELECT * FROM role WHERE role_id = ? LIMIT 1',
             values: id
-        }, async function(error, unitDB: Unit[]) {
+        }, async function(error, roleDB: Role[]) {
             if(error) {
                 return res.status(500).json({
                     ok: false,
@@ -157,19 +155,19 @@ export async function deleteUnit(req: Request, res: Response) {
                 });
             }
 
-            if(!unitDB[0]) {
+            if(!roleDB[0]) {
                 return res.status(400).json({
                     ok: false,
-                    message: 'The unit does not exist'
+                    message: 'The role does not exist'
                 });
             }
 
-            await conn.query('DELETE FROM unit WHERE unit_id = ?', [id]);
+            await conn.query('DELETE FROM role WHERE role_id = ?', [id]);
     
             return res.json({
                 ok: true,
-                message: 'Unit deleted',
-                unit: id
+                message: 'Role deleted',
+                role: id
             });
 
         });

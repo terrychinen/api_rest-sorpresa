@@ -8,6 +8,8 @@ import { tokenValidation } from './middlewares/authentication';
 
 import IndexRoutes from './routes/index.routes';
 import LoginRoutes from './routes/login.routes';
+
+import RoleRoutes from './routes/role.routes';
 import UnitRoutes from './routes/unit.routes';
 import CategoryRoutes from './routes/category.routes';
 
@@ -46,6 +48,7 @@ export class App {
         this.app.use(IndexRoutes);
 
         this.app.use('/login', LoginRoutes);
+        this.app.use('/role', tokenValidation, RoleRoutes);
         this.app.use('/unit', tokenValidation, UnitRoutes);
         this.app.use('/category', tokenValidation, CategoryRoutes);
     }
