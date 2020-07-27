@@ -1,6 +1,6 @@
 import { connect } from '../database';
 import { Request, Response } from 'express';
-import { Unit } from '../interfaces/unit.interfaces';
+import { Unit } from '../interfaces/unit.interface';
 
 
 
