@@ -4,6 +4,7 @@ import express, { Application } from 'express';
 import morgan from 'morgan';
 
 import { tokenValidation } from './middlewares/authentication';
+import { checkVersionFlutterApp } from './middlewares/check_version_flutter';
 
 
 import IndexRoutes from './routes/index.routes';
