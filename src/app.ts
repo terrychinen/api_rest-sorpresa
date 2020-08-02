@@ -4,7 +4,7 @@ import express, { Application } from 'express';
 import morgan from 'morgan';
 
 import { tokenValidation } from './middlewares/authentication';
-
+import { checkVersionFlutterApp } from './middlewares/check_version_flutter';
 
 import IndexRoutes from './routes/index.routes';
 import LoginRoutes from './routes/login.routes';
@@ -12,7 +12,6 @@ import LoginRoutes from './routes/login.routes';
 import RoleRoutes from './routes/role.routes';
 import UnitRoutes from './routes/unit.routes';
 import CategoryRoutes from './routes/category.routes';
-import { checkVersionFlutterApp } from './middlewares/check_version_flutter';
 
 
 

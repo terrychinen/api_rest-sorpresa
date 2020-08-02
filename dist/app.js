@@ -17,12 +17,12 @@ require('./config/config');
 const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const authentication_1 = require("./middlewares/authentication");
+const check_version_flutter_1 = require("./middlewares/check_version_flutter");
 const index_routes_1 = __importDefault(require("./routes/index.routes"));
 const login_routes_1 = __importDefault(require("./routes/login.routes"));
 const role_routes_1 = __importDefault(require("./routes/role.routes"));
 const unit_routes_1 = __importDefault(require("./routes/unit.routes"));
 const category_routes_1 = __importDefault(require("./routes/category.routes"));
-const check_version_flutter_1 = require("./middlewares/check_version_flutter");
 class App {
     constructor(port) {
         this.app = express_1.default();
