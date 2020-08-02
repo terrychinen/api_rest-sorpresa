@@ -11,7 +11,6 @@ export async function login(req: Request, res: Response) {
     const username = body.username;
     const password = body.password;
 
-
     conn.query({
         sql: 'SELECT * FROM user WHERE username = ? AND password = ? AND state = 1',
         values: [username, password]
