@@ -10,15 +10,6 @@ export async function login(req: Request, res: Response) {
 
     const username = body.username;
     const password = body.password;
-    const flutter_key = body.flutter_key;
-
-    if(flutter_key != process.env.FLUTTER_KEY) {
-        return res.status(400).json({
-            ok: false,
-            message: 'Update the app'
-        });
-    }
-
 
     conn.query({
         sql: 'SELECT * FROM user WHERE username = ? AND password = ? AND state = 1',
