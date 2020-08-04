@@ -24,7 +24,7 @@ export async function login(req: Request, res: Response) {
         }
 
         if(!user[0]){
-            return res.status(400).json({
+            return res.status(404).json({
                 ok: false,
                 message: 'User not found!'
             });
@@ -44,7 +44,8 @@ export async function login(req: Request, res: Response) {
             ok: true,
             message: 'Login successful!',
             user: user[0],
-            token
+            token,
+            expireIn: process.env.TOKEN_EXPIRATION
         });
         
     });
