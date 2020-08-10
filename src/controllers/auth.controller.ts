@@ -34,10 +34,9 @@ export async function signIn(req: Request, res: Response) {
         if(!compare) return res.status(400).json({ok:false, message: 'The username or password is not correct'});
         
         delete userDB.password;
+        delete userDB.street;
 
-        let token = jsonWebToken.sign({
-            user: userDB
-        }, process.env.SECRET, {expiresIn: process.env.TOKEN_EXPIRATION}); 
+        let token = jsonWebToken.sign({user: userDB}, process.env.SECRET, {expiresIn: process.env.TOKEN_EXPIRATION}); 
 
         return saveNewToken(userDB, token).then(data => {
             if(!data.ok) return res.status(400).json({ok: false, message: data.message})
@@ -85,11 +84,15 @@ export async function signUp(req: Request, res: Response) {
             if(error) return res.status(500).json({ok: false, message: 'INSERT new User Error', error})
             
             newUser.user_id = resultUser.insertID;
+
+            delete newUser.password;
+            delete newUser.street;
           
             //GENERATE NEW TOKEN
             let jwt = jsonWebToken.sign({
                 user: newUser
             }, process.env.SECRET, {expiresIn: process.env.TOKEN_EXPIRATION});
+
             
             let token = new TokenModel();
             token.token_key = jwt;

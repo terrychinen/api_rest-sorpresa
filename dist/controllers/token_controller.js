@@ -18,6 +18,7 @@ const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
 const token_model_1 = require("../models/token.model");
 const moment_1 = __importDefault(require("moment"));
+const user_model_1 = require("../models/user.model");
 function saveNewToken(user, token) {
     return __awaiter(this, void 0, void 0, function* () {
         const tableName = 'user';
@@ -43,27 +44,40 @@ function saveNewToken(user, token) {
     });
 }
 exports.saveNewToken = saveNewToken;
-function refreshToken(res, req) {
+function refreshToken(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const body = req.body;
         const token = body.token;
         const userID = body.user_id;
-        const tableName = 'token';
-        const columnName = 'token_key';
+        const tableToken = 'token';
+        const columnToken = 'token_key';
+        const tableUser = 'user';
+        const columnUserId = 'user_id';
         if (!token)
             return res.status(406).json({ ok: false, message: 'The token is required' });
-        return yield query_1.queryGetBy(tableName, columnName, token).then((dataToken) => __awaiter(this, void 0, void 0, function* () {
+        return yield query_1.queryGetBy(tableToken, columnToken, token).then((dataToken) => __awaiter(this, void 0, void 0, function* () {
             if (!dataToken.ok)
                 return res.status(dataToken.status).json({ ok: false, error: dataToken.error });
-            let newToken = yield jsonwebtoken_1.default.sign(dataToken.result[0], process.env.SECRET, {
-                expireIn: process.env.TOKEN_EXPIRATION
-            });
-            return yield updateToken(res, req, userID, newToken, Number(process.env.TOKEN_EXPIRATION));
+            return yield query_1.queryGetBy(tableUser, columnUserId, userID).then((dataUser) => __awaiter(this, void 0, void 0, function* () {
+                const resultJSON = dataUser.result[0][0];
+                const user = new user_model_1.UserModel();
+                user.user_id = resultJSON.user_id;
+                user.role_id = resultJSON.role_id;
+                user.token_id = resultJSON.token_id;
+                user.first_name = resultJSON.first_name;
+                user.last_name = resultJSON.last_name;
+                user.username = resultJSON.username;
+                user.phone = resultJSON.phone;
+                user.email = resultJSON.email;
+                user.state = resultJSON.state;
+                let newToken = jsonwebtoken_1.default.sign({ user: user }, process.env.SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
+                return yield updateToken(req, res, userID, newToken, Number(process.env.TOKEN_EXPIRATION));
+            }));
         }));
     });
 }
 exports.refreshToken = refreshToken;
-function updateToken(res, req, userID, newToken, expiresIn) {
+function updateToken(req, res, userID, newToken, expiresIn) {
     return __awaiter(this, void 0, void 0, function* () {
         const tableUser = 'user';
         const columnUserID = 'user_id';

@@ -44,9 +44,8 @@ function signIn(req, res) {
             if (!compare)
                 return res.status(400).json({ ok: false, message: 'The username or password is not correct' });
             delete userDB.password;
-            let token = jsonwebtoken_1.default.sign({
-                user: userDB
-            }, process.env.SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
+            delete userDB.street;
+            let token = jsonwebtoken_1.default.sign({ user: userDB }, process.env.SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
             return token_controller_1.saveNewToken(userDB, token).then(data => {
                 if (!data.ok)
                     return res.status(400).json({ ok: false, message: data.message });
@@ -90,6 +89,8 @@ function signUp(req, res) {
                     if (error)
                         return res.status(500).json({ ok: false, message: 'INSERT new User Error', error });
                     newUser.user_id = resultUser.insertID;
+                    delete newUser.password;
+                    delete newUser.street;
                     //GENERATE NEW TOKEN
                     let jwt = jsonwebtoken_1.default.sign({
                         user: newUser

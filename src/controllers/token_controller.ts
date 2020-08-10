@@ -5,6 +5,8 @@ import { checkIfDataExist } from '../queries/search.query';
 import { queryUpdate, queryGetBy} from '../queries/query';
 import { TokenModel } from '../models/token.model';
 import moment from 'moment';
+import { IToken } from '../interfaces/token.interface';
+import { UserModel } from '../models/user.model';
 
 
 export async function saveNewToken(user: IUser, token) {
@@ -34,30 +36,43 @@ export async function saveNewToken(user: IUser, token) {
 
 
 
-export async function refreshToken(res: Response, req: Request) {
+export async function refreshToken(req: Request, res: Response) {
     const body = req.body;
     const token = body.token;
     const userID = body.user_id;
 
-    const tableName = 'token';
-    const columnName = 'token_key';
+    const tableToken = 'token';
+    const columnToken = 'token_key';
+
+    const tableUser = 'user';
+    const columnUserId = 'user_id';
     
     if(!token) return res.status(406).json({ok: false, message: 'The token is required'});
 
-    return await queryGetBy(tableName, columnName, token).then(async dataToken => {
+    return await queryGetBy(tableToken, columnToken, token).then(async dataToken => {
         if(!dataToken.ok) return res.status(dataToken.status).json({ok: false, error: dataToken.error});
 
-        let newToken = await jsonWebToken.sign(dataToken.result[0], process.env.SECRET, {
-            expireIn: process.env.TOKEN_EXPIRATION
-        });
-
-        return await updateToken(res, req, userID, newToken, Number(process.env.TOKEN_EXPIRATION));
-
+       return await queryGetBy(tableUser, columnUserId, userID).then( async dataUser => {
+           const resultJSON: IUser = dataUser.result[0][0];
+           const user = new UserModel();
+           user.user_id = resultJSON.user_id;
+           user.role_id = resultJSON.role_id;
+           user.token_id = resultJSON.token_id;
+           user.first_name = resultJSON.first_name;
+           user.last_name = resultJSON.last_name;
+           user.username = resultJSON.username;
+           user.phone = resultJSON.phone;
+           user.email = resultJSON.email;
+           user.state = resultJSON.state;    
+           
+           let newToken = jsonWebToken.sign({user: user}, process.env.SECRET, {expiresIn: process.env.TOKEN_EXPIRATION});     
+           return await updateToken(req, res, userID, newToken, Number(process.env.TOKEN_EXPIRATION));
+       });
     });
 } 
 
 
-async function updateToken(res: Response, req: Request, userID: Number, newToken: string, expiresIn: Number) {
+async function updateToken(req: Request, res: Response, userID: Number, newToken: string, expiresIn: Number) {
     const tableUser = 'user';
     const columnUserID = 'user_id';
 
