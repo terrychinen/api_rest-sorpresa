@@ -7,7 +7,6 @@ exports.tokenValidation = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 exports.tokenValidation = (req, res, next) => {
     let token = req.get('token');
-    //console.log(token);
     jsonwebtoken_1.default.verify(token, process.env.SECRET, (err, decoded) => {
         if (err) {
             return res.status(401).json({

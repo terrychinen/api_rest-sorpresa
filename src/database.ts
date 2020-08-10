@@ -8,8 +8,9 @@ export async function connect() {
         user: 'bcd20465993d1e',
         password: '298145dd',
         database: 'heroku_5d7a179d98846fd',
-        connectionLimit: 10
+        connectionLimit: 100
     });
+
 
     return connection;
 

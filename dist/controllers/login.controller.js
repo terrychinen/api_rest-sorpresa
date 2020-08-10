@@ -38,8 +38,6 @@ function login(req, res) {
                 });
             }
             delete user[0].password;
-            console.log('SECRET:', process.env.SECRET);
-            console.log('EXPIRATION:', process.env.TOKEN_EXPIRATION);
             let token = jsonwebtoken_1.default.sign({
                 user: user[0]
             }, process.env.SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });

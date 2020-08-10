@@ -17,9 +17,10 @@ require('./config/config');
 const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const authentication_1 = require("./middlewares/authentication");
-const check_version_flutter_1 = require("./middlewares/check_version_flutter");
+const check_version_app_1 = require("./middlewares/check_version_app");
 const index_routes_1 = __importDefault(require("./routes/index.routes"));
-const login_routes_1 = __importDefault(require("./routes/login.routes"));
+const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
+const token_routes_1 = __importDefault(require("./routes/token.routes"));
 const role_routes_1 = __importDefault(require("./routes/role.routes"));
 const unit_routes_1 = __importDefault(require("./routes/unit.routes"));
 const category_routes_1 = __importDefault(require("./routes/category.routes"));
@@ -46,10 +47,11 @@ class App {
     }
     routes() {
         this.app.use(index_routes_1.default);
-        this.app.use('/login', check_version_flutter_1.checkVersionFlutterApp, login_routes_1.default);
-        this.app.use('/role', check_version_flutter_1.checkVersionFlutterApp, authentication_1.tokenValidation, role_routes_1.default);
-        this.app.use('/unit', check_version_flutter_1.checkVersionFlutterApp, authentication_1.tokenValidation, unit_routes_1.default);
-        this.app.use('/category', check_version_flutter_1.checkVersionFlutterApp, authentication_1.tokenValidation, category_routes_1.default);
+        this.app.use('/auth', check_version_app_1.checkVersionFlutterApp, auth_routes_1.default);
+        this.app.use('/token', check_version_app_1.checkVersionFlutterApp, token_routes_1.default);
+        this.app.use('/role', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, role_routes_1.default);
+        this.app.use('/unit', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, unit_routes_1.default);
+        this.app.use('/category', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, category_routes_1.default);
     }
 }
 exports.App = App;

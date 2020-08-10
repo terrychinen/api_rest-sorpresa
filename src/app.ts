@@ -4,10 +4,11 @@ import express, { Application } from 'express';
 import morgan from 'morgan';
 
 import { tokenValidation } from './middlewares/authentication';
-import { checkVersionFlutterApp } from './middlewares/check_version_flutter';
+import { checkVersionFlutterApp } from './middlewares/check_version_app';
 
 import IndexRoutes from './routes/index.routes';
-import LoginRoutes from './routes/login.routes';
+import AuthRoutes from './routes/auth.routes';
+import TokenRoutes from './routes/token.routes';
 
 import RoleRoutes from './routes/role.routes';
 import UnitRoutes from './routes/unit.routes';
@@ -47,7 +48,8 @@ export class App {
     routes() {
         this.app.use(IndexRoutes);
 
-        this.app.use('/login', checkVersionFlutterApp, LoginRoutes);
+        this.app.use('/auth', checkVersionFlutterApp, AuthRoutes);
+        this.app.use('/token', checkVersionFlutterApp, TokenRoutes);
         this.app.use('/role', checkVersionFlutterApp, tokenValidation, RoleRoutes);
         this.app.use('/unit', checkVersionFlutterApp, tokenValidation, UnitRoutes);
         this.app.use('/category', checkVersionFlutterApp, tokenValidation, CategoryRoutes);

@@ -10,176 +10,97 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteRole = exports.updateRole = exports.createRole = exports.getRole = exports.getRoles = void 0;
-const database_1 = require("../database");
+const search_query_1 = require("../queries/search.query");
+const query_1 = require("../queries/query");
 //================== OBTENER TODAS LOS ROLES ==================//
 function getRoles(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const conn = yield database_1.connect();
-            const roles = yield conn.query('SELECT * FROM role');
-            return res.status(200).json({
-                ok: true,
-                message: 'Query successful',
-                Roles: roles[0]
-            });
-        }
-        catch (error) {
-            console.log(error);
-            return res.status(500).json({
-                ok: false,
-                message: 'Internal Server error',
-            });
-        }
+        const tableName = 'role';
+        return yield query_1.queryGet(tableName).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, error: data.error });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
     });
 }
 exports.getRoles = getRoles;
 //================== OBTENER UN ROL POR SU ID ==================//
 function getRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const id = req.params.role_id;
-            const conn = yield database_1.connect();
-            const role = yield conn.query('SELECT * FROM role WHERE role_id = ?', [id]);
-            return res.status(200).json({
-                ok: true,
-                message: 'Query successful',
-                role: role[0]
-            });
-        }
-        catch (error) {
-            console.log(error);
-            return res.status(500).json({
-                ok: false,
-                message: 'Internal Server error'
-            });
-        }
+        const search = req.params.role_id;
+        const tableName = 'role';
+        const columnName = 'role_id';
+        return yield query_1.queryGetBy(tableName, columnName, search).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, error: data.error });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
     });
 }
 exports.getRole = getRole;
 //================== CREAR UN ROL ==================//
 function createRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const role = req.body;
-            const conn = yield database_1.connect();
-            yield conn.query({
-                sql: 'SELECT * FROM role WHERE role_name = ? LIMIT 1',
-                values: role.role_name
-            }, function (error, roleDB) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    if (error) {
-                        return res.status(500).json({
-                            ok: false,
-                            message: 'Internal Server error'
-                        });
-                    }
-                    if (roleDB[0]) {
-                        return res.status(400).json({
-                            ok: false,
-                            message: 'Role already exists',
-                        });
-                    }
-                    yield conn.query('INSERT INTO role SET ?', role);
-                    return res.status(200).json({
-                        ok: true,
-                        message: 'Role created',
-                        role
-                    });
-                });
+        const role = req.body;
+        const tableName = 'role';
+        const columnName = 'role_name';
+        //VERIFICA SI EL ROL EXISTE
+        return yield search_query_1.checkIfDataExist(tableName, columnName, role.role_name).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+            if (dataCheck.ok)
+                return res.status(dataCheck.status).json({ ok: true, message: dataCheck.message });
+            //INSERTA EL NUEVO ROL
+            return yield query_1.queryInsert(tableName, role).then(data => {
+                if (!data.ok)
+                    return res.status(data.status).json({ ok: false, message: data.error });
+                return res.status(data.status).json({ ok: true, message: data.message });
             });
-        }
-        catch (error) {
-            console.log(error);
-            return res.status(500).json({
-                ok: false,
-                messsage: 'Internal Server error'
-            });
-        }
+        }));
     });
 }
 exports.createRole = createRole;
 //================== ACTUALIZAR UN ROL ==================//
 function updateRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const id = req.params.role_id;
-            const updateRole = req.body;
-            const conn = yield database_1.connect();
-            yield conn.query({
-                sql: 'SELECT * FROM role WHERE role_id = ? LIMIT 1',
-                values: id
-            }, function (error, roleDB) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    if (error) {
-                        return res.status(500).json({
-                            ok: false,
-                            message: 'Internal Server error'
-                        });
-                    }
-                    if (!roleDB[0]) {
-                        return res.status(400).json({
-                            ok: false,
-                            message: 'The role does not exist'
-                        });
-                    }
-                    yield conn.query('UPDATE role SET ? WHERE role_id = ?', [updateRole, id]);
-                    return res.status(200).json({
-                        ok: true,
-                        message: 'Unit updated',
-                        unit: id
-                    });
+        const role = req.body;
+        const tableName = 'role';
+        const columnName = 'role_id';
+        //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
+        return yield search_query_1.checkIfDataExist(tableName, columnName, role.role_id).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+            if (!dataCheck.ok) {
+                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
+            }
+            //VERIFICA SI YA HAY UN ROL CON EL MISMO NOMBRE PARA NO ACTUALIZAR
+            return yield search_query_1.checkIfDataExist(tableName, columnName, role.role_name).then((dataCheckRepeat) => __awaiter(this, void 0, void 0, function* () {
+                if (dataCheckRepeat.ok) {
+                    return res.status(dataCheckRepeat.status).json({ ok: false, message: dataCheckRepeat.message });
+                }
+                //ACTUALIZA EL REGISTRO
+                return yield query_1.queryUpdate(tableName, columnName, role, role.role_id).then(data => {
+                    if (!data.ok)
+                        return res.status(data.status).json({ ok: false, error: data.error });
+                    return res.status(data.status).json({ ok: true, message: data.message });
                 });
-            });
-        }
-        catch (error) {
-            console.log(error);
-            return res.status(500).json({
-                ok: false,
-                messsage: 'Internal Server error'
-            });
-        }
+            }));
+        }));
     });
 }
 exports.updateRole = updateRole;
 //================== ELIMINAR UN ROL POR SU ID ==================//
 function deleteRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const id = req.params.role_id;
-            const conn = yield database_1.connect();
-            conn.query({
-                sql: 'SELECT * FROM role WHERE role_id = ? LIMIT 1',
-                values: id
-            }, function (error, roleDB) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    if (error) {
-                        return res.status(500).json({
-                            ok: false,
-                            message: 'Internal Server error'
-                        });
-                    }
-                    if (!roleDB[0]) {
-                        return res.status(400).json({
-                            ok: false,
-                            message: 'The role does not exist'
-                        });
-                    }
-                    yield conn.query('DELETE FROM role WHERE role_id = ?', [id]);
-                    return res.json({
-                        ok: true,
-                        message: 'Role deleted',
-                        role: id
-                    });
-                });
+        const tableName = 'role';
+        const columnName = 'role_id';
+        const roleId = req.params.role_id;
+        return yield search_query_1.checkIfDataExist(tableName, columnName, roleId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+            if (!dataCheck.ok) {
+                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
+            }
+            return yield query_1.queryDelete(tableName, columnName, roleId).then(data => {
+                if (!data.ok)
+                    return res.status(data.status).json({ ok: false, error: data.error });
+                return res.status(data.status).json({ ok: true, message: data.message });
             });
-        }
-        catch (error) {
-            console.log(error);
-            return res.status(500).json({
-                ok: false,
-                messsage: 'Internal Server error'
-            });
-        }
+        }));
     });
 }
 exports.deleteRole = deleteRole;

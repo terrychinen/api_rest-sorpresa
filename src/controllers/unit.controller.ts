@@ -1,184 +1,92 @@
-import { connect } from '../database';
 import { Request, Response } from 'express';
-import { Unit } from '../interfaces/unit.interface';
-
+import { IUnit } from '../interfaces/unit.interface';
+import { checkIfDataExist } from '../queries/search.query';
+import { queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../queries/query';
 
 
 
 //================== OBTENER TODAS LAS UNIDADES ==================//
-export async function getUnits(req: Request, res: Response): Promise<Response> {
-    try{
-        const conn = await connect();
-        const units = await conn.query('SELECT * FROM unit');
-    
-        return res.status(200).json({
-            ok: true,
-            message: 'Query successful',
-            Units: units[0]
-        });    
-
-    }catch(error) {
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            message: 'Internal Server error',
-        });
-    }
+export async function getUnits(req: Request, res: Response) {
+    const tableName = 'unit';
+    return await queryGet(tableName).then( data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+        
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+    });
 }
 
 
-
 //================== OBTENER UNA UNIDAD POR SU ID ==================//
-export async function getUnit(req: Request, res: Response): Promise<Response> {
-    try{
-        const id = req.params.unit_id;
-        const conn = await connect();
-        const unit = await conn.query('SELECT * FROM unit WHERE unit_id = ?', [id]);
-    
-        return res.status(200).json({
-            ok: true,
-            message: 'Query successful',
-            unit: unit[0]
-        });
+export async function getUnit(req: Request, res: Response) {
+    const search = req.params.unit_id;
+    const tableName = 'unit';
+    const columnName = 'unit_id';
 
-    }catch(error) {
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            message: 'Internal Server error'
-        });
-    }
+    await await queryGetBy(tableName, columnName, search).then( data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+        
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+    });
 }
 
 
 //================== CREAR UNA UNIDAD ==================//
 export async function createUnit(req: Request, res: Response) {
-    try{
-        const unit: Unit = req.body;
-        const conn = await connect();
+    const unit: IUnit = req.body;
+    const tableName = 'unit';
+    const columnName = 'unit_name';
 
-        await conn.query({
-            sql: 'SELECT * FROM unit WHERE unit_name = ? LIMIT 1',
-            values: unit.unit_name
-        }, async function(error, unitDB: Unit[]) {
-            if(error) {
-                return res.status(500).json({
-                    ok: false,
-                    message: 'Internal Server error'
-                });
-            }
-
-            if(unitDB[0]) {
-                return res.status(400).json({
-                    ok :false,
-                    message: 'Unit name already exists',
-                });
-            }
-
-            await conn.query('INSERT INTO unit SET ?', unit);
-    
-            return res.status(200).json({
-                ok: true,
-                message: 'Unit created',
-                unit
-            });
-
+    //VERIFICA SI LA UNIDAD EXISTE
+    return await checkIfDataExist(tableName, columnName, unit.unit_name).then( async dataCheck => {
+        if(dataCheck.ok) return res.status(dataCheck.status).json({ok: true, message: dataCheck.message});
+        
+        //INSERTA LA NUEVA UNIDAD
+        return await queryInsert(tableName, unit).then( data => {
+            if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+            
+            return res.status(data.status).json({ok: true, message: data.message});
         });
-    
- 
-    }catch(error) {
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            messsage: 'Internal Server error'
-        });
-    }
+    });
 }
 
 
 //================== ACTUALIZAR UNA UNIDAD ==================//
 export async function updateUnit(req: Request, res: Response) {
-    try{
-        const id = req.params.unit_id;
-        const updateUnit = req.body;
-        const conn = await connect();
+    const unit: IUnit = req.body;
+    const tableName = 'unit';
+    const columnName = 'unit_id';
 
-        await conn.query({
-            sql: 'SELECT * FROM unit WHERE unit_id = ? LIMIT 1',
-            values: id 
-        }, async function(error, unitDB: Unit[]) {
-            if(error) {
-                return res.status(500).json({
-                    ok: false,
-                    message: 'Internal Server error'
-                });
-            }
+    //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
+    await checkIfDataExist(tableName, columnName, unit.unit_id).then( async dataCheck => {
+        if(!dataCheck.ok) {return res.status(dataCheck.status).json({ok: false, message: dataCheck.message})}
 
-            if(!unitDB[0]) {
-                return res.status(400).json({
-                    ok: false,
-                    message: 'The unit does not exist'
-                });
-            }
+        //VERIFICA SI YA HAY UNA UNIDAD CON EL MISMO NOMBRE PARA NO ACTUALIZAR
+        return await checkIfDataExist(tableName, columnName, unit.unit_name).then( async dataCheckRepeat => {
+            if(dataCheckRepeat.ok) {return res.status(dataCheckRepeat.status).json({ok: false, message: dataCheckRepeat.message})}
+            //ACTUALIZA EL REGISTRO
+            return await queryUpdate(tableName, columnName, unit, unit.unit_id).then( data => {
+                if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
             
-            await conn.query('UPDATE unit SET ? WHERE unit_id = ?', [updateUnit, id]);
-    
-            return res.status(200).json({
-                ok: true,
-                message: 'Unit updated',
-                unit: id
+                return res.status(data.status).json({ok: true, message: data.message});
             });
         });
-        
-    }catch(error) {
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            messsage: 'Internal Server error'
-        });
-    }
+    });
 }
 
 
 //================== ELIMINAR UNA UNIDAD POR SU ID ==================//
 export async function deleteUnit(req: Request, res: Response) {
-    try{
-        const id = req.params.unit_id;
-        const conn = await connect();
+    const tableName = 'unit';
+    const columnName = 'unit_id';
+    const value = req.params.unit_id;
 
-        conn.query({
-            sql: 'SELECT * FROM unit WHERE unit_id = ? LIMIT 1',
-            values: id
-        }, async function(error, unitDB: Unit[]) {
-            if(error) {
-                return res.status(500).json({
-                    ok: false,
-                    message: 'Internal Server error'
-                });
-            }
+    await checkIfDataExist(tableName, columnName, value).then( async dataCheck => {
+        if(!dataCheck.ok) {return res.status(dataCheck.status).json({ok: false, message: dataCheck.message})}
 
-            if(!unitDB[0]) {
-                return res.status(400).json({
-                    ok: false,
-                    message: 'The unit does not exist'
-                });
-            }
-
-            await conn.query('DELETE FROM unit WHERE unit_id = ?', [id]);
-    
-            return res.json({
-                ok: true,
-                message: 'Unit deleted',
-                unit: id
-            });
-
+        return await queryDelete(tableName, columnName, value).then( data => {
+            if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+            
+            return res.status(data.status).json({ok: true, message: data.message});
         });
-
-    }catch(error) {
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            messsage: 'Internal Server error'
-        });
-    }
+    });
 }

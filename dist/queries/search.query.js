@@ -9,18 +9,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connect = void 0;
-const promise_1 = require("mysql2/promise");
-function connect() {
+exports.checkIfDataExist = void 0;
+const database_1 = require("../database");
+function checkIfDataExist(table, columnName, value) {
     return __awaiter(this, void 0, void 0, function* () {
-        const connection = yield promise_1.createPool({
-            host: 'us-cdbr-east-02.cleardb.com',
-            user: 'bcd20465993d1e',
-            password: '298145dd',
-            database: 'heroku_5d7a179d98846fd',
-            connectionLimit: 100
-        });
-        return connection;
+        try {
+            const conn = yield database_1.connect();
+            const data = yield conn.query('SELECT * FROM ' + table + ' WHERE ' + columnName + ' = ?', [value]);
+            if (Object.keys(data[0]).length === 0)
+                return ({ ok: false, status: 200, message: 'The data does not exist' });
+            return ({ ok: true, status: 200, message: 'The data exist', result: data[0] });
+        }
+        catch (e) {
+            return ({ ok: false, status: 500, message: e });
+        }
     });
 }
-exports.connect = connect;
+exports.checkIfDataExist = checkIfDataExist;

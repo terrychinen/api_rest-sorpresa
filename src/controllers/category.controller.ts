@@ -1,185 +1,94 @@
-import { connect } from '../database';
 import { Request, Response } from 'express';
-import { Category } from '../interfaces/category.interface';
-
-
-
+import { ICategory } from '../interfaces/category.interface';
+import { checkIfDataExist } from '../queries/search.query';
+import { queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../queries/query';
 
 
 //================== OBTENER TODAS LAS CATEGORIAS ==================//
-export async function getCategories(req: Request, res: Response): Promise<Response> {
-    try{
-        const conn = await connect();
-        const categories = await conn.query('SELECT * FROM category');
-    
-        return res.status(200).json({
-            ok: true,
-            message: 'Query successful',
-            Categories: categories[0]
-        });    
-
-    }catch(error){
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            message: 'Internal Server error',
-        });
-    }
+export async function getCategories(req: Request, res: Response){
+    const tableName = 'category';
+    return await queryGet(tableName).then( data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+        
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+    });
 }
 
 
 //================== OBTENER UNA CATEGORIA POR SU ID ==================//
-export async function getCategory(req: Request, res: Response): Promise<Response> {
-    try{
-        const id = req.params.category_id;
-        const conn = await connect();
-        const category = await conn.query('SELECT * FROM category WHERE category_id = ?', [id]);
-    
-        return res.status(200).json({
-            ok: true,
-            message: 'Query successful',
-            category: category[0]
-        });
+export async function getCategory(req: Request, res: Response) {
+    const search = req.params.category_id;
+    const tableName = 'category';
+    const columnName = 'category_id';
 
-    }catch(error){
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            message: 'Internal Server error'
-        });
-    }
+    return await queryGetBy(tableName, columnName, search).then( data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+        
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+    });
 }
 
 
 //================== CREAR UNA CATEGORIA ==================//
 export async function createCategory(req: Request, res: Response) {
-    try{
-        const category: Category = req.body;
-        const conn = await connect();
+    const category: ICategory = req.body;
+    const tableName = 'category';
+    const columnName = 'category_name';
 
-        await conn.query({
-            sql: 'SELECT * FROM category WHERE category_name = ? limit 1',
-            values: category.category_name
-        }, async function(error, categoryDB: Category[]) {
+    //VERIFICA SI LA CATEGORIA EXISTE
+    return await checkIfDataExist(tableName, columnName, category.category_name).then( async dataCheck => {
+        if(dataCheck.ok) return res.status(dataCheck.status).json({ok: true, message: dataCheck.message});
 
-            if(error) {
-                return res.status(500).json({
-                    ok: false,
-                    message: 'Internal Server error'
-                });
-            }
-
-            if(categoryDB[0]) {
-                return res.status(400).json({
-                    ok :false,
-                    message: 'Category name already exists',
-                });
-            }
+         //INSERTA LA NUEVA CATEGORIA
+         return await queryInsert(tableName, category).then( data => {
+            if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
             
-            await conn.query('INSERT INTO category SET ?', category);
-    
-            return res.status(200).json({
-                ok: true,
-                message: 'Category created',
-                category
-            });
-
+            return res.status(data.status).json({ok: true, message: data.message});
         });
 
-    }catch(error) {
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            messsage: 'Internal Server error'
-        });
-    }
+    });
 }
 
 
 //================== ACTUALIZAR UNA CATEGORIA ==================//
 export async function updateCategory(req: Request, res: Response) {
-    try{
-        const id = req.params.category_id;
-        const updateCategory: Category = req.body;
-        const conn = await connect();
+    const category: ICategory = req.body;
+    const categoryId = req.params.category_id;
+    const tableName = 'category';
+    const columnName = 'category_id';
 
-        await conn.query({
-            sql: 'SELECT * FROM category WHERE category_id = ?',
-            values: id 
-        }, async function(error, categoryDB: Category[]) {
-            if(error) {
-                return res.status(500).json({
-                    ok: false,
-                    message: 'Internal Server error'
-                });
-            }
+    //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
+    return await checkIfDataExist(tableName, columnName, categoryId).then( async dataCheck => {
+        if(!dataCheck.ok) {return res.status(dataCheck.status).json({ok: false, message: dataCheck.message})}
 
-            if(!categoryDB[0]) {
-                return res.status(400).json({
-                    ok: false,
-                    message: 'The category does not exist'
-                });
-            }
+        //VERIFICA SI YA HAY UNA CATEGORIA CON EL MISMO NOMBRE PARA NO ACTUALIZAR
+        return await checkIfDataExist(tableName, columnName, category.category_name).then( async dataCheckRepeat => {
+            if(dataCheckRepeat.ok) {return res.status(dataCheckRepeat.status).json({ok: false, message: dataCheckRepeat.message})}
 
-            await conn.query('UPDATE category SET ? WHERE category_id = ?', [updateCategory, id]);
-    
-            return res.status(200).json({
-                ok: true,
-                message: 'Category updated',
-                category: id
+            //ACTUALIZA EL REGISTRO
+            return await queryUpdate(tableName, columnName, category, categoryId).then( data => {
+                if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+                
+                return res.status(data.status).json({ok: true, message: data.message});
             });
-
         });
-
-    }catch(error) {
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            messsage: 'Internal Server error'
-        });
-    }
+    });
 }
 
 
 //================== ELIMINAR UNA CATEGORIA POR SU ID ==================//
 export async function deleteCategory(req: Request, res: Response) {
-    try{
-        const id = req.params.category_id;
-        const conn = await connect();
+    const tableName = 'category';
+    const columnName = 'category_id';
+    const value = req.params.category_id;
 
-        await conn.query({
-            sql: 'SELECT * FROM category WHERE category_id = ? limit 1',
-            values: id
-        }, async function(error, categoryDB: Category[]) {
-            if(error) {
-                return res.status(500).json({
-                    ok: false,
-                    message: 'Internal Server error'
-                });
-            }
+    return await checkIfDataExist(tableName, columnName, value).then( async dataCheck => {
+        if(!dataCheck.ok) {return res.status(dataCheck.status).json({ok: false, message: dataCheck.message})}
 
-            if(!categoryDB[0]) {
-                return res.status(400).json({
-                    ok: false,
-                    message: 'The category does not exist'
-                });
-            }
-
-            await conn.query('DELETE FROM category WHERE category_id = ?', [id]);
-    
-            return res.json({
-                ok: true,
-                message: 'Category deleted',
-                category: id
-            });    
-
+        return await queryDelete(tableName, columnName, value).then( data => {
+            if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+            
+            return res.status(data.status).json({ok: true, message: data.message});
         });
-
-    }catch(error) {
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            messsage: 'Internal Server error'
-        });
-    }
+    });
 }
