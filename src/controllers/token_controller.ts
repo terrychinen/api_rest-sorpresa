@@ -5,7 +5,6 @@ import { checkIfDataExist } from '../queries/search.query';
 import { queryUpdate, queryGetBy} from '../queries/query';
 import { TokenModel } from '../models/token.model';
 import moment from 'moment';
-import { IToken } from '../interfaces/token.interface';
 import { UserModel } from '../models/user.model';
 
 

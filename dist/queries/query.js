@@ -11,11 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.queryDelete = exports.queryUpdate = exports.queryInsert = exports.queryGetBy = exports.queryGet = void 0;
 const database_1 = require("../database");
-function queryGet(table) {
+function queryGet(table, offset) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const conn = yield database_1.connect();
-            const query = yield conn.query('SELECT * FROM ' + table);
+            const query = yield conn.query(`SELECT * FROM ${table} LIMIT 10 OFFSET ${offset}`);
             if (!query)
                 return ({ ok: false, status: 400, error: 'GET error: ' + table, result: [] });
             return ({

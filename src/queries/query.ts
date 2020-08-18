@@ -1,9 +1,9 @@
 import { connect } from '../database';
 
-export async function queryGet(table: String) {
+export async function queryGet(table: String, offset: Number) {
     try{
         const conn = await connect();
-        const query = await conn.query('SELECT * FROM ' +table);
+        const query = await conn.query(`SELECT * FROM ${table} LIMIT 10 OFFSET ${offset}`);
 
         if(!query) return ({ok: false, status: 400, error: 'GET error: ' +table, result: []});
         
@@ -48,7 +48,7 @@ export async function queryInsert(table: String, value: any) {
 }
 
 
-export async function queryUpdate(table: String, columnName: String, value: any, id: any) {
+export async function queryUpdate(table: String, columnName: String, value: any, id: any) {    
     try {
         const conn = await connect();
         const query = await conn.query('UPDATE ' +table+ ' SET ? WHERE ' +columnName +' = ?', [value, id]);

@@ -16,7 +16,8 @@ const query_1 = require("../queries/query");
 function getUnits(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const tableName = 'unit';
-        return yield query_1.queryGet(tableName).then(data => {
+        const offset = Number(req.query.offset);
+        return yield query_1.queryGet(tableName, offset).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, error: data.error });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
