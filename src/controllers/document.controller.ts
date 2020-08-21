@@ -166,4 +166,4 @@ export async function getDataByRuc(req: Request, res: Response) {
             electronicReceipts          :    rucData.electronicReceipts,
        });
 
-    
+}
