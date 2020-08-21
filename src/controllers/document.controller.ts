@@ -32,28 +32,38 @@ export async function getFullNameByDni(req: Request, res: Response) {
 export async function getDniByName(req: Request, res: Response) {
     try{
         const body = req.body;
-        const firstName: String = body.first_name;
-        const lastNameF: String = body.last_name_f;
-        const lastNameM: String = body.last_name_m;
+        const firstName: string = body.first_name;
+        const lastNameF: string = body.last_name_f;
+        const lastNameM: string = body.last_name_m;
 
-
+        console.log('0');
         const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox',]});
+        console.log('1');
         const page = await browser.newPage();
+        console.log('2');
         await page.goto('https://eldni.com/buscar-por-nombres', {waitUntil: 'networkidle2'});
+        console.log('3');
     
         await page.waitFor('input[name=nombres]');
+        console.log('4');
         await page.waitFor('input[name=apellido_p]');
+        console.log('5');
         await page.waitFor('input[name=apellido_m]');
+        console.log('6');
 
-        await page.evaluate(({firstName,lastNameF, lastNameM}) => {
+        await page.evaluate(() => {
             (<HTMLInputElement>document.getElementById('nombres')).value    = firstName;
             (<HTMLInputElement>document.getElementById('apellido_p')).value = lastNameF;
             (<HTMLInputElement>document.getElementById('apellido_m')).value = lastNameM;
-        }, {firstName,lastNameF, lastNameM});
+        });
 
+        console.log('7');
         await page.focus('#nombres');      
+        console.log('8');
         await page.keyboard.press('Enter');
+        console.log('9');
         await page.waitForSelector('.text-danger');
+        console.log('10');
 
         const people = await page.evaluate(() => {
             const numsRowsText = document.querySelector('.text-danger').innerHTML;
@@ -78,10 +88,9 @@ export async function getDniByName(req: Request, res: Response) {
             return arrayPeople;
         });
 
+        console.log('11');
         await browser.close();
-
-        console.log(10%10);
-
+        console.log('12');
         return res.status(200).json({ok:true, result: people});
     }catch(e){
         return res.status(400).json({ok: false, error: e});
