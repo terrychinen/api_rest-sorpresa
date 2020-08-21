@@ -105,7 +105,13 @@ export async function getDataByRuc(req: Request, res: Response) {
 
         const browser = await puppeteer.launch({args: ['--no-sandbox'], devtools: true});        
         const page1 = await browser.newPage();
+        page1.on('error', err=> {
+            console.log('error happen at the page: ', err);
+          })
         await page1.goto(urlNumRandom, {waitUntil: 'networkidle2'});
+        page1.on('error', err=> {
+            console.log('error happen at the page: ', err);
+          })
 
         let numRandom = await page1.evaluate(() => {
             var rowData = <HTMLElement><unknown>document.querySelector('pre');
@@ -114,6 +120,9 @@ export async function getDataByRuc(req: Request, res: Response) {
             return {data};
         });
 
+        page1.on('error', err=> {
+            console.log('error happen at the page: ', err);
+          })
         const urlRuc = url + '/jcrS00Alias?accion=consPorRuc&nroRuc='+ruc+'&numRnd='+numRandom.data;
         const page2 = await browser.newPage();
         await page2.goto(urlRuc, {waitUntil: 'networkidle2'});
