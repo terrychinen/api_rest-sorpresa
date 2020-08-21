@@ -10,6 +10,8 @@ import IndexRoutes from './routes/index.routes';
 import AuthRoutes from './routes/auth.routes';
 import TokenRoutes from './routes/token.routes';
 
+import DocumentRoutes from './routes/document.routes';
+
 import RoleRoutes from './routes/role.routes';
 import UnitRoutes from './routes/unit.routes';
 import CategoryRoutes from './routes/category.routes';
@@ -30,9 +32,7 @@ export class App {
         this.routes();
     }
 
-    settings() {
-        this.app.set('port', this.port || process.env.PORT || 3000);
-    }
+    settings() {this.app.set('port', this.port || process.env.PORT || 3000);}
 
     middlewares() {
         this.app.use(morgan('dev'));
@@ -47,9 +47,9 @@ export class App {
 
     routes() {
         this.app.use(IndexRoutes);
-
         this.app.use('/auth', checkVersionFlutterApp, AuthRoutes);
         this.app.use('/token', checkVersionFlutterApp, TokenRoutes);
+        this.app.use('/document', DocumentRoutes);
         this.app.use('/role', checkVersionFlutterApp, tokenValidation, RoleRoutes);
         this.app.use('/unit', checkVersionFlutterApp, tokenValidation, UnitRoutes);
         this.app.use('/category', checkVersionFlutterApp, tokenValidation, CategoryRoutes);

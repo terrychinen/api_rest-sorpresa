@@ -48,7 +48,7 @@ function createRole(req, res) {
         //VERIFICA SI EL ROL EXISTE
         return yield search_query_1.checkIfDataExist(tableName, columnName, role.role_name).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheck.ok)
-                return res.status(dataCheck.status).json({ ok: true, message: dataCheck.message });
+                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
             //INSERTA EL NUEVO ROL
             return yield query_1.queryInsert(tableName, role).then(data => {
                 if (!data.ok)

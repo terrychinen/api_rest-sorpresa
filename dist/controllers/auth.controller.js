@@ -27,24 +27,17 @@ function signIn(req, res) {
         const body = req.body;
         const tableUser = 'user';
         const columnUsername = 'username';
-        return yield query_1.queryGetBy(tableUser, columnUsername, body.username).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+        return yield search_query_1.checkIfDataExist(tableUser, columnUsername, body.username).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (!dataCheck.ok)
-                return res.status(dataCheck.status).json({ ok: false, error: dataCheck.error });
-            const userDB = dataCheck.result[0][0];
-            if (userDB.state == 0) {
-                return res.status(403).json({
-                    ok: false,
-                    message: 'User deleted',
-                    user: userDB.last_name + ' ' + userDB.first_name,
-                    username: userDB.username,
-                    state: userDB.state
-                });
-            }
+                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
+            const userDB = dataCheck.result[0];
             const compare = yield bcrypt_1.default.compareSync(body.password, userDB.password);
             if (!compare)
                 return res.status(400).json({ ok: false, message: 'The username or password is not correct' });
+            if (userDB.state == 0) {
+                return res.status(403).json({ ok: false, message: 'User deleted', username: userDB.username, state: 0 });
+            }
             delete userDB.password;
-            delete userDB.street;
             let token = jsonwebtoken_1.default.sign({ user: userDB }, process.env.SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
             return token_controller_1.saveNewToken(userDB, token).then(data => {
                 if (!data.ok)
@@ -69,61 +62,64 @@ function signUp(req, res) {
             const tableName = 'user';
             const columnName = 'username';
             const conn = yield database_1.connect();
-            yield search_query_1.checkIfDataExist(tableName, columnName, user.username.toString());
-            let password = yield bcrypt_1.default.hashSync(user.password, 10);
-            let newUser = new user_model_1.UserModel();
-            newUser.role_id = user.role_id;
-            newUser.first_name = user.first_name;
-            newUser.last_name = user.last_name;
-            newUser.username = user.username;
-            newUser.password = password;
-            newUser.phone = user.phone;
-            newUser.email = user.email;
-            newUser.street = user.street;
-            newUser.state = user.state;
-            yield conn.query({
-                sql: 'INSERT INTO user SET ?',
-                values: newUser
-            }, function (error, resultUser) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    if (error)
-                        return res.status(500).json({ ok: false, message: 'INSERT new User Error', error });
-                    newUser.user_id = resultUser.insertID;
-                    delete newUser.password;
-                    delete newUser.street;
-                    //GENERATE NEW TOKEN
-                    let jwt = jsonwebtoken_1.default.sign({
-                        user: newUser
-                    }, process.env.SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
-                    let token = new token_model_1.TokenModel();
-                    token.token_key = jwt;
-                    token.created_at = moment_1.default().format('YYYY-MM-DD h:mm:ss');
-                    token.expires_in = Number(process.env.TOKEN_EXPIRATION);
-                    yield conn.query({
-                        sql: 'INSERT INTO token SET ?',
-                        values: token
-                    }, function (error, resultToken) {
-                        return __awaiter(this, void 0, void 0, function* () {
-                            if (error)
-                                return res.status(500).json({ ok: false, message: 'INSERT Token Error', error });
-                            const user = new user_model_1.UserModel();
-                            const user_id = resultUser.insertId;
-                            user.token_id = resultToken.insertId;
-                            return query_1.queryUpdate(tableName, 'user_id', user, user_id).then(data => {
-                                if (data.ok)
-                                    return res.status(data.status).json({ ok: false, message: data.error });
-                                return res.status(data.status).json({ ok: true, message: data.message });
+            return yield search_query_1.checkIfDataExist(tableName, columnName, user.username).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+                if (dataCheck.ok)
+                    return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
+                let password = yield bcrypt_1.default.hashSync(user.password, 10);
+                let newUser = new user_model_1.UserModel();
+                newUser.role_id = user.role_id;
+                newUser.first_name = user.first_name;
+                newUser.last_name = user.last_name;
+                newUser.username = user.username;
+                newUser.password = password;
+                newUser.phone = user.phone;
+                newUser.email = user.email;
+                newUser.street = user.street;
+                newUser.state = user.state;
+                yield conn.query({
+                    sql: 'INSERT INTO user SET ?',
+                    values: newUser
+                }, function (error, resultUser) {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        if (error)
+                            return res.status(400).json({ ok: false, message: 'INSERT new User Error', error });
+                        newUser.user_id = resultUser.insertID;
+                        delete newUser.password;
+                        delete newUser.street;
+                        //GENERATE NEW TOKEN
+                        let jwt = jsonwebtoken_1.default.sign({
+                            user: newUser
+                        }, process.env.SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
+                        let token = new token_model_1.TokenModel();
+                        token.token_key = jwt;
+                        token.created_at = moment_1.default().format('YYYY-MM-DD h:mm:ss');
+                        token.expires_in = Number(process.env.TOKEN_EXPIRATION);
+                        yield conn.query({
+                            sql: 'INSERT INTO token SET ?',
+                            values: token
+                        }, function (error, resultToken) {
+                            return __awaiter(this, void 0, void 0, function* () {
+                                if (error)
+                                    return res.status(400).json({ ok: false, message: 'INSERT Token Error', error });
+                                const user = new user_model_1.UserModel();
+                                const user_id = resultUser.insertId;
+                                user.token_id = resultToken.insertId;
+                                return query_1.queryUpdate(tableName, 'user_id', user, user_id).then(data => {
+                                    if (!data.ok)
+                                        return res.status(data.status).json({ ok: false, message: data.error });
+                                    return res.status(data.status).json({ ok: true, message: 'User created successfully' });
+                                });
                             });
                         });
                     });
                 });
-            });
+            }));
         }
         catch (error) {
             console.log(error);
             return res.status(500).json({
                 ok: false,
-                messsage: 'Internal Server error (Create user) '
+                message: 'Internal Server error (Create user)'
             });
         }
     });

@@ -48,7 +48,7 @@ function createCategory(req, res) {
         //VERIFICA SI LA CATEGORIA EXISTE
         return yield search_query_1.checkIfDataExist(tableName, columnName, category.category_name).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheck.ok)
-                return res.status(dataCheck.status).json({ ok: true, message: dataCheck.message });
+                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
             //INSERTA LA NUEVA CATEGORIA
             return yield query_1.queryInsert(tableName, category).then(data => {
                 if (!data.ok)

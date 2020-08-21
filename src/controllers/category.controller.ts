@@ -38,7 +38,7 @@ export async function createCategory(req: Request, res: Response) {
 
     //VERIFICA SI LA CATEGORIA EXISTE
     return await checkIfDataExist(tableName, columnName, category.category_name).then( async dataCheck => {
-        if(dataCheck.ok) return res.status(dataCheck.status).json({ok: true, message: dataCheck.message});
+        if(dataCheck.ok) return res.status(dataCheck.status).json({ok: false, message: dataCheck.message});
 
          //INSERTA LA NUEVA CATEGORIA
          return await queryInsert(tableName, category).then( data => {

@@ -48,7 +48,7 @@ function createUnit(req, res) {
         //VERIFICA SI LA UNIDAD EXISTE
         return yield search_query_1.checkIfDataExist(tableName, columnName, unit.unit_name).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheck.ok)
-                return res.status(dataCheck.status).json({ ok: true, message: dataCheck.message });
+                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
             //INSERTA LA NUEVA UNIDAD
             return yield query_1.queryInsert(tableName, unit).then(data => {
                 if (!data.ok)

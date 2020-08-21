@@ -39,7 +39,7 @@ export async function createUnit(req: Request, res: Response) {
 
     //VERIFICA SI LA UNIDAD EXISTE
     return await checkIfDataExist(tableName, columnName, unit.unit_name).then( async dataCheck => {
-        if(dataCheck.ok) return res.status(dataCheck.status).json({ok: true, message: dataCheck.message});
+        if(dataCheck.ok) return res.status(dataCheck.status).json({ok: false, message: dataCheck.message});
         
         //INSERTA LA NUEVA UNIDAD
         return await queryInsert(tableName, unit).then( data => {

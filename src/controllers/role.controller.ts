@@ -38,7 +38,7 @@ export async function createRole(req: Request, res: Response) {
 
     //VERIFICA SI EL ROL EXISTE
     return await checkIfDataExist(tableName, columnName, role.role_name).then( async dataCheck => {
-        if(dataCheck.ok) return res.status(dataCheck.status).json({ok: true, message: dataCheck.message});
+        if(dataCheck.ok) return res.status(dataCheck.status).json({ok: false, message: dataCheck.message});
  
         //INSERTA EL NUEVO ROL
         return await queryInsert(tableName, role).then( data => {
