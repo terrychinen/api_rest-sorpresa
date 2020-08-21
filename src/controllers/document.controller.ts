@@ -98,7 +98,6 @@ export async function getDniByName(req: Request, res: Response) {
 }
 
 export async function getDataByRuc(req: Request, res: Response) {
-    try {
         const ruc = req.params.ruc;
 
         const url = 'http://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc';
@@ -167,7 +166,4 @@ export async function getDataByRuc(req: Request, res: Response) {
             electronicReceipts          :    rucData.electronicReceipts,
        });
 
-    }catch(e) {
-        console.error(e);        
-        return res.status(400).json({error: e})};
-}
+    
