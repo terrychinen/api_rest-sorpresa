@@ -95,8 +95,15 @@ export async function getDataByRuc(req: Request, res: Response) {
         const url = 'http://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc';
         const urlNumRandom = url + '/captcha?accion=random';
 
-        const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox',]});
-        const page1 = await browser.newPage();
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: [
+              '--no-sandbox',
+              '--disable-setuid-sandbox',
+              '--disable-dev-shm-usage',
+              '--single-process'
+            ],
+          });        const page1 = await browser.newPage();
         await page1.goto(urlNumRandom, {waitUntil: 'networkidle2'});
 
         let numRandom = await page1.evaluate(() => {
