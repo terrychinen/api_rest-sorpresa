@@ -5,7 +5,7 @@ export async function getFullNameByDni(req: Request, res: Response) {
     try{
         const dniParams = req.params.dni;
         const url = 'https://eldni.com/buscar-por-dni?dni=' +dniParams;
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox',]});
         const page = await browser.newPage();    
         await page.goto(url, {waitUntil: 'networkidle2'});    
 
@@ -37,7 +37,7 @@ export async function getDniByName(req: Request, res: Response) {
         const lastNameM: String = body.last_name_m;
 
 
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox',]});
         const page = await browser.newPage();
         await page.goto('https://eldni.com/buscar-por-nombres', {waitUntil: 'networkidle2'});
     
@@ -95,7 +95,7 @@ export async function getDataByRuc(req: Request, res: Response) {
         const url = 'http://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc';
         const urlNumRandom = url + '/captcha?accion=random';
 
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox',]});
         const page1 = await browser.newPage();
         await page1.goto(urlNumRandom, {waitUntil: 'networkidle2'});
 
