@@ -194,7 +194,7 @@
         },
         {
           "title": "UpdateApp: 406",
-          "content": "HTTP/1.1 403 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Update the app\",\n}",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Update the app\",\n}",
           "type": "json"
         },
         {
@@ -374,7 +374,7 @@
         },
         {
           "title": "UpdateApp: 406",
-          "content": "HTTP/1.1 403 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Update the app\",\n}",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Update the app\",\n}",
           "type": "json"
         },
         {
@@ -449,9 +449,18 @@
   {
     "type": "post",
     "url": "url/category/",
-    "title": "Post category",
-    "name": "PostCategoryBy",
+    "title": "Create category",
+    "name": "PostCreateCategory",
     "group": "Category",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"flutter_key\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "success": {
       "fields": {
         "Success 200": [
@@ -474,7 +483,53 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"GET BY category_id successful: category\",\n        \"result\": [\n            {\n                \"category_id\": 0,\n                \"category_name\": \"xxxxx\"\n            }\n        ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"INSERT successful: category\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "InsertQueryError",
+            "description": "<p>POST query error</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "Token",
+            "description": "<p>error</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Internal Server Error</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "InsertQueryError: 400",
+          "content": "HTTP/1.1 400 Query error\n{\n        \"ok\": false,\n        \"message\": \"INSERT error\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "TokenError: 401",
+          "content": "HTTP/1.1 401 Token error\n{\n        \"ok\": false,\n        \"message\": \"Token error\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "UpdateApp: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Update the app\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Server's message\",\n}",
           "type": "json"
         }
       ]

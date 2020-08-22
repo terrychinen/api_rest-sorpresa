@@ -7,7 +7,7 @@ export const tokenValidation = (req, res, next) => {
         if(err){
             return res.status(401).json({
                 ok: false,
-                err
+                message: err
             });
         }
     

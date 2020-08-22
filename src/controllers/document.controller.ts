@@ -49,7 +49,7 @@ export async function getDniByName(req: Request, res: Response) {
             (<HTMLInputElement>document.getElementById('nombres')).value    = firstName;
             (<HTMLInputElement>document.getElementById('apellido_p')).value = lastNameF;
             (<HTMLInputElement>document.getElementById('apellido_m')).value = lastNameM;
-        }, {firstName,lastNameF, lastNameM});
+        });
 
         await page.focus('#nombres');      
         await page.keyboard.press('Enter');
