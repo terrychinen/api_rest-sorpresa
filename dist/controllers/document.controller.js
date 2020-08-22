@@ -55,11 +55,11 @@ function getDniByName(req, res) {
             yield page.waitFor('input[name=nombres]');
             yield page.waitFor('input[name=apellido_p]');
             yield page.waitFor('input[name=apellido_m]');
-            yield page.evaluate(({ firstName, lastNameF, lastNameM }) => {
+            yield page.evaluate(() => {
                 document.getElementById('nombres').value = firstName;
                 document.getElementById('apellido_p').value = lastNameF;
                 document.getElementById('apellido_m').value = lastNameM;
-            }, { firstName, lastNameF, lastNameM });
+            });
             yield page.focus('#nombres');
             yield page.keyboard.press('Enter');
             yield page.waitForSelector('.text-danger');

@@ -43,7 +43,7 @@ const router = express_1.Router();
  *     }
  *
  * @apiErrorExample UpdateApp: 406
- *     HTTP/1.1 403 Need to update
+ *     HTTP/1.1 406 Need to update
  *     {
             "ok": false,
             "message": "Update the app",
@@ -61,10 +61,15 @@ const router = express_1.Router();
  *
  */
 /**
-* @api {post} url/category/ Post category
-* @apiName PostCategoryBy
+* @api {post} url/category/ Create category
+* @apiName PostCreateCategory
 * @apiGroup Category
 *
+* @apiHeaderExample {json} Header-Example:
+*    {
+*       "flutter_key": "xxxxx",
+*       "token": "xxxx.xxxx.xxxx"
+*    }
 *
 * @apiSuccess {Boolean}  ok                         Success of the petition.
 * @apiSuccess {String}   message                    Message of the petition.
@@ -73,13 +78,43 @@ const router = express_1.Router();
 *     HTTP/1.1 200 OK
 *     {
            "ok": true,
-           "message": "GET BY category_id successful: category",
-           "result": [
-               {
-                   "category_id": 0,
-                   "category_name": "xxxxx"
-               }
-           ]
+           "message": "INSERT successful: category",
+*     }
+*
+*
+*
+* @apiError InsertQueryError POST query error
+* @apiErrorExample InsertQueryError: 400
+*     HTTP/1.1 400 Query error
+*     {
+           "ok": false,
+           "message": "INSERT error"
+*     }
+*
+* @apiError Token error
+* @apiErrorExample TokenError: 401
+*     HTTP/1.1 401 Token error
+*     {
+           "ok": false,
+           "message": "Token error"
+*     }
+*
+*
+* @apiErrorExample UpdateApp: 406
+*     HTTP/1.1 406 Need to update
+*     {
+           "ok": false,
+           "message": "Update the app",
+*     }
+*
+*
+* @apiError ServeError Internal Server Error
+*
+* @apiErrorExample ServeError: 500
+*     HTTP/1.1 500 Internal Server Error
+*     {
+           "ok": false,
+           "message": "Server's message",
 *     }
 *
 *

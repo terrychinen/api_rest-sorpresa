@@ -19,7 +19,7 @@ function getCategories(req, res) {
         const offset = Number(req.query.offset);
         return yield query_1.queryGet(tableName, offset).then(data => {
             if (!data.ok)
-                return res.status(data.status).json({ ok: false, error: data.error });
+                return res.status(data.status).json({ ok: false, message: data.error });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
         });
     });
@@ -33,7 +33,7 @@ function getCategory(req, res) {
         const columnName = 'category_id';
         return yield query_1.queryGetBy(tableName, columnName, search).then(data => {
             if (!data.ok)
-                return res.status(data.status).json({ ok: false, error: data.error });
+                return res.status(data.status).json({ ok: false, message: data.error });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
         });
     });
@@ -48,11 +48,13 @@ function createCategory(req, res) {
         //VERIFICA SI LA CATEGORIA EXISTE
         return yield search_query_1.checkIfDataExist(tableName, columnName, category.category_name).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheck.ok)
-                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
+                return res.status(403).json({ ok: false, message: dataCheck.message });
+            if (dataCheck.status == 500)
+                return res.status(500).json({ ok: false, message: dataCheck.message });
             //INSERTA LA NUEVA CATEGORIA
             return yield query_1.queryInsert(tableName, category).then(data => {
                 if (!data.ok)
-                    return res.status(data.status).json({ ok: false, error: data.error });
+                    return res.status(data.status).json({ ok: false, message: data.error });
                 return res.status(data.status).json({ ok: true, message: data.message });
             });
         }));
@@ -79,7 +81,7 @@ function updateCategory(req, res) {
                 //ACTUALIZA EL REGISTRO
                 return yield query_1.queryUpdate(tableName, columnName, category, categoryId).then(data => {
                     if (!data.ok)
-                        return res.status(data.status).json({ ok: false, error: data.error });
+                        return res.status(data.status).json({ ok: false, message: data.error });
                     return res.status(data.status).json({ ok: true, message: data.message });
                 });
             }));
@@ -99,7 +101,7 @@ function deleteCategory(req, res) {
             }
             return yield query_1.queryDelete(tableName, columnName, value).then(data => {
                 if (!data.ok)
-                    return res.status(data.status).json({ ok: false, error: data.error });
+                    return res.status(data.status).json({ ok: false, message: data.error });
                 return res.status(data.status).json({ ok: true, message: data.message });
             });
         }));

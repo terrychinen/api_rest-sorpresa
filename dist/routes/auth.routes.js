@@ -77,7 +77,7 @@ const router = express_1.Router();
 * @apiError UpdateApp Need to update the application
 *
 * @apiErrorExample UpdateApp: 406
-*     HTTP/1.1 403 Need to update
+*     HTTP/1.1 406 Need to update
 *     {
             "ok": false,
             "message": "Update the app",

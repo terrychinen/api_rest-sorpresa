@@ -11,7 +11,7 @@ exports.tokenValidation = (req, res, next) => {
         if (err) {
             return res.status(401).json({
                 ok: false,
-                err
+                message: err
             });
         }
         req.user = decoded.user;

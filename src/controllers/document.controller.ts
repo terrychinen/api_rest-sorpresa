@@ -32,9 +32,9 @@ export async function getFullNameByDni(req: Request, res: Response) {
 export async function getDniByName(req: Request, res: Response) {
     try{
         const body = req.body;
-        const firstName: String = body.first_name;
-        const lastNameF: String = body.last_name_f;
-        const lastNameM: String = body.last_name_m;
+        const firstName: string = body.first_name;
+        const lastNameF: string = body.last_name_f;
+        const lastNameM: string = body.last_name_m;
 
 
         const browser = await puppeteer.launch();
@@ -45,7 +45,7 @@ export async function getDniByName(req: Request, res: Response) {
         await page.waitFor('input[name=apellido_p]');
         await page.waitFor('input[name=apellido_m]');
 
-        await page.evaluate(({firstName,lastNameF, lastNameM}) => {
+        await page.evaluate(() => {
             (<HTMLInputElement>document.getElementById('nombres')).value    = firstName;
             (<HTMLInputElement>document.getElementById('apellido_p')).value = lastNameF;
             (<HTMLInputElement>document.getElementById('apellido_m')).value = lastNameM;
