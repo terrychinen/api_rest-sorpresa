@@ -5,7 +5,7 @@ export async function queryGet(table: String, offset: Number) {
         const conn = await connect();
         const query = await conn.query(`SELECT * FROM ${table} LIMIT 10 OFFSET ${offset}`);
 
-        if(!query) return ({ok: false, status: 400, error: 'GET error: ' +table, result: []});
+        if(!query) return ({ok: false, status: 400, message: 'GET error: ' +table, result: []});
         
         return ({
             ok: true, 
@@ -14,7 +14,7 @@ export async function queryGet(table: String, offset: Number) {
             result: query
         });
 
-    }catch(e){return ({ok: false, status: 500, error: e, result: []});}
+    }catch(e){return ({ok: false, status: 500, message: e.toString(), result: []});}
 }
 
 
@@ -23,7 +23,7 @@ export async function queryGetBy(table: String, columnName: String, value: any) 
         const conn = await connect();
         const query = await conn.query('SELECT * FROM '+ table +' WHERE '+ columnName +' = ?', [value]);
     
-        if(!query) return ({ok: false, status: 400, error: 'GET BY '+columnName +' error: ' +table, result: []});
+        if(!query) return ({ok: false, status: 400, message: 'GET BY '+columnName +' error: ' +table, result: []});
 
         return ({
             ok: true, 
@@ -32,7 +32,7 @@ export async function queryGetBy(table: String, columnName: String, value: any) 
             result: query
         });
 
-    }catch(e){return ({ok: false, status: 500, error: e, result: []});}
+    }catch(e){return ({ok: false, status: 500, message: e.toString(), result: []});}
 }
 
 
@@ -41,10 +41,10 @@ export async function queryInsert(table: String, value: any) {
         const conn = await connect();
         const query = await conn.query('INSERT INTO ' +table +' SET ?', value);
         
-        if(!query) return ({ok: false, status: 400, error: 'INSERT error: ' +table});
+        if(!query) return ({ok: false, status: 400, message: 'INSERT error: ' +table});
         return ({ok: true, status: 200, message: 'INSERT successful: ' +table});
 
-    }catch(e) {return ({ok: false, status: 500, error: e});}       
+    }catch(e) {return ({ok: false, status: 500, message: e.toString()});}       
 }
 
 
@@ -53,10 +53,10 @@ export async function queryUpdate(table: String, columnName: String, value: any,
         const conn = await connect();
         const query = await conn.query('UPDATE ' +table+ ' SET ? WHERE ' +columnName +' = ?', [value, id]);
         
-        if(!query) return ({ok: false, status: 400, error: 'UPDATE error' +table});
+        if(!query) return ({ok: false, status: 400, message: 'UPDATE error' +table});
         return ({ok: true, status: 200, message: 'UPDATE successful: ' +table});
 
-    }catch(e) {return ({ok: false, status: 500, error: e});}      
+    }catch(e) {return ({ok: false, status: 500, message: e.toString()});}      
 
 }
 
@@ -66,9 +66,9 @@ export async function queryDelete(table: String, columnName: String, value: any)
         const conn = await connect();
         const query = await conn.query(`DELETE FROM ${table} WHERE ${columnName} = ${value}`);
 
-        if(!query) return ({ok: false, status: 400, error: 'DELETE error' +table});
+        if(!query) return ({ok: false, status: 400, message: 'DELETE error' +table});
         return ({ok: true, status: 200, message: 'DELETE successful: ' +table});
 
 
-    }catch(e) {return ({ok: false, status: 500, error: e});}      
+    }catch(e) {return ({ok: false, status: 500, message: e.toString()});}      
 }

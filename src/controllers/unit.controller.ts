@@ -10,7 +10,7 @@ export async function getUnits(req: Request, res: Response) {
     const tableName = 'unit';
     const offset = Number(req.query.offset);
     return await queryGet(tableName, offset).then( data => {
-        if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
@@ -24,7 +24,7 @@ export async function getUnit(req: Request, res: Response) {
     const columnName = 'unit_id';
 
     await await queryGetBy(tableName, columnName, search).then( data => {
-        if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
@@ -43,7 +43,7 @@ export async function createUnit(req: Request, res: Response) {
         
         //INSERTA LA NUEVA UNIDAD
         return await queryInsert(tableName, unit).then( data => {
-            if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+            if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
             
             return res.status(data.status).json({ok: true, message: data.message});
         });
@@ -66,7 +66,7 @@ export async function updateUnit(req: Request, res: Response) {
             if(dataCheckRepeat.ok) {return res.status(dataCheckRepeat.status).json({ok: false, message: dataCheckRepeat.message})}
             //ACTUALIZA EL REGISTRO
             return await queryUpdate(tableName, columnName, unit, unit.unit_id).then( data => {
-                if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+                if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
             
                 return res.status(data.status).json({ok: true, message: data.message});
             });
@@ -85,7 +85,7 @@ export async function deleteUnit(req: Request, res: Response) {
         if(!dataCheck.ok) {return res.status(dataCheck.status).json({ok: false, message: dataCheck.message})}
 
         return await queryDelete(tableName, columnName, value).then( data => {
-            if(!data.ok) return res.status(data.status).json({ok: false, error: data.error})
+            if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
             
             return res.status(data.status).json({ok: true, message: data.message});
         });

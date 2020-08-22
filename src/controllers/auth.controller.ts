@@ -104,7 +104,7 @@ export async function signUp(req: Request, res: Response) {
                     user.token_id = resultToken.insertId;
                     
                     return queryUpdate(tableName, 'user_id', user, user_id).then( data => {
-                        if(!data.ok) return res.status(data.status).json({ok: false, message: data.error});
+                        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message});
                         return res.status(data.status).json({ok: true, message: 'User created successfully'});
                     });     
                  });

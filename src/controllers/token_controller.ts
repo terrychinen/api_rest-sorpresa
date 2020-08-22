@@ -25,7 +25,7 @@ export async function saveNewToken(user: IUser, token) {
     
         //ACTUALIZA EL NUEVO TOKEN AL DB
         return await queryUpdate('token', 'token_id', jwt, user.token_id).then( data => {
-            if(!data.ok) return ({ok: data.ok,message: data.error})
+            if(!data.ok) return ({ok: data.ok,message: data.message})
     
             return ({ok: data.ok, message: 'Update ok'});
         });
@@ -49,7 +49,7 @@ export async function refreshToken(req: Request, res: Response) {
     if(!token) return res.status(406).json({ok: false, message: 'The token is required'});
 
     return await queryGetBy(tableToken, columnToken, token).then(async dataToken => {
-        if(!dataToken.ok) return res.status(dataToken.status).json({ok: false, error: dataToken.error});
+        if(!dataToken.ok) return res.status(dataToken.status).json({ok: false, message: dataToken.message});
 
        return await queryGetBy(tableUser, columnUserId, userID).then( async dataUser => {
            const resultJSON: IUser = dataUser.result[0][0];
@@ -76,7 +76,7 @@ async function updateToken(req: Request, res: Response, userID: Number, newToken
     const columnUserID = 'user_id';
 
     await queryGetBy(tableUser, columnUserID, userID).then( async dataToken => {
-        if(!dataToken.ok) return res.status(dataToken.status).json({ok: false, error: dataToken.error});
+        if(!dataToken.ok) return res.status(dataToken.status).json({ok: false, message: dataToken.message});
 
         const tableToken = 'token';
         const columnTokenId = 'token_id';
@@ -87,7 +87,7 @@ async function updateToken(req: Request, res: Response, userID: Number, newToken
         token.expires_in = expiresIn;
 
         await queryUpdate(tableToken, columnTokenId, token, userID).then( dataUpdate => {
-            if(!dataUpdate.ok) return res.status(dataUpdate.status).json({ok: false, error: dataUpdate.error});
+            if(!dataUpdate.ok) return res.status(dataUpdate.status).json({ok: false, message: dataUpdate.message});
 
             return res.status(200).json({
                 ok: true,
