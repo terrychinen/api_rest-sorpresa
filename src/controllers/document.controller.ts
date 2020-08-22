@@ -5,7 +5,7 @@ export async function getFullNameByDni(req: Request, res: Response) {
     try{
         const dniParams = req.params.dni;
         const url = 'https://eldni.com/buscar-por-dni?dni=' +dniParams;
-        const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox',]});
+        const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox',], devtools: true});
         const page = await browser.newPage();    
         await page.goto(url, {waitUntil: 'networkidle2'});    
 
@@ -35,7 +35,6 @@ export async function getDniByName(req: Request, res: Response) {
         const firstName: string = body.first_name;
         const lastNameF: string = body.last_name_f;
         const lastNameM: string = body.last_name_m;
-
 
         const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox',]});
         const page = await browser.newPage();
@@ -79,9 +78,6 @@ export async function getDniByName(req: Request, res: Response) {
         });
 
         await browser.close();
-
-        console.log(10%10);
-
         return res.status(200).json({ok:true, result: people});
     }catch(e){
         return res.status(400).json({ok: false, error: e});
@@ -89,22 +85,20 @@ export async function getDniByName(req: Request, res: Response) {
 }
 
 export async function getDataByRuc(req: Request, res: Response) {
-    try {
         const ruc = req.params.ruc;
 
         const url = 'http://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc';
         const urlNumRandom = url + '/captcha?accion=random';
 
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: [
-              '--no-sandbox',
-              '--disable-setuid-sandbox',
-              '--disable-dev-shm-usage',
-              '--single-process'
-            ],
-          });        const page1 = await browser.newPage();
+        const browser = await puppeteer.launch({args: ['--no-sandbox'], devtools: true});        
+        const page1 = await browser.newPage();
+        page1.on('error', err=> {
+            console.log('error happen at the page: ', err);
+          })
         await page1.goto(urlNumRandom, {waitUntil: 'networkidle2'});
+        page1.on('error', err=> {
+            console.log('error happen at the page: ', err);
+          })
 
         let numRandom = await page1.evaluate(() => {
             var rowData = <HTMLElement><unknown>document.querySelector('pre');
@@ -113,6 +107,9 @@ export async function getDataByRuc(req: Request, res: Response) {
             return {data};
         });
 
+        page1.on('error', err=> {
+            console.log('error happen at the page: ', err);
+          })
         const urlRuc = url + '/jcrS00Alias?accion=consPorRuc&nroRuc='+ruc+'&numRnd='+numRandom.data;
         const page2 = await browser.newPage();
         await page2.goto(urlRuc, {waitUntil: 'networkidle2'});
@@ -165,5 +162,4 @@ export async function getDataByRuc(req: Request, res: Response) {
             electronicReceipts          :    rucData.electronicReceipts,
        });
 
-    }catch(e) {return res.status(400).json({error: e})};
 }
