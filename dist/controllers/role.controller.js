@@ -19,7 +19,7 @@ function getRoles(req, res) {
         const offset = Number(req.query.offset);
         return yield query_1.queryGet(tableName, offset).then(data => {
             if (!data.ok)
-                return res.status(data.status).json({ ok: false, error: data.error });
+                return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
         });
     });
@@ -33,7 +33,7 @@ function getRole(req, res) {
         const columnName = 'role_id';
         return yield query_1.queryGetBy(tableName, columnName, search).then(data => {
             if (!data.ok)
-                return res.status(data.status).json({ ok: false, error: data.error });
+                return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
         });
     });
@@ -52,7 +52,7 @@ function createRole(req, res) {
             //INSERTA EL NUEVO ROL
             return yield query_1.queryInsert(tableName, role).then(data => {
                 if (!data.ok)
-                    return res.status(data.status).json({ ok: false, message: data.error });
+                    return res.status(data.status).json({ ok: false, message: data.message });
                 return res.status(data.status).json({ ok: true, message: data.message });
             });
         }));
@@ -78,7 +78,7 @@ function updateRole(req, res) {
                 //ACTUALIZA EL REGISTRO
                 return yield query_1.queryUpdate(tableName, columnName, role, role.role_id).then(data => {
                     if (!data.ok)
-                        return res.status(data.status).json({ ok: false, error: data.error });
+                        return res.status(data.status).json({ ok: false, message: data.message });
                     return res.status(data.status).json({ ok: true, message: data.message });
                 });
             }));
@@ -98,7 +98,7 @@ function deleteRole(req, res) {
             }
             return yield query_1.queryDelete(tableName, columnName, roleId).then(data => {
                 if (!data.ok)
-                    return res.status(data.status).json({ ok: false, error: data.error });
+                    return res.status(data.status).json({ ok: false, message: data.message });
                 return res.status(data.status).json({ ok: true, message: data.message });
             });
         }));

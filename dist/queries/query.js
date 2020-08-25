@@ -17,7 +17,7 @@ function queryGet(table, offset) {
             const conn = yield database_1.connect();
             const query = yield conn.query(`SELECT * FROM ${table} LIMIT 10 OFFSET ${offset}`);
             if (!query)
-                return ({ ok: false, status: 400, error: 'GET error: ' + table, result: [] });
+                return ({ ok: false, status: 400, message: 'GET error: ' + table, result: [] });
             return ({
                 ok: true,
                 status: 200,
@@ -26,7 +26,7 @@ function queryGet(table, offset) {
             });
         }
         catch (e) {
-            return ({ ok: false, status: 500, error: e, result: [] });
+            return ({ ok: false, status: 500, message: e.toString(), result: [] });
         }
     });
 }
@@ -37,7 +37,7 @@ function queryGetBy(table, columnName, value) {
             const conn = yield database_1.connect();
             const query = yield conn.query('SELECT * FROM ' + table + ' WHERE ' + columnName + ' = ?', [value]);
             if (!query)
-                return ({ ok: false, status: 400, error: 'GET BY ' + columnName + ' error: ' + table, result: [] });
+                return ({ ok: false, status: 400, message: 'GET BY ' + columnName + ' error: ' + table, result: [] });
             return ({
                 ok: true,
                 status: 200,
@@ -46,7 +46,7 @@ function queryGetBy(table, columnName, value) {
             });
         }
         catch (e) {
-            return ({ ok: false, status: 500, error: e, result: [] });
+            return ({ ok: false, status: 500, message: e.toString(), result: [] });
         }
     });
 }
@@ -57,11 +57,11 @@ function queryInsert(table, value) {
             const conn = yield database_1.connect();
             const query = yield conn.query('INSERT INTO ' + table + ' SET ?', value);
             if (!query)
-                return ({ ok: false, status: 400, error: 'INSERT error: ' + table });
+                return ({ ok: false, status: 400, message: 'INSERT error: ' + table });
             return ({ ok: true, status: 200, message: 'INSERT successful: ' + table });
         }
         catch (e) {
-            return ({ ok: false, status: 500, error: e });
+            return ({ ok: false, status: 500, message: e.toString() });
         }
     });
 }
@@ -72,11 +72,11 @@ function queryUpdate(table, columnName, value, id) {
             const conn = yield database_1.connect();
             const query = yield conn.query('UPDATE ' + table + ' SET ? WHERE ' + columnName + ' = ?', [value, id]);
             if (!query)
-                return ({ ok: false, status: 400, error: 'UPDATE error' + table });
+                return ({ ok: false, status: 400, message: 'UPDATE error' + table });
             return ({ ok: true, status: 200, message: 'UPDATE successful: ' + table });
         }
         catch (e) {
-            return ({ ok: false, status: 500, error: e });
+            return ({ ok: false, status: 500, message: e.toString() });
         }
     });
 }
@@ -87,11 +87,11 @@ function queryDelete(table, columnName, value) {
             const conn = yield database_1.connect();
             const query = yield conn.query(`DELETE FROM ${table} WHERE ${columnName} = ${value}`);
             if (!query)
-                return ({ ok: false, status: 400, error: 'DELETE error' + table });
+                return ({ ok: false, status: 400, message: 'DELETE error' + table });
             return ({ ok: true, status: 200, message: 'DELETE successful: ' + table });
         }
         catch (e) {
-            return ({ ok: false, status: 500, error: e });
+            return ({ ok: false, status: 500, message: e.toString() });
         }
     });
 }

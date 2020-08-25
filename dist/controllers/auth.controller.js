@@ -29,7 +29,7 @@ function signIn(req, res) {
         const columnUsername = 'username';
         return yield search_query_1.checkIfDataExist(tableUser, columnUsername, body.username).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (!dataCheck.ok)
-                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
+                return res.status(400).json({ ok: false, message: dataCheck.message });
             const userDB = dataCheck.result[0];
             const compare = yield bcrypt_1.default.compareSync(body.password, userDB.password);
             if (!compare)
@@ -106,7 +106,7 @@ function signUp(req, res) {
                                 user.token_id = resultToken.insertId;
                                 return query_1.queryUpdate(tableName, 'user_id', user, user_id).then(data => {
                                     if (!data.ok)
-                                        return res.status(data.status).json({ ok: false, message: data.error });
+                                        return res.status(data.status).json({ ok: false, message: data.message });
                                     return res.status(data.status).json({ ok: true, message: 'User created successfully' });
                                 });
                             });

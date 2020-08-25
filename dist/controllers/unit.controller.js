@@ -19,7 +19,7 @@ function getUnits(req, res) {
         const offset = Number(req.query.offset);
         return yield query_1.queryGet(tableName, offset).then(data => {
             if (!data.ok)
-                return res.status(data.status).json({ ok: false, error: data.error });
+                return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
         });
     });
@@ -33,7 +33,7 @@ function getUnit(req, res) {
         const columnName = 'unit_id';
         yield yield query_1.queryGetBy(tableName, columnName, search).then(data => {
             if (!data.ok)
-                return res.status(data.status).json({ ok: false, error: data.error });
+                return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
         });
     });
@@ -52,7 +52,7 @@ function createUnit(req, res) {
             //INSERTA LA NUEVA UNIDAD
             return yield query_1.queryInsert(tableName, unit).then(data => {
                 if (!data.ok)
-                    return res.status(data.status).json({ ok: false, error: data.error });
+                    return res.status(data.status).json({ ok: false, message: data.message });
                 return res.status(data.status).json({ ok: true, message: data.message });
             });
         }));
@@ -78,7 +78,7 @@ function updateUnit(req, res) {
                 //ACTUALIZA EL REGISTRO
                 return yield query_1.queryUpdate(tableName, columnName, unit, unit.unit_id).then(data => {
                     if (!data.ok)
-                        return res.status(data.status).json({ ok: false, error: data.error });
+                        return res.status(data.status).json({ ok: false, message: data.message });
                     return res.status(data.status).json({ ok: true, message: data.message });
                 });
             }));
@@ -98,7 +98,7 @@ function deleteUnit(req, res) {
             }
             return yield query_1.queryDelete(tableName, columnName, value).then(data => {
                 if (!data.ok)
-                    return res.status(data.status).json({ ok: false, error: data.error });
+                    return res.status(data.status).json({ ok: false, message: data.message });
                 return res.status(data.status).json({ ok: true, message: data.message });
             });
         }));
