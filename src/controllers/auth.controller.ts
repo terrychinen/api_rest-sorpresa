@@ -16,7 +16,7 @@ export async function signIn(req: Request, res: Response) {
     const columnUsername = 'username';
 
     return await checkIfDataExist(tableUser, columnUsername, body.username).then( async dataCheck => {
-        if(!dataCheck.ok) return res.status(dataCheck.status).json({ok: false, message: dataCheck.message});
+        if(!dataCheck.ok) return res.status(400).json({ok: false, message: dataCheck.message});
         
         const userDB:IUser = dataCheck.result[0];
 
