@@ -61,11 +61,11 @@ export async function updateUnit(req: Request, res: Response) {
 
     //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
     await checkIfDataExist(tableName, columnId, unitId).then( async dataCheck => {
-        if(!dataCheck.ok) {return res.status(dataCheck.status).json({ok: false, message: dataCheck.message})}
+        if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
 
         //VERIFICA SI YA HAY UNA UNIDAD CON EL MISMO NOMBRE PARA NO ACTUALIZAR
         return await checkIfDataExist(tableName, columnName, unit.unit_name).then( async dataCheckRepeat => {
-            if(dataCheckRepeat.ok) {return res.status(dataCheckRepeat.status).json({ok: false, message: dataCheckRepeat.message})}
+            if(dataCheckRepeat.ok) {return res.status(400).json({ok: false, message: dataCheckRepeat.message})}
             //ACTUALIZA EL REGISTRO
             return await queryUpdate(tableName, columnId, unit, unitId).then( data => {
                 if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})

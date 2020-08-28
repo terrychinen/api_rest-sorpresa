@@ -70,12 +70,12 @@ function updateUnit(req, res) {
         //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
         yield search_query_1.checkIfDataExist(tableName, columnId, unitId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (!dataCheck.ok) {
-                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
+                return res.status(404).json({ ok: false, message: dataCheck.message });
             }
             //VERIFICA SI YA HAY UNA UNIDAD CON EL MISMO NOMBRE PARA NO ACTUALIZAR
             return yield search_query_1.checkIfDataExist(tableName, columnName, unit.unit_name).then((dataCheckRepeat) => __awaiter(this, void 0, void 0, function* () {
                 if (dataCheckRepeat.ok) {
-                    return res.status(dataCheckRepeat.status).json({ ok: false, message: dataCheckRepeat.message });
+                    return res.status(400).json({ ok: false, message: dataCheckRepeat.message });
                 }
                 //ACTUALIZA EL REGISTRO
                 return yield query_1.queryUpdate(tableName, columnId, unit, unitId).then(data => {

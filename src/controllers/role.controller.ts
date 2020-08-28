@@ -60,11 +60,11 @@ export async function updateRole(req: Request, res: Response) {
 
     //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
     return await checkIfDataExist(tableName, columnId, roleId).then( async dataCheck => {
-        if(!dataCheck.ok) {return res.status(dataCheck.status).json({ok: false, message: dataCheck.message})}
+        if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
 
         //VERIFICA SI YA HAY UN ROL CON EL MISMO NOMBRE PARA NO ACTUALIZAR
         return await checkIfDataExist(tableName, columnName, role.role_name).then( async dataCheckRepeat => {
-            if(dataCheckRepeat.ok) {return res.status(dataCheckRepeat.status).json({ok: false, message: dataCheckRepeat.message})}
+            if(dataCheckRepeat.ok) {return res.status(400).json({ok: false, message: dataCheckRepeat.message})}
 
              //ACTUALIZA EL REGISTRO
             return await queryUpdate(tableName, columnId, role, roleId).then( data => {
