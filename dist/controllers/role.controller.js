@@ -63,10 +63,12 @@ exports.createRole = createRole;
 function updateRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const role = req.body;
+        const roleId = req.params.role_id;
         const tableName = 'role';
-        const columnName = 'role_id';
+        const columnId = 'role_id';
+        const columnName = 'role_name';
         //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-        return yield search_query_1.checkIfDataExist(tableName, columnName, role.role_id).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+        return yield search_query_1.checkIfDataExist(tableName, columnId, roleId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (!dataCheck.ok) {
                 return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
             }
@@ -76,7 +78,7 @@ function updateRole(req, res) {
                     return res.status(dataCheckRepeat.status).json({ ok: false, message: dataCheckRepeat.message });
                 }
                 //ACTUALIZA EL REGISTRO
-                return yield query_1.queryUpdate(tableName, columnName, role, role.role_id).then(data => {
+                return yield query_1.queryUpdate(tableName, columnId, role, roleId).then(data => {
                     if (!data.ok)
                         return res.status(data.status).json({ ok: false, message: data.message });
                     return res.status(data.status).json({ ok: true, message: data.message });

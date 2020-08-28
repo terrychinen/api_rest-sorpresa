@@ -102,7 +102,7 @@ function getDataByRuc(req, res) {
         const ruc = req.params.ruc;
         const url = 'http://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc';
         const urlNumRandom = url + '/captcha?accion=random';
-        const browser = yield puppeteer_1.default.launch({ args: ['--no-sandbox'], devtools: true });
+        const browser = yield puppeteer_1.default.launch();
         const page1 = yield browser.newPage();
         page1.on('error', err => {
             console.log('error happen at the page: ', err);
@@ -115,9 +115,6 @@ function getDataByRuc(req, res) {
             var rowData = document.querySelector('pre');
             var data = rowData.innerText;
             return { data };
-        });
-        page1.on('error', err => {
-            console.log('error happen at the page: ', err);
         });
         const urlRuc = url + '/jcrS00Alias?accion=consPorRuc&nroRuc=' + ruc + '&numRnd=' + numRandom.data;
         const page2 = yield browser.newPage();

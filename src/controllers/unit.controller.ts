@@ -54,18 +54,20 @@ export async function createUnit(req: Request, res: Response) {
 //================== ACTUALIZAR UNA UNIDAD ==================//
 export async function updateUnit(req: Request, res: Response) {
     const unit: IUnit = req.body;
+    const unitId = req.params.unit_id;
     const tableName = 'unit';
-    const columnName = 'unit_id';
+    const columnId = 'unit_id';
+    const columnName = 'unit_name';
 
     //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-    await checkIfDataExist(tableName, columnName, unit.unit_id).then( async dataCheck => {
+    await checkIfDataExist(tableName, columnId, unitId).then( async dataCheck => {
         if(!dataCheck.ok) {return res.status(dataCheck.status).json({ok: false, message: dataCheck.message})}
 
         //VERIFICA SI YA HAY UNA UNIDAD CON EL MISMO NOMBRE PARA NO ACTUALIZAR
         return await checkIfDataExist(tableName, columnName, unit.unit_name).then( async dataCheckRepeat => {
             if(dataCheckRepeat.ok) {return res.status(dataCheckRepeat.status).json({ok: false, message: dataCheckRepeat.message})}
             //ACTUALIZA EL REGISTRO
-            return await queryUpdate(tableName, columnName, unit, unit.unit_id).then( data => {
+            return await queryUpdate(tableName, columnId, unit, unitId).then( data => {
                 if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
             
                 return res.status(data.status).json({ok: true, message: data.message});

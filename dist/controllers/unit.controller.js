@@ -63,10 +63,12 @@ exports.createUnit = createUnit;
 function updateUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const unit = req.body;
+        const unitId = req.params.unit_id;
         const tableName = 'unit';
-        const columnName = 'unit_id';
+        const columnId = 'unit_id';
+        const columnName = 'unit_name';
         //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-        yield search_query_1.checkIfDataExist(tableName, columnName, unit.unit_id).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+        yield search_query_1.checkIfDataExist(tableName, columnId, unitId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (!dataCheck.ok) {
                 return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
             }
@@ -76,7 +78,7 @@ function updateUnit(req, res) {
                     return res.status(dataCheckRepeat.status).json({ ok: false, message: dataCheckRepeat.message });
                 }
                 //ACTUALIZA EL REGISTRO
-                return yield query_1.queryUpdate(tableName, columnName, unit, unit.unit_id).then(data => {
+                return yield query_1.queryUpdate(tableName, columnId, unit, unitId).then(data => {
                     if (!data.ok)
                         return res.status(data.status).json({ ok: false, message: data.message });
                     return res.status(data.status).json({ ok: true, message: data.message });

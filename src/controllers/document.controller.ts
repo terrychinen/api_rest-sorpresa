@@ -90,7 +90,7 @@ export async function getDataByRuc(req: Request, res: Response) {
         const url = 'http://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc';
         const urlNumRandom = url + '/captcha?accion=random';
 
-        const browser = await puppeteer.launch({args: ['--no-sandbox'], devtools: true});        
+        const browser = await puppeteer.launch();        
         const page1 = await browser.newPage();
         page1.on('error', err=> {
             console.log('error happen at the page: ', err);
@@ -107,9 +107,6 @@ export async function getDataByRuc(req: Request, res: Response) {
             return {data};
         });
 
-        page1.on('error', err=> {
-            console.log('error happen at the page: ', err);
-          })
         const urlRuc = url + '/jcrS00Alias?accion=consPorRuc&nroRuc='+ruc+'&numRnd='+numRandom.data;
         const page2 = await browser.newPage();
         await page2.goto(urlRuc, {waitUntil: 'networkidle2'});

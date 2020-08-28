@@ -53,11 +53,13 @@ export async function createRole(req: Request, res: Response) {
 //================== ACTUALIZAR UN ROL ==================//
 export async function updateRole(req: Request, res: Response) {
     const role: IRole = req.body;
+    const roleId = req.params.role_id;
     const tableName = 'role';
-    const columnName = 'role_id';
+    const columnId = 'role_id';
+    const columnName = 'role_name';
 
     //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-    return await checkIfDataExist(tableName, columnName, role.role_id).then( async dataCheck => {
+    return await checkIfDataExist(tableName, columnId, roleId).then( async dataCheck => {
         if(!dataCheck.ok) {return res.status(dataCheck.status).json({ok: false, message: dataCheck.message})}
 
         //VERIFICA SI YA HAY UN ROL CON EL MISMO NOMBRE PARA NO ACTUALIZAR
@@ -65,7 +67,7 @@ export async function updateRole(req: Request, res: Response) {
             if(dataCheckRepeat.ok) {return res.status(dataCheckRepeat.status).json({ok: false, message: dataCheckRepeat.message})}
 
              //ACTUALIZA EL REGISTRO
-            return await queryUpdate(tableName, columnName, role, role.role_id).then( data => {
+            return await queryUpdate(tableName, columnId, role, roleId).then( data => {
                 if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
                 
                 return res.status(data.status).json({ok: true, message: data.message});
