@@ -17,7 +17,8 @@ function getRoles(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const tableName = 'role';
         const offset = Number(req.query.offset);
-        return yield query_1.queryGet(tableName, offset).then(data => {
+        const state = Number(req.query.state);
+        return yield query_1.queryGet(tableName, offset, state).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });

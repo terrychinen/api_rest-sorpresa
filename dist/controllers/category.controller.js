@@ -17,7 +17,8 @@ function getCategories(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const tableName = 'category';
         const offset = Number(req.query.offset);
-        return yield query_1.queryGet(tableName, offset).then(data => {
+        const state = Number(req.query.state);
+        return yield query_1.queryGet(tableName, offset, state).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
@@ -92,14 +93,16 @@ exports.updateCategory = updateCategory;
 //================== ELIMINAR UNA CATEGORIA POR SU ID ==================//
 function deleteCategory(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
+        const categoryId = req.params.category_id;
         const tableName = 'category';
         const columnName = 'category_id';
-        const value = req.params.category_id;
-        return yield search_query_1.checkIfDataExist(tableName, columnName, value).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+        //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
+        return yield search_query_1.checkIfDataExist(tableName, columnName, categoryId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (!dataCheck.ok) {
-                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
+                return res.status(404).json({ ok: false, message: dataCheck.message });
             }
-            return yield query_1.queryDelete(tableName, columnName, value).then(data => {
+            //ELIMINA EL REGISTRO
+            return yield query_1.queryDelete(tableName, columnName, categoryId).then(data => {
                 if (!data.ok)
                     return res.status(data.status).json({ ok: false, message: data.message });
                 return res.status(data.status).json({ ok: true, message: data.message });

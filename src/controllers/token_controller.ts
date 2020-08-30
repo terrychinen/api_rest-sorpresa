@@ -31,8 +31,6 @@ export async function saveNewToken(user: IUser, token) {
         });
     });   
 }
-   
-
 
 
 export async function refreshToken(req: Request, res: Response) {

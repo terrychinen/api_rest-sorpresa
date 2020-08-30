@@ -14,6 +14,7 @@ import DocumentRoutes from './routes/document.routes';
 
 import RoleRoutes from './routes/role.routes';
 import UnitRoutes from './routes/unit.routes';
+import StoreRoutes from './routes/store.routes';
 import CategoryRoutes from './routes/category.routes';
 
 
@@ -53,6 +54,7 @@ export class App {
         this.app.use('/role', checkVersionFlutterApp, tokenValidation, RoleRoutes);
         this.app.use('/unit', checkVersionFlutterApp, tokenValidation, UnitRoutes);
         this.app.use('/category', checkVersionFlutterApp, tokenValidation, CategoryRoutes);
+        this.app.use('/store', checkVersionFlutterApp, tokenValidation, StoreRoutes);
     }
 
 }

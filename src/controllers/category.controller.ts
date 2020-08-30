@@ -8,7 +8,8 @@ import { queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../
 export async function getCategories(req: Request, res: Response){
     const tableName = 'category';
     const offset = Number(req.query.offset);
-    return await queryGet(tableName, offset).then( data => {
+    const state = Number(req.query.state);
+    return await queryGet(tableName, offset, state).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
@@ -80,14 +81,16 @@ export async function updateCategory(req: Request, res: Response) {
 
 //================== ELIMINAR UNA CATEGORIA POR SU ID ==================//
 export async function deleteCategory(req: Request, res: Response) {
+    const categoryId = req.params.category_id;
     const tableName = 'category';
     const columnName = 'category_id';
-    const value = req.params.category_id;
 
-    return await checkIfDataExist(tableName, columnName, value).then( async dataCheck => {
-        if(!dataCheck.ok) {return res.status(dataCheck.status).json({ok: false, message: dataCheck.message})}
+    //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
+    return await checkIfDataExist(tableName, columnName, categoryId).then( async dataCheck => {
+        if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
 
-        return await queryDelete(tableName, columnName, value).then( data => {
+        //ELIMINA EL REGISTRO
+        return await queryDelete(tableName, columnName, categoryId).then( data => {
             if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
             
             return res.status(data.status).json({ok: true, message: data.message});

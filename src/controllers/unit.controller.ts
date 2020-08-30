@@ -9,7 +9,8 @@ import { queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../
 export async function getUnits(req: Request, res: Response) {
     const tableName = 'unit';
     const offset = Number(req.query.offset);
-    return await queryGet(tableName, offset).then( data => {
+    const state = Number(req.query.state);
+    return await queryGet(tableName, offset, state).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
@@ -81,12 +82,14 @@ export async function updateUnit(req: Request, res: Response) {
 export async function deleteUnit(req: Request, res: Response) {
     const tableName = 'unit';
     const columnName = 'unit_id';
-    const value = req.params.unit_id;
+    const unitId = req.params.unit_id;
 
-    await checkIfDataExist(tableName, columnName, value).then( async dataCheck => {
-        if(!dataCheck.ok) {return res.status(dataCheck.status).json({ok: false, message: dataCheck.message})}
+     //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
+    await checkIfDataExist(tableName, columnName, unitId).then( async dataCheck => {
+        if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
 
-        return await queryDelete(tableName, columnName, value).then( data => {
+         //ELIMINA EL REGISTRO
+        return await queryDelete(tableName, columnName, unitId).then( data => {
             if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
             
             return res.status(data.status).json({ok: true, message: data.message});

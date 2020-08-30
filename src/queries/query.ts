@@ -1,9 +1,9 @@
 import { connect } from '../database';
 
-export async function queryGet(table: String, offset: Number) {
+export async function queryGet(table: String, offset: Number, state: Number) {
     try{
         const conn = await connect();
-        const query = await conn.query(`SELECT * FROM ${table} LIMIT 10 OFFSET ${offset}`);
+        const query = await conn.query(`SELECT * FROM ${table} WHERE state = ${state} LIMIT 10 OFFSET ${offset}`);
 
         if(!query) return ({ok: false, status: 400, message: 'GET error: ' +table, result: []});
         
