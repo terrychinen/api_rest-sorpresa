@@ -20,10 +20,10 @@ export async function getRoles(req: Request, res: Response) {
 //================== OBTENER UN ROL POR SU ID ==================//
 export async function getRole(req: Request, res: Response) {
     const search = req.params.role_id;
-
+    const state = req.params.state;
     const tableName = 'role';
     const columnName = 'role_id';
-    return await queryGetBy(tableName, columnName, search).then( data => {
+    return await queryGetBy(tableName, columnName, search, state).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});

@@ -12,6 +12,7 @@ import TokenRoutes from './routes/token.routes';
 
 import DocumentRoutes from './routes/document.routes';
 
+import CommodityRoutes from './routes/commodity.routes'
 import RoleRoutes from './routes/role.routes';
 import UnitRoutes from './routes/unit.routes';
 import StoreRoutes from './routes/store.routes';
@@ -41,7 +42,7 @@ export class App {
     }
 
     public async listen() {
-        await this.app.listen(this.app.get('port'));
+        await this.app.listen(this.app.get('port'), '0.0.0.0');
         console.log('Server on port', this.app.get('port'));
     }
 
@@ -51,9 +52,10 @@ export class App {
         this.app.use('/auth', checkVersionFlutterApp, AuthRoutes);
         this.app.use('/token', checkVersionFlutterApp, TokenRoutes);
         this.app.use('/document', DocumentRoutes);
+        this.app.use('/commodity', checkVersionFlutterApp, tokenValidation, CommodityRoutes)
+        this.app.use('/category', checkVersionFlutterApp, tokenValidation, CategoryRoutes);
         this.app.use('/role', checkVersionFlutterApp, tokenValidation, RoleRoutes);
         this.app.use('/unit', checkVersionFlutterApp, tokenValidation, UnitRoutes);
-        this.app.use('/category', checkVersionFlutterApp, tokenValidation, CategoryRoutes);
         this.app.use('/store', checkVersionFlutterApp, tokenValidation, StoreRoutes);
     }
 

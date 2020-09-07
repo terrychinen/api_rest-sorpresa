@@ -55,10 +55,10 @@ function refreshToken(req, res) {
         const columnUserId = 'user_id';
         if (!token)
             return res.status(406).json({ ok: false, message: 'The token is required' });
-        return yield query_1.queryGetBy(tableToken, columnToken, token).then((dataToken) => __awaiter(this, void 0, void 0, function* () {
+        return yield query_1.queryGetBy(tableToken, columnToken, token, '1').then((dataToken) => __awaiter(this, void 0, void 0, function* () {
             if (!dataToken.ok)
                 return res.status(dataToken.status).json({ ok: false, message: dataToken.message });
-            return yield query_1.queryGetBy(tableUser, columnUserId, userID).then((dataUser) => __awaiter(this, void 0, void 0, function* () {
+            return yield query_1.queryGetBy(tableUser, columnUserId, userID, '1').then((dataUser) => __awaiter(this, void 0, void 0, function* () {
                 const resultJSON = dataUser.result[0][0];
                 const user = new user_model_1.UserModel();
                 user.user_id = resultJSON.user_id;
@@ -81,7 +81,7 @@ function updateToken(req, res, userID, newToken, expiresIn) {
     return __awaiter(this, void 0, void 0, function* () {
         const tableUser = 'user';
         const columnUserID = 'user_id';
-        yield query_1.queryGetBy(tableUser, columnUserID, userID).then((dataToken) => __awaiter(this, void 0, void 0, function* () {
+        yield query_1.queryGetBy(tableUser, columnUserID, userID, '1').then((dataToken) => __awaiter(this, void 0, void 0, function* () {
             if (!dataToken.ok)
                 return res.status(dataToken.status).json({ ok: false, message: dataToken.message });
             const tableToken = 'token';

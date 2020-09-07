@@ -30,9 +30,10 @@ exports.getUnits = getUnits;
 function getUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const search = req.params.unit_id;
+        const state = req.params.state;
         const tableName = 'unit';
         const columnName = 'unit_id';
-        yield yield query_1.queryGetBy(tableName, columnName, search).then(data => {
+        yield yield query_1.queryGetBy(tableName, columnName, search, state).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });

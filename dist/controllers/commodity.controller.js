@@ -9,13 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategory = exports.getCategories = void 0;
+exports.deleteCommodity = exports.updateCommodity = exports.createCommodity = exports.getComoditiesByCategoryId = exports.getCommodities = void 0;
+const database_1 = require("../database");
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
-//================== OBTENER TODAS LAS CATEGORIAS ==================//
-function getCategories(req, res) {
+//================== OBTENER TODOS LAS MERCANCÍAS ==================//
+function getCommodities(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const tableName = 'category';
+        const tableName = 'commodity';
         const offset = Number(req.query.offset);
         const state = Number(req.query.state);
         return yield query_1.queryGet(tableName, offset, state).then(data => {
@@ -25,28 +26,38 @@ function getCategories(req, res) {
         });
     });
 }
-exports.getCategories = getCategories;
-//================== OBTENER UNA CATEGORIA POR SU ID ==================//
-function getCategory(req, res) {
+exports.getCommodities = getCommodities;
+//================== OBTENER TODOS LAS MERCANCÍAS POR EL ID DE LA CATEGORÍA ==================//
+function getComoditiesByCategoryId(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const search = req.params.category_id;
-        const state = req.params.state;
-        const tableName = 'category';
+        const categoryId = req.params.category_id;
+        const state = req.query.state;
+        const offset = Number(req.query.offset);
+        const tableName = 'commodity';
         const columnName = 'category_id';
-        return yield query_1.queryGetBy(tableName, columnName, search, state).then(data => {
-            if (!data.ok)
-                return res.status(data.status).json({ ok: false, message: data.message });
-            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
-        });
+        try {
+            const conn = yield database_1.connect();
+            const query = yield conn.query(`SELECT * FROM ${tableName} WHERE category_id = ${categoryId} AND state = ${state}`);
+            if (!query)
+                return res.status(400).json({ ok: false, message: 'GET BY ' + columnName + ' error: Commodity', result: [] });
+            return res.status(200).json({
+                ok: true,
+                message: 'GET BY ' + columnName + ' successful: Commodity',
+                result: query[0]
+            });
+        }
+        catch (e) {
+            return res.status(500).json({ ok: false, message: e.toString(), result: [] });
+        }
     });
 }
-exports.getCategory = getCategory;
-//================== CREAR UNA CATEGORIA ==================//
-function createCategory(req, res) {
+exports.getComoditiesByCategoryId = getComoditiesByCategoryId;
+//================== CREAR UNA MERCANCÍA ==================//
+function createCommodity(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const category = req.body;
-        const tableName = 'category';
-        const columnName = 'category_name';
+        const tableName = 'commodity';
+        const columnName = 'commodity_name';
         //VERIFICA SI LA CATEGORIA EXISTE
         return yield search_query_1.checkIfDataExist(tableName, columnName, category.category_name).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheck.ok)
@@ -62,9 +73,9 @@ function createCategory(req, res) {
         }));
     });
 }
-exports.createCategory = createCategory;
-//================== ACTUALIZAR UNA CATEGORIA ==================//
-function updateCategory(req, res) {
+exports.createCommodity = createCommodity;
+//================== ACTUALIZAR UNA MERCANCÍA ==================//
+function updateCommodity(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const category = req.body;
         const categoryId = req.params.category_id;
@@ -90,9 +101,9 @@ function updateCategory(req, res) {
         }));
     });
 }
-exports.updateCategory = updateCategory;
-//================== ELIMINAR UNA CATEGORIA POR SU ID ==================//
-function deleteCategory(req, res) {
+exports.updateCommodity = updateCommodity;
+//================== ELIMINAR UNA MERCANCÍA POR SU ID ==================//
+function deleteCommodity(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const categoryId = req.params.category_id;
         const tableName = 'category';
@@ -111,4 +122,4 @@ function deleteCategory(req, res) {
         }));
     });
 }
-exports.deleteCategory = deleteCategory;
+exports.deleteCommodity = deleteCommodity;

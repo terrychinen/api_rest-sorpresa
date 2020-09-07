@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
+import { connect } from '../database';
 import { ICategory } from '../interfaces/category.interface';
 import { checkIfDataExist } from '../queries/search.query';
 import { queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../queries/query';
 
 
-//================== OBTENER TODAS LAS CATEGORIAS ==================//
-export async function getCategories(req: Request, res: Response){
-    const tableName = 'category';
+//================== OBTENER TODOS LAS MERCANCÍAS ==================//
+export async function getCommodities(req: Request, res: Response){
+    const tableName = 'commodity';
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
     return await queryGet(tableName, offset, state).then( data => {
@@ -17,26 +18,36 @@ export async function getCategories(req: Request, res: Response){
 }
 
 
-//================== OBTENER UNA CATEGORIA POR SU ID ==================//
-export async function getCategory(req: Request, res: Response) {
-    const search = req.params.category_id;
-    const state = req.params.state;
-    const tableName = 'category';
+//================== OBTENER TODOS LAS MERCANCÍAS POR EL ID DE LA CATEGORÍA ==================//
+export async function getComoditiesByCategoryId(req: Request, res: Response) {
+    const categoryId = req.params.category_id;
+    const state = req.query.state;
+    const offset = Number(req.query.offset);
+
+    const tableName = 'commodity';
     const columnName = 'category_id';
 
-    return await queryGetBy(tableName, columnName, search, state).then( data => {
-        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
-        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
-    });
+    try{
+        const conn = await connect();
+        const query = await conn.query(`SELECT * FROM ${tableName} WHERE category_id = ${categoryId} AND state = ${state}`);
+    
+        if(!query)  return res.status(400).json({ok: false, message: 'GET BY '+columnName +' error: Commodity', result: []})
+
+        return res.status(200).json({
+            ok: true, 
+            message: 'GET BY '+columnName +' successful: Commodity',
+            result: query[0]
+        });
+
+    }catch(e){return res.status(500).json({ok: false, message: e.toString(), result: []});}
 }
 
 
-//================== CREAR UNA CATEGORIA ==================//
-export async function createCategory(req: Request, res: Response) {
+//================== CREAR UNA MERCANCÍA ==================//
+export async function createCommodity(req: Request, res: Response) {
     const category: ICategory = req.body;
-    const tableName = 'category';
-    const columnName = 'category_name';
+    const tableName = 'commodity';
+    const columnName = 'commodity_name';
 
     //VERIFICA SI LA CATEGORIA EXISTE
     return await checkIfDataExist(tableName, columnName, category.category_name).then( async dataCheck => {
@@ -54,8 +65,8 @@ export async function createCategory(req: Request, res: Response) {
 }
 
 
-//================== ACTUALIZAR UNA CATEGORIA ==================//
-export async function updateCategory(req: Request, res: Response) {
+//================== ACTUALIZAR UNA MERCANCÍA ==================//
+export async function updateCommodity(req: Request, res: Response) {
     const category: ICategory = req.body;
     const categoryId = req.params.category_id;
     const tableName = 'category';
@@ -80,8 +91,8 @@ export async function updateCategory(req: Request, res: Response) {
 }
 
 
-//================== ELIMINAR UNA CATEGORIA POR SU ID ==================//
-export async function deleteCategory(req: Request, res: Response) {
+//================== ELIMINAR UNA MERCANCÍA POR SU ID ==================//
+export async function deleteCommodity(req: Request, res: Response) {
     const categoryId = req.params.category_id;
     const tableName = 'category';
     const columnName = 'category_id';

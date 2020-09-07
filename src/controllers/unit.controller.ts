@@ -21,10 +21,11 @@ export async function getUnits(req: Request, res: Response) {
 //================== OBTENER UNA UNIDAD POR SU ID ==================//
 export async function getUnit(req: Request, res: Response) {
     const search = req.params.unit_id;
+    const state = req.params.state;
     const tableName = 'unit';
     const columnName = 'unit_id';
 
-    await await queryGetBy(tableName, columnName, search).then( data => {
+    await await queryGetBy(tableName, columnName, search, state).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});

@@ -1,0 +1,52 @@
+* [33md815742[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31mheroku/master[m[33m)[m Agregando los archivos de store
+* [33mfef29d8[m Cambiando el status
+* [33me16c210[m Corrigiendo los campos
+* [33maacb11b[m Cambiando el status del sign in en el js
+* [33m5ac2f4a[m Cambiando el status del sign in
+* [33mddc5c63[m Cambiando la variable 'error' por 'message'
+*   [33m26436f1[m Eliminando los console.log en document.controller
+[32m|[m[33m\[m  
+[32m|[m * [33m22b4196[m Solucionando el error con la libreria de puppeteer en heroku 6
+[32m|[m * [33m42417c9[m Solucionando el error con la libreria de puppeteer en heroku 6
+[32m|[m * [33m5a04f26[m Solucionando el error con la libreria de puppeteer en heroku 6
+[32m|[m * [33m23aacf3[m Solucionando el error con la libreria de puppeteer en heroku 5
+[32m|[m * [33mb33dc77[m Solucionando el error con la libreria de puppeteer en heroku 4
+[32m|[m * [33m615b6bf[m Solucionando el error con la libreria de puppeteer en heroku 3
+* [33m|[m [33m0938fe1[m Merge branch 'master' of https://github.com/terrychinen/api_rest-sorpresa
+[34m|[m[33m\[m[33m|[m 
+[34m|[m * [33mcb0fb15[m  Solucionando el error con la libreria de puppeteer en heroku 2
+[34m|[m * [33m13af23c[m Solucionando el error con la libreria de puppeteer en heroku
+* [35m|[m [33m37d97aa[m corrigiendo document.controller puppeteer
+* [35m|[m [33m50c090e[m Agregando documentacion a la categoria y documento
+[35m|[m[35m/[m  
+* [33m34186f2[m Agregando consulta dni, ruc y agregnado documentacion del rest api en autenticacion(listo) y categoria(no terminado)
+* [33mbac3abb[m Agregando el offset al query get
+* [33mc22f574[m corrigiendo errores del refresh token
+* [33m07d6297[m Mejorando y reduciendo el codigo
+* [33m0ac6a36[m Agregamos el retorno de la expiracion del token en el login
+* [33m8646c99[m Agregamos el retorno de la expiracion del token en el login
+*   [33m02ed803[m Agregando y correcion de la validacion del versionado de la aplicacion movil (flutter)
+[36m|[m[1;31m\[m  
+[36m|[m *   [33me4283c6[m Merge branch 'master' of https://github.com/terrychinen/api_rest-sorpresa
+[36m|[m [1;32m|[m[1;33m\[m  
+[36m|[m [1;32m|[m * [33m718d4ba[m Agremos la verificacion de versionado para la aplicacion movil(Flutter)
+[36m|[m [1;32m|[m * [33me19727b[m Agregando la verificacion para la aplicacion movil
+* [1;32m|[m [1;33m|[m [33ma0218fd[m Agregando y correcion de la validacion del versionado de la aplicacion movil (flutter)
+[1;32m|[m[1;32m/[m [1;33m/[m  
+* [1;33m/[m [33me690d8d[m Agregando la verificacion del versionado del aplicacion movil(Flutter)
+[1;33m|[m[1;33m/[m  
+* [33md3bf683[m Cambiando la database de heroku
+* [33m73f8835[m Removiendo el comando tsc del package.json
+* [33m7c145eb[m modificando la nomenclatura de la clase unidad
+* [33maa6b00a[m Agregando los routes, controllers, interfaces, etc para el rol
+* [33mc285ff1[m Agregando las routas faltantes de la unidad
+* [33m379adc9[m Mejorando los queries de categoria y unidad
+* [33m0ef4ac2[m Agregando los routes controllers, interfaces, etc para la unidad
+*   [33m15ea55b[m Merge https://github.com/terrychinen/api_rest-sorpresa
+[1;34m|[m[1;35m\[m  
+[1;34m|[m * [33mdb11f48[m Eliminando la carpeta node_modules
+* [1;35m|[m [33md618d07[m Agregando la autenticacion con token y se agrego el middleware para el checkeo del token en categorias
+[1;35m|[m[1;35m/[m  
+* [33mdda78be[m Agregando los routes, controllers, interfaces para categoria
+* [33m4f3c4e4[m Agregando la conexion con la base de datos
+* [33mbd7fc1b[m Creando el proyecto y configurando el server(el port)

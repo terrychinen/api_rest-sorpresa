@@ -18,10 +18,10 @@ export async function queryGet(table: String, offset: Number, state: Number) {
 }
 
 
-export async function queryGetBy(table: String, columnName: String, value: any) {
+export async function queryGetBy(table: String, columnName: String, value: any, state: String) {
     try{
         const conn = await connect();
-        const query = await conn.query('SELECT * FROM '+ table +' WHERE '+ columnName +' = ?', [value]);
+        const query = await conn.query(`SELECT * FROM ${table} WHERE ${columnName} = ${value} AND state = ${state}`);
     
         if(!query) return ({ok: false, status: 400, message: 'GET BY '+columnName +' error: ' +table, result: []});
 

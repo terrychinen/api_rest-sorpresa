@@ -30,9 +30,10 @@ exports.getStores = getStores;
 function getStore(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const search = req.params.store_id;
+        const state = req.params.state;
         const tableName = 'store';
         const columnName = 'store_id';
-        return yield query_1.queryGetBy(tableName, columnName, search).then(data => {
+        return yield query_1.queryGetBy(tableName, columnName, search, state).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });

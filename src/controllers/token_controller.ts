@@ -46,10 +46,10 @@ export async function refreshToken(req: Request, res: Response) {
     
     if(!token) return res.status(406).json({ok: false, message: 'The token is required'});
 
-    return await queryGetBy(tableToken, columnToken, token).then(async dataToken => {
+    return await queryGetBy(tableToken, columnToken, token, '1').then(async dataToken => {
         if(!dataToken.ok) return res.status(dataToken.status).json({ok: false, message: dataToken.message});
 
-       return await queryGetBy(tableUser, columnUserId, userID).then( async dataUser => {
+       return await queryGetBy(tableUser, columnUserId, userID, '1').then( async dataUser => {
            const resultJSON: IUser = dataUser.result[0][0];
            const user = new UserModel();
            user.user_id = resultJSON.user_id;
@@ -73,7 +73,7 @@ async function updateToken(req: Request, res: Response, userID: Number, newToken
     const tableUser = 'user';
     const columnUserID = 'user_id';
 
-    await queryGetBy(tableUser, columnUserID, userID).then( async dataToken => {
+    await queryGetBy(tableUser, columnUserID, userID, '1').then( async dataToken => {
         if(!dataToken.ok) return res.status(dataToken.status).json({ok: false, message: dataToken.message});
 
         const tableToken = 'token';

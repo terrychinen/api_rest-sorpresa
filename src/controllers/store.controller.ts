@@ -20,10 +20,11 @@ export async function getStores(req: Request, res: Response){
 //================== OBTENER UN ALMACÉN POR SU ID ==================//
 export async function getStore(req: Request, res: Response) {
     const search = req.params.store_id;
+    const state = req.params.state;
     const tableName = 'store';
     const columnName = 'store_id';
 
-    return await queryGetBy(tableName, columnName, search).then( data => {
+    return await queryGetBy(tableName, columnName, search, state).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});

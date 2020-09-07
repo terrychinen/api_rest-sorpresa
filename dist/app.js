@@ -22,6 +22,7 @@ const index_routes_1 = __importDefault(require("./routes/index.routes"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const token_routes_1 = __importDefault(require("./routes/token.routes"));
 const document_routes_1 = __importDefault(require("./routes/document.routes"));
+const commodity_routes_1 = __importDefault(require("./routes/commodity.routes"));
 const role_routes_1 = __importDefault(require("./routes/role.routes"));
 const unit_routes_1 = __importDefault(require("./routes/unit.routes"));
 const store_routes_1 = __importDefault(require("./routes/store.routes"));
@@ -41,7 +42,7 @@ class App {
     }
     listen() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.app.listen(this.app.get('port'));
+            yield this.app.listen(this.app.get('port'), '0.0.0.0');
             console.log('Server on port', this.app.get('port'));
         });
     }
@@ -50,9 +51,10 @@ class App {
         this.app.use('/auth', check_version_app_1.checkVersionFlutterApp, auth_routes_1.default);
         this.app.use('/token', check_version_app_1.checkVersionFlutterApp, token_routes_1.default);
         this.app.use('/document', document_routes_1.default);
+        this.app.use('/commodity', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, commodity_routes_1.default);
+        this.app.use('/category', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, category_routes_1.default);
         this.app.use('/role', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, role_routes_1.default);
         this.app.use('/unit', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, unit_routes_1.default);
-        this.app.use('/category', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, category_routes_1.default);
         this.app.use('/store', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, store_routes_1.default);
     }
 }
