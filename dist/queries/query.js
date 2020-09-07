@@ -35,7 +35,7 @@ function queryGetBy(table, columnName, value, state) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const conn = yield database_1.connect();
-            const query = yield conn.query(`SELECT * FROM ${table} WHERE ${columnName} = ${value} AND state = ${state}`);
+            const query = yield conn.query(`SELECT * FROM ${table} WHERE ${columnName} = "${value}" AND state = ${state}`);
             if (!query)
                 return ({ ok: false, status: 400, message: 'GET BY ' + columnName + ' error: ' + table, result: [] });
             return ({

@@ -47,7 +47,7 @@ export async function refreshToken(req: Request, res: Response) {
     if(!token) return res.status(406).json({ok: false, message: 'The token is required'});
 
     return await queryGetBy(tableToken, columnToken, token, '1').then(async dataToken => {
-        if(!dataToken.ok) return res.status(dataToken.status).json({ok: false, message: dataToken.message});
+        if(!dataToken.ok) return res.status(dataToken.status).json({ok: false, message: dataToken.message, result: dataToken.result});
 
        return await queryGetBy(tableUser, columnUserId, userID, '1').then( async dataUser => {
            const resultJSON: IUser = dataUser.result[0][0];
