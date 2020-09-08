@@ -20,17 +20,22 @@ export async function getCommodities(req: Request, res: Response){
 
 
 //================== OBTENER TODOS LAS MERCANCÍAS POR EL ID DE LA CATEGORÍA ==================//
-export async function getComoditiesByCategoryId(req: Request, res: Response) {
+export async function getCommoditiesByCategoryId(req: Request, res: Response) {
     const categoryId = req.params.category_id;
     const state = req.query.state;
     const offset = Number(req.query.offset);
 
-    const tableName = 'commodity';
     const columnName = 'category_id';
 
     try{
         const conn = await connect();
-        const query = await conn.query(`SELECT * FROM ${tableName} WHERE category_id = ${categoryId} AND state = ${state}`);
+        const queryString = 'SELECT commodity_id, commodity_name, created_at, state,' + 
+                '(SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, ' +
+                '(SELECT unit_name FROM unit un WHERE un.unit_id = comm.unit_id)unit_name, ' + 
+                '(SELECT username FROM user us WHERE us.user_id = comm.user_id)username ' + 
+                'FROM commodity comm WHERE category_id = ' +categoryId +' AND state = ' +state+ ' LIMIT 10 OFFSET ' +offset;
+
+        const query = await conn.query(queryString);
     
         if(!query)  return res.status(400).json({ok: false, message: 'GET BY '+columnName +' error: Commodity', result: []})
 

@@ -33,11 +33,15 @@ function getComoditiesByCategoryId(req, res) {
         const categoryId = req.params.category_id;
         const state = req.query.state;
         const offset = Number(req.query.offset);
-        const tableName = 'commodity';
         const columnName = 'category_id';
         try {
             const conn = yield database_1.connect();
-            const query = yield conn.query(`SELECT * FROM ${tableName} WHERE category_id = ${categoryId} AND state = ${state}`);
+            const queryString = 'SELECT commodity_id, commodity_name, created_at, state,' +
+                '(SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, ' +
+                '(SELECT unit_name FROM unit un WHERE un.unit_id = comm.unit_id)unit_name, ' +
+                '(SELECT username FROM user us WHERE us.user_id = comm.user_id)username ' +
+                'FROM commodity comm WHERE category_id = ' + categoryId + ' AND state = ' + state + ' LIMIT 10 OFFSET ' + offset;
+            const query = yield conn.query(queryString);
             if (!query)
                 return res.status(400).json({ ok: false, message: 'GET BY ' + columnName + ' error: Commodity', result: [] });
             return res.status(200).json({
@@ -77,22 +81,22 @@ exports.createCommodity = createCommodity;
 //================== ACTUALIZAR UNA MERCANCÍA ==================//
 function updateCommodity(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const category = req.body;
-        const categoryId = req.params.category_id;
-        const tableName = 'category';
-        const columnName = 'category_id';
+        const commodity = req.body;
+        const commodityId = req.params.commodity_id;
+        const tableName = 'commodity';
+        const columnName = 'commodity_id';
         //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-        return yield search_query_1.checkIfDataExist(tableName, columnName, categoryId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+        return yield search_query_1.checkIfDataExist(tableName, columnName, commodityId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (!dataCheck.ok) {
                 return res.status(404).json({ ok: false, message: dataCheck.message });
             }
             //VERIFICA SI YA HAY UNA CATEGORIA CON EL MISMO NOMBRE PARA NO ACTUALIZAR
-            return yield search_query_1.checkIfDataExist(tableName, columnName, category.category_name).then((dataCheckRepeat) => __awaiter(this, void 0, void 0, function* () {
+            return yield search_query_1.checkIfDataExist(tableName, columnName, commodity.commodity_name).then((dataCheckRepeat) => __awaiter(this, void 0, void 0, function* () {
                 if (dataCheckRepeat.ok) {
                     return res.status(400).json({ ok: false, message: dataCheckRepeat.message });
                 }
                 //ACTUALIZA EL REGISTRO
-                return yield query_1.queryUpdate(tableName, columnName, category, categoryId).then(data => {
+                return yield query_1.queryUpdate(tableName, columnName, commodity, commodityId).then(data => {
                     if (!data.ok)
                         return res.status(data.status).json({ ok: false, message: data.message });
                     return res.status(data.status).json({ ok: true, message: data.message });
@@ -105,16 +109,16 @@ exports.updateCommodity = updateCommodity;
 //================== ELIMINAR UNA MERCANCÍA POR SU ID ==================//
 function deleteCommodity(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const categoryId = req.params.category_id;
-        const tableName = 'category';
-        const columnName = 'category_id';
+        const commodityId = req.params.commodity_id;
+        const tableName = 'commoity';
+        const columnName = 'commodity_id';
         //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-        return yield search_query_1.checkIfDataExist(tableName, columnName, categoryId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+        return yield search_query_1.checkIfDataExist(tableName, columnName, commodityId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (!dataCheck.ok) {
                 return res.status(404).json({ ok: false, message: dataCheck.message });
             }
             //ELIMINA EL REGISTRO
-            return yield query_1.queryDelete(tableName, columnName, categoryId).then(data => {
+            return yield query_1.queryDelete(tableName, columnName, commodityId).then(data => {
                 if (!data.ok)
                     return res.status(data.status).json({ ok: false, message: data.message });
                 return res.status(data.status).json({ ok: true, message: data.message });
