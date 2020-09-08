@@ -3,6 +3,7 @@ import { connect } from '../database';
 import { ICategory } from '../interfaces/category.interface';
 import { checkIfDataExist } from '../queries/search.query';
 import { queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../queries/query';
+import { ICommodity } from '../interfaces/commodity.interface';
 
 
 //================== OBTENER TODOS LAS MERCANCÍAS ==================//
@@ -67,21 +68,21 @@ export async function createCommodity(req: Request, res: Response) {
 
 //================== ACTUALIZAR UNA MERCANCÍA ==================//
 export async function updateCommodity(req: Request, res: Response) {
-    const category: ICategory = req.body;
-    const categoryId = req.params.category_id;
-    const tableName = 'category';
-    const columnName = 'category_id';
+    const commodity: ICommodity = req.body;
+    const commodityId = req.params.commodity_id;
+    const tableName = 'commodity';
+    const columnName = 'commodity_id';
 
     //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-    return await checkIfDataExist(tableName, columnName, categoryId).then( async dataCheck => {
+    return await checkIfDataExist(tableName, columnName, commodityId).then( async dataCheck => {
         if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
 
         //VERIFICA SI YA HAY UNA CATEGORIA CON EL MISMO NOMBRE PARA NO ACTUALIZAR
-        return await checkIfDataExist(tableName, columnName, category.category_name).then( async dataCheckRepeat => {
+        return await checkIfDataExist(tableName, columnName, commodity.commodity_name).then( async dataCheckRepeat => {
             if(dataCheckRepeat.ok) {return res.status(400).json({ok: false, message: dataCheckRepeat.message})}
 
             //ACTUALIZA EL REGISTRO
-            return await queryUpdate(tableName, columnName, category, categoryId).then( data => {
+            return await queryUpdate(tableName, columnName, commodity, commodityId).then( data => {
                 if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
                 
                 return res.status(data.status).json({ok: true, message: data.message});
@@ -93,16 +94,16 @@ export async function updateCommodity(req: Request, res: Response) {
 
 //================== ELIMINAR UNA MERCANCÍA POR SU ID ==================//
 export async function deleteCommodity(req: Request, res: Response) {
-    const categoryId = req.params.category_id;
-    const tableName = 'category';
-    const columnName = 'category_id';
+    const commodityId = req.params.commodity_id;
+    const tableName = 'commoity';
+    const columnName = 'commodity_id';
 
     //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-    return await checkIfDataExist(tableName, columnName, categoryId).then( async dataCheck => {
+    return await checkIfDataExist(tableName, columnName, commodityId).then( async dataCheck => {
         if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
 
         //ELIMINA EL REGISTRO
-        return await queryDelete(tableName, columnName, categoryId).then( data => {
+        return await queryDelete(tableName, columnName, commodityId).then( data => {
             if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
             
             return res.status(data.status).json({ok: true, message: data.message});
