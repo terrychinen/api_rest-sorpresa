@@ -84,8 +84,15 @@ function signUp(req, res) {
                         if (error)
                             return res.status(400).json({ ok: false, message: 'INSERT new User Error', error });
                         newUser.user_id = resultUser.insertID;
+                        delete newUser.first_name;
+                        delete newUser.last_name;
+                        delete newUser.role_id;
+                        delete newUser.phone;
                         delete newUser.password;
                         delete newUser.street;
+                        delete newUser.state;
+                        delete newUser.token_id;
+                        delete newUser.email;
                         //GENERATE NEW TOKEN
                         let jwt = jsonwebtoken_1.default.sign({
                             user: newUser

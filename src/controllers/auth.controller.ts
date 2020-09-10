@@ -79,8 +79,15 @@ export async function signUp(req: Request, res: Response) {
                 
                 newUser.user_id = resultUser.insertID;
     
+                delete newUser.first_name;
+                delete newUser.last_name;
+                delete newUser.role_id;
+                delete newUser.phone;
                 delete newUser.password;
                 delete newUser.street;
+                delete newUser.state;
+                delete newUser.token_id;
+                delete newUser.email;
               
                 //GENERATE NEW TOKEN
                 let jwt = jsonWebToken.sign({

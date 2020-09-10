@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCommodity = exports.updateCommodity = exports.createCommodity = exports.getComoditiesByCategoryId = exports.getCommodities = void 0;
+exports.deleteCommodity = exports.updateCommodity = exports.createCommodity = exports.getCommoditiesByCategoryId = exports.getCommodities = void 0;
 const database_1 = require("../database");
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
@@ -28,7 +28,7 @@ function getCommodities(req, res) {
 }
 exports.getCommodities = getCommodities;
 //================== OBTENER TODOS LAS MERCANCÍAS POR EL ID DE LA CATEGORÍA ==================//
-function getComoditiesByCategoryId(req, res) {
+function getCommoditiesByCategoryId(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const categoryId = req.params.category_id;
         const state = req.query.state;
@@ -55,7 +55,7 @@ function getComoditiesByCategoryId(req, res) {
         }
     });
 }
-exports.getComoditiesByCategoryId = getComoditiesByCategoryId;
+exports.getCommoditiesByCategoryId = getCommoditiesByCategoryId;
 //================== CREAR UNA MERCANCÍA ==================//
 function createCommodity(req, res) {
     return __awaiter(this, void 0, void 0, function* () {

@@ -6,7 +6,7 @@ const router = express_1.Router();
 router.route('/')
     .post(commodity_controller_1.createCommodity);
 router.route('/:category_id')
-    .get(commodity_controller_1.getComoditiesByCategoryId);
+    .get(commodity_controller_1.getCommoditiesByCategoryId);
 //     .put(updateUnit)
 //     .delete(deleteUnit);
 exports.default = router;
