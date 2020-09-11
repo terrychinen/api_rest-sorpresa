@@ -5,7 +5,7 @@ export async function connect() {
     const connection: Pool = await createPool({
         host: '127.0.0.1',
         port: 3306,
-        user: 'terrych',
+        user: 'root',
         password: 'Di.ta.lux&29',
         database: 'sorpresa_db',
         connectionLimit: 300 
