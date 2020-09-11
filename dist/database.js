@@ -14,7 +14,7 @@ const promise_1 = require("mysql2/promise");
 function connect() {
     return __awaiter(this, void 0, void 0, function* () {
         const connection = yield promise_1.createPool({
-            host: '127.0.0.1',
+            host: '0.0.0.0',
             port: 3306,
             user: 'terrych',
             password: 'Di.ta.lux&29',
