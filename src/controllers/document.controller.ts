@@ -90,7 +90,7 @@ export async function getDataByRuc(req: Request, res: Response) {
         const url = 'http://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc';
         const urlNumRandom = url + '/captcha?accion=random';
 
-        const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});        
+        const browser = await puppeteer.launch({args: ['--disable-setuid-sandbox']});        
         const page1 = await browser.newPage();
         page1.on('error', err=> {
             console.log('error happen at the page: ', err);
