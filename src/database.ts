@@ -8,7 +8,9 @@ export async function connect() {
         user: 'terrych',
         password: 'Di.ta.lux&29',
         database: 'sorpresa_db',
-        connectionLimit: 10 
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
     });
 
     
