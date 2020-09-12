@@ -19,7 +19,7 @@ function getFullNameByDni(req, res) {
         try {
             const dniParams = req.params.dni;
             const url = 'https://eldni.com/buscar-por-dni?dni=' + dniParams;
-            const browser = yield puppeteer_1.default.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox',], devtools: true });
+            const browser = yield puppeteer_1.default.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox',] });
             const page = yield browser.newPage();
             yield page.goto(url, { waitUntil: 'networkidle2' });
             let data = yield page.evaluate(() => {

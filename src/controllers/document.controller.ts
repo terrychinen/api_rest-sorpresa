@@ -5,7 +5,7 @@ export async function getFullNameByDni(req: Request, res: Response) {
     try{
         const dniParams = req.params.dni;
         const url = 'https://eldni.com/buscar-por-dni?dni=' +dniParams;
-        const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox',], devtools: true});
+        const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox',]});
         const page = await browser.newPage();    
         await page.goto(url, {waitUntil: 'networkidle2'});    
 
