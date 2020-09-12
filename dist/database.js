@@ -19,7 +19,7 @@ function connect() {
             user: 'terrych',
             password: 'Di.ta.lux&29',
             database: 'sorpresa_db',
-            connectionLimit: 100
+            connectionLimit: 10
         });
         return connection;
     });
