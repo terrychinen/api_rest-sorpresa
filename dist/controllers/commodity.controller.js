@@ -8,12 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCommodity = exports.updateCommodity = exports.createCommodity = exports.getCommoditiesByCategoryId = exports.getCommodities = void 0;
-const moment_1 = __importDefault(require("moment"));
 const database_1 = require("../database");
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
@@ -76,8 +72,6 @@ function createCommodity(req, res) {
                 return res.status(500).json({ ok: false, message: dataCheck.message });
             //INSERTA LA NUEVA MERCANCÍA
             const conn = yield database_1.connect();
-            commodity.created_at = moment_1.default().format('YYYY-MM-DD h:mm:ss');
-            console.log('DATA:  ' + storesIdList.length);
             return yield conn.query({
                 sql: 'INSERT INTO commodity SET ?',
                 values: commodity

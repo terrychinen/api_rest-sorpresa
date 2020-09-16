@@ -69,11 +69,7 @@ export async function createCommodity(req: Request, res: Response) {
          //INSERTA LA NUEVA MERCANCÍA
         const conn = await connect();
 
-        commodity.created_at =  moment().format('YYYY-MM-DD h:mm:ss');
-
-        console.log('DATA:  ' +storesIdList.length);
-
-       return await conn.query({
+        return await conn.query({
            sql: 'INSERT INTO commodity SET ?', 
            values: commodity
         }, async function(err, result) {
