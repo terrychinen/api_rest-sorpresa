@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import moment from 'moment';
 import { connect } from '../database';
 import { ICategory } from '../interfaces/category.interface';
 import { checkIfDataExist } from '../queries/search.query';
@@ -51,22 +52,44 @@ export async function getCommoditiesByCategoryId(req: Request, res: Response) {
 
 //================== CREAR UNA MERCANCÍA ==================//
 export async function createCommodity(req: Request, res: Response) {
-    const category: ICategory = req.body;
-    const tableName = 'commodity';
+    const commodity: ICommodity = req.body;
+    const storesIdList = req.query.store_id;
+
+    const tableCommodity = 'commodity';
     const columnName = 'commodity_name';
 
-    //VERIFICA SI LA CATEGORIA EXISTE
-    return await checkIfDataExist(tableName, columnName, category.category_name).then( async dataCheck => {
+    const tableStoreCommodity = 'store_commodity';
+
+
+    //VERIFICA SI LA MERCANCÍA EXISTE
+    return await checkIfDataExist(tableCommodity, columnName, commodity.commodity_name).then( async dataCheck => {
         if(dataCheck.ok) return res.status(403).json({ok: false, message: dataCheck.message});
         if(dataCheck.status == 500) return res.status(500).json({ok: false, message: dataCheck.message});
 
-         //INSERTA LA NUEVA CATEGORIA
-         return await queryInsert(tableName, category).then( data => {
-            if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-            
-            return res.status(data.status).json({ok: true, message: data.message});
-        });
+         //INSERTA LA NUEVA MERCANCÍA
+        const conn = await connect();
 
+        commodity.created_at =  moment().format('YYYY-MM-DD h:mm:ss');
+
+        console.log('DATA:  ' +storesIdList.length);
+
+       return await conn.query({
+           sql: 'INSERT INTO commodity SET ?', 
+           values: commodity
+        }, async function(err, result) {
+               if(err) return res.status(400).json({ok: false, message: err.toString()});
+
+               try{
+                for(var i=0; i < storesIdList.length; i++) {                
+                    await conn.query('INSERT INTO ' +tableStoreCommodity +' SET store_id = ' 
+                             +storesIdList[i]+ ' , commodity_id = ' +result.insertId);
+                 }
+
+                return res.status(200).json({ok: true, message: 'Se creo exitosamente'});
+               }catch(e){
+                return res.status(500).json({ok: true, message: e.toString()});
+               }
+        });
     });
 }
 

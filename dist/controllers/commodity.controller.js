@@ -8,8 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCommodity = exports.updateCommodity = exports.createCommodity = exports.getCommoditiesByCategoryId = exports.getCommodities = void 0;
+const moment_1 = __importDefault(require("moment"));
 const database_1 = require("../database");
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
@@ -59,20 +63,39 @@ exports.getCommoditiesByCategoryId = getCommoditiesByCategoryId;
 //================== CREAR UNA MERCANCÍA ==================//
 function createCommodity(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const category = req.body;
-        const tableName = 'commodity';
+        const commodity = req.body;
+        const storesIdList = req.query.store_id;
+        const tableCommodity = 'commodity';
         const columnName = 'commodity_name';
-        //VERIFICA SI LA CATEGORIA EXISTE
-        return yield search_query_1.checkIfDataExist(tableName, columnName, category.category_name).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+        const tableStoreCommodity = 'store_commodity';
+        //VERIFICA SI LA MERCANCÍA EXISTE
+        return yield search_query_1.checkIfDataExist(tableCommodity, columnName, commodity.commodity_name).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheck.ok)
                 return res.status(403).json({ ok: false, message: dataCheck.message });
             if (dataCheck.status == 500)
                 return res.status(500).json({ ok: false, message: dataCheck.message });
-            //INSERTA LA NUEVA CATEGORIA
-            return yield query_1.queryInsert(tableName, category).then(data => {
-                if (!data.ok)
-                    return res.status(data.status).json({ ok: false, message: data.message });
-                return res.status(data.status).json({ ok: true, message: data.message });
+            //INSERTA LA NUEVA MERCANCÍA
+            const conn = yield database_1.connect();
+            commodity.created_at = moment_1.default().format('YYYY-MM-DD h:mm:ss');
+            console.log('DATA:  ' + storesIdList.length);
+            return yield conn.query({
+                sql: 'INSERT INTO commodity SET ?',
+                values: commodity
+            }, function (err, result) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (err)
+                        return res.status(400).json({ ok: false, message: err.toString() });
+                    try {
+                        for (var i = 0; i < storesIdList.length; i++) {
+                            yield conn.query('INSERT INTO ' + tableStoreCommodity + ' SET store_id = '
+                                + storesIdList[i] + ' , commodity_id = ' + result.insertId);
+                        }
+                        return res.status(200).json({ ok: true, message: 'Se creo exitosamente' });
+                    }
+                    catch (e) {
+                        return res.status(500).json({ ok: true, message: e.toString() });
+                    }
+                });
             });
         }));
     });
