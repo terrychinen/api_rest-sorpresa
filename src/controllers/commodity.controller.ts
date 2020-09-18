@@ -52,6 +52,7 @@ export async function getCommoditiesByCategoryId(req: Request, res: Response) {
 //================== CREAR UNA MERCANCÍA ==================//
 export async function createCommodity(req: Request, res: Response) {
     const commodity: ICommodity = req.body;
+    const lastUpdate = req.body.last_update;
     const storesIdList = req.query.store_id;
 
     const tableCommodity = 'commodity';
@@ -77,7 +78,7 @@ export async function createCommodity(req: Request, res: Response) {
                try{
                 for(var i=0; i < storesIdList.length; i++) {                
                     await conn.query('INSERT INTO ' +tableStoreCommodity +' SET store_id = ' 
-                             +storesIdList[i]+ ' , commodity_id = ' +result.insertId);
+                             +storesIdList[i]+ ', last_update = ' +lastUpdate +', commodity_id = ' +result.insertId);
                  }
 
                 return res.status(200).json({ok: true, message: 'Se creo exitosamente'});

@@ -61,6 +61,7 @@ exports.getCommoditiesByCategoryId = getCommoditiesByCategoryId;
 function createCommodity(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const commodity = req.body;
+        const lastUpdate = req.body.last_update;
         const storesIdList = req.query.store_id;
         const tableCommodity = 'commodity';
         const columnName = 'commodity_name';
@@ -83,7 +84,7 @@ function createCommodity(req, res) {
                     try {
                         for (var i = 0; i < storesIdList.length; i++) {
                             yield conn.query('INSERT INTO ' + tableStoreCommodity + ' SET store_id = '
-                                + storesIdList[i] + ' , commodity_id = ' + result.insertId);
+                                + storesIdList[i] + ', last_update = ' + lastUpdate + ', commodity_id = ' + result.insertId);
                         }
                         return res.status(200).json({ ok: true, message: 'Se creo exitosamente' });
                     }
