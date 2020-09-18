@@ -16,9 +16,10 @@ const query_1 = require("../queries/query");
 function getCategories(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const tableName = 'category';
+        const columnName = 'category_id';
         const offset = Number(req.query.offset);
         const state = Number(req.query.state);
-        return yield query_1.queryGet(tableName, offset, state).then(data => {
+        return yield query_1.queryGet(tableName, columnName, offset, state).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });

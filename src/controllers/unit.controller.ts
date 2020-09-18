@@ -8,9 +8,10 @@ import { queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../
 //================== OBTENER TODAS LAS UNIDADES ==================//
 export async function getUnits(req: Request, res: Response) {
     const tableName = 'unit';
+    const columnName = 'unit_id';
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
-    return await queryGet(tableName, offset, state).then( data => {
+    return await queryGet(tableName, columnName, offset, state).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});

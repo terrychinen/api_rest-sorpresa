@@ -7,9 +7,11 @@ import { queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../
 //================== OBTENER TODAS LAS CATEGORIAS ==================//
 export async function getCategories(req: Request, res: Response){
     const tableName = 'category';
+    const columnName = 'category_id';
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
-    return await queryGet(tableName, offset, state).then( data => {
+
+    return await queryGet(tableName, columnName, offset, state).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});

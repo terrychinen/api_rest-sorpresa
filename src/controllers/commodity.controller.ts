@@ -1,18 +1,17 @@
 import { Request, Response } from 'express';
-import moment from 'moment';
 import { connect } from '../database';
-import { ICategory } from '../interfaces/category.interface';
 import { checkIfDataExist } from '../queries/search.query';
-import { queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../queries/query';
+import { queryGet, queryDelete, queryUpdate } from '../queries/query';
 import { ICommodity } from '../interfaces/commodity.interface';
 
 
 //================== OBTENER TODOS LAS MERCANCÍAS ==================//
 export async function getCommodities(req: Request, res: Response){
     const tableName = 'commodity';
+    const columnName = 'commodity_id';
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
-    return await queryGet(tableName, offset, state).then( data => {
+    return await queryGet(tableName, columnName, offset, state).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
