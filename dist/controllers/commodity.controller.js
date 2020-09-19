@@ -37,7 +37,7 @@ function getCommoditiesByCategoryId(req, res) {
         const columnName = 'category_id';
         try {
             const conn = yield database_1.connect();
-            const queryString = 'SELECT commodity_id, commodity_name, created_at, state,' +
+            const queryString = 'SELECT commodity_id, commodity_name, last_update, state,' +
                 '(SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, ' +
                 '(SELECT unit_name FROM unit un WHERE un.unit_id = comm.unit_id)unit_name, ' +
                 '(SELECT username FROM user us WHERE us.user_id = comm.user_id)username ' +
@@ -61,6 +61,7 @@ exports.getCommoditiesByCategoryId = getCommoditiesByCategoryId;
 function createCommodity(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const commodity = req.body;
+        const lastUpdate = req.body.last_update;
         const storesIdList = req.query.store_id;
         const tableCommodity = 'commodity';
         const columnName = 'commodity_name';
@@ -71,6 +72,7 @@ function createCommodity(req, res) {
                 return res.status(403).json({ ok: false, message: dataCheck.message });
             if (dataCheck.status == 500)
                 return res.status(500).json({ ok: false, message: dataCheck.message });
+            console.log('FECHA: ' + lastUpdate.toString());
             //INSERTA LA NUEVA MERCANCÍA
             const conn = yield database_1.connect();
             return yield conn.query({
@@ -82,8 +84,8 @@ function createCommodity(req, res) {
                         return res.status(400).json({ ok: false, message: err.toString() });
                     try {
                         for (var i = 0; i < storesIdList.length; i++) {
-                            yield conn.query('INSERT INTO ' + tableStoreCommodity + ' SET store_id = '
-                                + storesIdList[i] + ', last_update = ' + commodity.last_update + ', commodity_id = ' + result.insertId);
+                            yield conn.query(`INSERT INTO  ${tableStoreCommodity} (commodity_id, store_id, last_update) VALUES 
+                                         ('${result.insertId}', '${storesIdList[i]}', '${lastUpdate.toString()}')`);
                         }
                         return res.status(200).json({ ok: true, message: 'Se creo exitosamente' });
                     }

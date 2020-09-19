@@ -29,7 +29,7 @@ export async function getCommoditiesByCategoryId(req: Request, res: Response) {
 
     try{
         const conn = await connect();
-        const queryString = 'SELECT commodity_id, commodity_name, created_at, state,' + 
+        const queryString = 'SELECT commodity_id, commodity_name, last_update, state,' + 
                 '(SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, ' +
                 '(SELECT unit_name FROM unit un WHERE un.unit_id = comm.unit_id)unit_name, ' + 
                 '(SELECT username FROM user us WHERE us.user_id = comm.user_id)username ' + 
@@ -52,6 +52,7 @@ export async function getCommoditiesByCategoryId(req: Request, res: Response) {
 //================== CREAR UNA MERCANCÍA ==================//
 export async function createCommodity(req: Request, res: Response) {
     const commodity: ICommodity = req.body;
+    const lastUpdate = req.body.last_update;
     const storesIdList = req.query.store_id;
 
     const tableCommodity = 'commodity';
@@ -65,6 +66,8 @@ export async function createCommodity(req: Request, res: Response) {
         if(dataCheck.ok) return res.status(403).json({ok: false, message: dataCheck.message});
         if(dataCheck.status == 500) return res.status(500).json({ok: false, message: dataCheck.message});
 
+        console.log('FECHA: ' +lastUpdate.toString());
+
          //INSERTA LA NUEVA MERCANCÍA
         const conn = await connect();
 
@@ -76,8 +79,8 @@ export async function createCommodity(req: Request, res: Response) {
 
                try{
                 for(var i=0; i < storesIdList.length; i++) {                
-                    await conn.query('INSERT INTO ' +tableStoreCommodity +' SET store_id = ' 
-                             +storesIdList[i]+ ', last_update = ' +commodity.last_update +', commodity_id = ' +result.insertId);
+                    await conn.query(`INSERT INTO  ${tableStoreCommodity} (commodity_id, store_id, last_update) VALUES 
+                                         ('${result.insertId}', '${storesIdList[i]}', '${lastUpdate.toString()}')`);
                  }
 
                 return res.status(200).json({ok: true, message: 'Se creo exitosamente'});
