@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ICategory } from '../interfaces/category.interface';
 import { checkIfDataExist } from '../queries/search.query';
-import { queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../queries/query';
+import { queryGet, queryGetBy, queryOrderbyId, queryInsert, queryDelete, queryUpdate } from '../queries/query';
 
 
 //================== OBTENER TODAS LAS CATEGORIAS ==================//
@@ -98,5 +98,21 @@ export async function deleteCategory(req: Request, res: Response) {
             
             return res.status(data.status).json({ok: true, message: data.message});
         });
+    });
+}
+
+
+//================== OBTENER TODAS LAS CATEGORIAS ORDER BY CATEGORY ID ==================//
+export async function getCategoriesById(req: Request, res: Response){
+    const tableName = 'category';
+    const offset = Number(req.query.offset);
+    const state = Number(req.query.state);
+    const categoryId = '"' +req.params.category_id +'"';
+    const columnName = `category_id`;
+
+    return await queryOrderbyId(tableName, columnName, categoryId, offset, state).then( data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+        
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }

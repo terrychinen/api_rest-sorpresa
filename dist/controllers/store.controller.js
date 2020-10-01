@@ -9,7 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteStore = exports.updateStore = exports.createStore = exports.getStore = exports.getStores = void 0;
+exports.getCategoriesByStores = exports.getStoresByCommodityId = exports.getStoresOrderById = exports.deleteStore = exports.updateStore = exports.createStore = exports.getStore = exports.getStores = void 0;
+const database_1 = require("../database");
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
 //================== OBTENER TODAS LOS ALMACENES ==================//
@@ -17,9 +18,8 @@ function getStores(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const tableName = 'store';
         const columnName = 'store_id';
-        const offset = Number(req.query.offset);
         const state = Number(req.query.state);
-        return yield query_1.queryGet(tableName, columnName, offset, state).then(data => {
+        return yield query_1.queryGetWithoutOffset(tableName, columnName, state).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
@@ -71,6 +71,7 @@ function updateStore(req, res) {
         const storeId = req.params.store_id;
         const tableName = 'store';
         const columnName = 'store_id';
+        console.log('STORE ID: ' + storeId);
         //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
         return yield search_query_1.checkIfDataExist(tableName, columnName, storeId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (!dataCheck.ok) {
@@ -113,3 +114,89 @@ function deleteStore(req, res) {
     });
 }
 exports.deleteStore = deleteStore;
+//================== OBTENER TODAS LOS ALMACENES ORDER BY STORE ID ==================//
+function getStoresOrderById(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const tableName = 'store';
+        const state = Number(req.query.state);
+        const storeIdList = req.query.store_id;
+        const columnName = `store_id`;
+        var storesIdsString = '';
+        if (storeIdList != null) {
+            for (var i = 0; i < storeIdList.length; i++) {
+                storesIdsString += '"' + storeIdList[i] + '"' + ',';
+            }
+            var cutStoresIdsString = storesIdsString.substring(0, storesIdsString.length - 1);
+            console.log(cutStoresIdsString);
+            return yield query_1.queryOrderbyId(tableName, columnName, cutStoresIdsString, 0, state).then(data => {
+                if (!data.ok)
+                    return res.status(data.status).json({ ok: false, message: data.message });
+                return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+            });
+        }
+        else {
+            return yield query_1.queryGetWithoutOffset(tableName, columnName, state).then(data => {
+                if (!data.ok)
+                    return res.status(data.status).json({ ok: false, message: data.message });
+                return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+            });
+        }
+    });
+}
+exports.getStoresOrderById = getStoresOrderById;
+//================== OBTENER LOS ALMACENES POR EL ID DEL PRODUCTO ==================//
+function getStoresByCommodityId(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const commodityId = req.query.commodity_id;
+        const state = req.query.state;
+        const columnName = 'commodity_id';
+        console.log('DATA: ' + commodityId);
+        try {
+            const conn = yield database_1.connect();
+            const queryString = `SELECT store_id, 
+        (SELECT store_name FROM store s WHERE s.store_id = sm.store_id)store_name,  
+        (SELECT state FROM store s WHERE s.store_id = sm.store_id)state  
+        FROM store_commodity sm WHERE commodity_id = ${commodityId} and state = ${state}`;
+            const queryStoreCommmodity = yield conn.query(queryString);
+            conn.end();
+            if (!queryStoreCommmodity)
+                return res.status(400).json({ ok: false, message: 'GET BY ' + columnName + ' error: store_commodity', result: [] });
+            return res.status(200).json({
+                ok: true,
+                message: 'GET BY ' + columnName + ' successful: Commodity',
+                result: queryStoreCommmodity[0],
+            });
+        }
+        catch (e) {
+            return res.status(500).json({ ok: false, message: e.toString(), result: [] });
+        }
+    });
+}
+exports.getStoresByCommodityId = getStoresByCommodityId;
+//================== OBTENER TODAS LAS CATEGORIAS SEGUN EL ALMACEN ==================//
+function getCategoriesByStores(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const storeId = req.params.store_id;
+        const tableName = 'category';
+        const columnName = 'store_id';
+        const state = Number(req.query.state);
+        try {
+            const conn = yield database_1.connect();
+            const queryString = `SELECT category_id, category_name FROM category c WHERE state = 1 AND c.category_id IN (SELECT category_id FROM commodity 
+                                 WHERE commodity_id IN (SELECT commodity_id FROM store_commodity WHERE store_id = "${storeId}"))`;
+            const queryCategoryCommmodity = yield conn.query(queryString);
+            conn.end();
+            if (!queryCategoryCommmodity)
+                return res.status(400).json({ ok: false, message: 'GET BY ' + columnName + ' error: store_commodity', result: [] });
+            return res.status(200).json({
+                ok: true,
+                message: 'GET BY ' + columnName + ' successful: Commodity',
+                result: queryCategoryCommmodity[0],
+            });
+        }
+        catch (e) {
+            return res.status(500).json({ ok: false, message: e.toString(), result: [] });
+        }
+    });
+}
+exports.getCategoriesByStores = getCategoriesByStores;

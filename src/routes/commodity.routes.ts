@@ -1,14 +1,13 @@
 import { Router } from 'express';
-import { getCommodities, getCommoditiesByCategoryId, createCommodity} from '../controllers/commodity.controller';
+import { getCommodities, getCommoditiesByCategoryId, updateCommodity, createCommodity} from '../controllers/commodity.controller';
 
 const router = Router();
 
 router.route('/')
-    .post(createCommodity);
+    .post(createCommodity)
+    .put(updateCommodity);
 
 router.route('/:category_id')
-    .get(getCommoditiesByCategoryId)
-//     .put(updateUnit)
-//     .delete(deleteUnit);
+    .get(getCommoditiesByCategoryId);
 
 export default router;

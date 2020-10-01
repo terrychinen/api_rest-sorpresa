@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUnit = exports.updateUnit = exports.createUnit = exports.getUnit = exports.getUnits = void 0;
+exports.getUnitsById = exports.deleteUnit = exports.updateUnit = exports.createUnit = exports.getUnit = exports.getUnits = void 0;
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
 //================== OBTENER TODAS LAS UNIDADES ==================//
@@ -112,3 +112,19 @@ function deleteUnit(req, res) {
     });
 }
 exports.deleteUnit = deleteUnit;
+//================== OBTENER TODAS LAS UNIDADES ORDER BY UNIT ID ==================//
+function getUnitsById(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const tableName = 'unit';
+        const offset = Number(req.query.offset);
+        const state = Number(req.query.state);
+        const unitId = '"' + req.params.unit_id + '"';
+        const columnName = `unit_id`;
+        return yield query_1.queryOrderbyId(tableName, columnName, unitId, offset, state).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
+    });
+}
+exports.getUnitsById = getUnitsById;

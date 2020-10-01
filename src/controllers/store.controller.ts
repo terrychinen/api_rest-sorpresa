@@ -1,16 +1,17 @@
+import { connect } from '../database';
 import { Request, Response } from 'express';
 import { IStore } from '../interfaces/store.interface';
 import { checkIfDataExist } from '../queries/search.query';
-import { queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../queries/query';
+import { queryGet, queryGetWithoutOffset, queryGetBy, queryOrderbyId, queryInsert, queryDelete, queryUpdate } from '../queries/query';
 
 
 //================== OBTENER TODAS LOS ALMACENES ==================//
 export async function getStores(req: Request, res: Response){
     const tableName = 'store';
     const columnName = 'store_id';
-    const offset = Number(req.query.offset);
     const state = Number(req.query.state);
-    return await queryGet(tableName, columnName, offset, state).then( data => {
+    
+    return await queryGetWithoutOffset(tableName, columnName, state).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
@@ -31,7 +32,6 @@ export async function getStore(req: Request, res: Response) {
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
-
 
 //================== CREAR UN ALMACÉN ==================//
 export async function createStore(req: Request, res: Response) {
@@ -61,6 +61,8 @@ export async function updateStore(req: Request, res: Response) {
     const storeId = req.params.store_id;
     const tableName = 'store';
     const columnName = 'store_id';
+
+    console.log('STORE ID: ' + storeId);
 
     //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
     return await checkIfDataExist(tableName, columnName, storeId).then( async dataCheck => {
@@ -99,3 +101,97 @@ export async function deleteStore(req: Request, res: Response) {
         });
     });
 }
+
+
+//================== OBTENER TODAS LOS ALMACENES ORDER BY STORE ID ==================//
+export async function getStoresOrderById(req: Request, res: Response){
+    const tableName = 'store';
+    const state = Number(req.query.state);
+    const storeIdList = req.query.store_id;
+    const columnName = `store_id`;
+
+    var storesIdsString = '';
+
+    if(storeIdList != null){
+        for(var i=0; i<storeIdList.length; i++){
+            storesIdsString += '"'+storeIdList[i]+'"' + ',';
+        }
+   
+       var cutStoresIdsString = storesIdsString.substring(0, storesIdsString.length - 1);
+   
+        console.log(cutStoresIdsString);
+   
+       return await queryOrderbyId(tableName, columnName, cutStoresIdsString, 0, state).then( data => {
+           if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+           
+           return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+       });
+    }else{
+        return await queryGetWithoutOffset(tableName, columnName, state).then( data => {
+            if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+            
+            return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+        });
+    }
+}
+
+
+//================== OBTENER LOS ALMACENES POR EL ID DEL PRODUCTO ==================//
+export async function getStoresByCommodityId(req: Request, res: Response) {
+    const commodityId = req.query.commodity_id;
+    const state = req.query.state;
+
+    const columnName = 'commodity_id';
+
+    console.log('DATA: ' +commodityId);
+
+    try{
+        const conn = await connect();
+
+        const queryString = `SELECT store_id, 
+        (SELECT store_name FROM store s WHERE s.store_id = sm.store_id)store_name,  
+        (SELECT state FROM store s WHERE s.store_id = sm.store_id)state  
+        FROM store_commodity sm WHERE commodity_id = ${commodityId} and state = ${state}`;
+
+        const queryStoreCommmodity = await conn.query(queryString);
+
+        conn.end();
+    
+        if(!queryStoreCommmodity)  return res.status(400).json({ok: false, message: 'GET BY '+columnName +' error: store_commodity', result: []})
+        return res.status(200).json({
+            ok: true, 
+            message: 'GET BY '+columnName +' successful: Commodity',
+            result: queryStoreCommmodity[0],
+        });
+
+    }catch(e){return res.status(500).json({ok: false, message: e.toString(), result: []});}
+}
+
+
+//================== OBTENER TODAS LAS CATEGORIAS SEGUN EL ALMACEN ==================//
+export async function getCategoriesByStores(req: Request, res: Response){
+    const storeId = req.params.store_id;
+    const tableName = 'category';
+    const columnName = 'store_id';
+    const state = Number(req.query.state);
+
+    try{
+        const conn = await connect();
+
+        const queryString = `SELECT category_id, category_name FROM category c WHERE state = 1 AND c.category_id IN (SELECT category_id FROM commodity 
+                                 WHERE commodity_id IN (SELECT commodity_id FROM store_commodity WHERE store_id = "${storeId}"))`;
+
+         const queryCategoryCommmodity = await conn.query(queryString);
+
+        conn.end();
+    
+        if(!queryCategoryCommmodity)  return res.status(400).json({ok: false, message: 'GET BY '+columnName +' error: store_commodity', result: []})
+        return res.status(200).json({
+            ok: true, 
+            message: 'GET BY '+columnName +' successful: Commodity',
+            result: queryCategoryCommmodity[0],
+        });
+
+    }catch(e){return res.status(500).json({ok: false, message: e.toString(), result: []});}
+}
+

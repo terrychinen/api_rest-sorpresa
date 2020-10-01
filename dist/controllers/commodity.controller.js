@@ -38,17 +38,20 @@ function getCommoditiesByCategoryId(req, res) {
         try {
             const conn = yield database_1.connect();
             const queryString = 'SELECT commodity_id, commodity_name, last_update, state,' +
+                '(SELECT cat.category_id FROM category cat WHERE cat.category_id = comm.category_id)category_id, ' +
                 '(SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, ' +
+                '(SELECT un.unit_id FROM unit un WHERE un.unit_id = comm.unit_id)unit_id, ' +
                 '(SELECT unit_name FROM unit un WHERE un.unit_id = comm.unit_id)unit_name, ' +
                 '(SELECT username FROM user us WHERE us.user_id = comm.user_id)username ' +
                 'FROM commodity comm WHERE category_id = ' + categoryId + ' AND state = ' + state + ' LIMIT 10 OFFSET ' + offset;
-            const query = yield conn.query(queryString);
-            if (!query)
+            const queryCommodity = yield conn.query(queryString);
+            conn.end();
+            if (!queryCommodity)
                 return res.status(400).json({ ok: false, message: 'GET BY ' + columnName + ' error: Commodity', result: [] });
             return res.status(200).json({
                 ok: true,
                 message: 'GET BY ' + columnName + ' successful: Commodity',
-                result: query[0]
+                result: queryCommodity[0],
             });
         }
         catch (e) {
@@ -72,8 +75,6 @@ function createCommodity(req, res) {
                 return res.status(403).json({ ok: false, message: dataCheck.message });
             if (dataCheck.status == 500)
                 return res.status(500).json({ ok: false, message: dataCheck.message });
-            console.log('FECHA: ' + lastUpdate.toString());
-            //INSERTA LA NUEVA MERCANCÍA
             const conn = yield database_1.connect();
             return yield conn.query({
                 sql: 'INSERT INTO commodity SET ?',
@@ -87,6 +88,7 @@ function createCommodity(req, res) {
                             yield conn.query(`INSERT INTO  ${tableStoreCommodity} (commodity_id, store_id, last_update) VALUES 
                                          ('${result.insertId}', '${storesIdList[i]}', '${lastUpdate.toString()}')`);
                         }
+                        conn.end();
                         return res.status(200).json({ ok: true, message: 'Se creo exitosamente' });
                     }
                     catch (e) {
@@ -102,25 +104,49 @@ exports.createCommodity = createCommodity;
 function updateCommodity(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const commodity = req.body;
-        const commodityId = req.params.commodity_id;
-        const tableName = 'commodity';
-        const columnName = 'commodity_id';
+        const storesIdList = req.query.store_id;
+        const lastUpdate = req.body.last_update;
+        const tableCommodity = 'commodity';
+        const tableStoreCommodity = 'store_commodity';
+        const columnCommodityId = 'commodity_id';
+        const columnCommodityName = 'commodity_name';
         //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-        return yield search_query_1.checkIfDataExist(tableName, columnName, commodityId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+        return yield search_query_1.checkIfDataExist(tableCommodity, columnCommodityId, commodity.commodity_id).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (!dataCheck.ok) {
                 return res.status(404).json({ ok: false, message: dataCheck.message });
             }
-            //VERIFICA SI YA HAY UNA CATEGORIA CON EL MISMO NOMBRE PARA NO ACTUALIZAR
-            return yield search_query_1.checkIfDataExist(tableName, columnName, commodity.commodity_name).then((dataCheckRepeat) => __awaiter(this, void 0, void 0, function* () {
-                if (dataCheckRepeat.ok) {
-                    return res.status(400).json({ ok: false, message: dataCheckRepeat.message });
+            //VERIFICA SI YA HAY UNA MERCANCÍA CON EL MISMO NOMBRE PARA NO ACTUALIZAR
+            return yield search_query_1.checkIfDataExist(tableStoreCommodity, columnCommodityName, commodity.commodity_name).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+                if (!dataCheck.ok) {
+                    try {
+                        const conn = yield database_1.connect();
+                        yield conn.query(`UPDATE store_commodity SET state = 0 WHERE commodity_id = ${commodity.commodity_id}`);
+                        for (var i = 0; i < storesIdList.length; i++) {
+                            const conn = yield database_1.connect();
+                            const query = yield conn.query(`SELECT store_commodity_id FROM store_commodity WHERE store_id = ${storesIdList[i]} AND commodity_id = ${commodity.commodity_id}`);
+                            if (Object.keys(query[0]).length === 0) {
+                                yield conn.query(`INSERT INTO store_commodity (commodity_id, store_id, last_update) VALUES 
+                            ('${commodity.commodity_id}', '${storesIdList[i]}', '${lastUpdate.toString()}')`);
+                            }
+                            else {
+                                yield conn.query(`UPDATE store_commodity SET state = 1 WHERE store_id = ${storesIdList[i]} AND commodity_id = ${commodity.commodity_id}`);
+                            }
+                        }
+                        yield conn.query(`UPDATE commodity SET last_update = '${lastUpdate.toString()}' WHERE commodity_id = ${commodity.commodity_id}`);
+                        conn.end();
+                    }
+                    catch (e) {
+                        return ({ ok: false, status: 500, message: e });
+                    }
+                    return yield query_1.queryUpdate(tableCommodity, columnCommodityId, commodity, commodity.commodity_id).then(data => {
+                        if (!data.ok)
+                            return res.status(data.status).json({ ok: false, message: data.message });
+                        return res.status(data.status).json({ ok: true, message: data.message });
+                    });
                 }
-                //ACTUALIZA EL REGISTRO
-                return yield query_1.queryUpdate(tableName, columnName, commodity, commodityId).then(data => {
-                    if (!data.ok)
-                        return res.status(data.status).json({ ok: false, message: data.message });
-                    return res.status(data.status).json({ ok: true, message: data.message });
-                });
+                else {
+                    return res.status(400).json({ ok: true, message: 'Error en el servidor' });
+                }
             }));
         }));
     });

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategory = exports.getCategories = void 0;
+exports.getCategoriesById = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategory = exports.getCategories = void 0;
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
 //================== OBTENER TODAS LAS CATEGORIAS ==================//
@@ -113,3 +113,19 @@ function deleteCategory(req, res) {
     });
 }
 exports.deleteCategory = deleteCategory;
+//================== OBTENER TODAS LAS CATEGORIAS ORDER BY CATEGORY ID ==================//
+function getCategoriesById(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const tableName = 'category';
+        const offset = Number(req.query.offset);
+        const state = Number(req.query.state);
+        const categoryId = '"' + req.params.category_id + '"';
+        const columnName = `category_id`;
+        return yield query_1.queryOrderbyId(tableName, columnName, categoryId, offset, state).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
+    });
+}
+exports.getCategoriesById = getCategoriesById;

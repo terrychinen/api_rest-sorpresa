@@ -10,4 +10,6 @@ router.route('/:unit_id')
     .get(unit_controller_1.getUnit)
     .put(unit_controller_1.updateUnit)
     .delete(unit_controller_1.deleteUnit);
+router.route('/order_by_unitid/:unit_id')
+    .get(unit_controller_1.getUnitsById);
 exports.default = router;

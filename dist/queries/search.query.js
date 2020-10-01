@@ -16,6 +16,7 @@ function checkIfDataExist(table, columnName, value) {
         try {
             const conn = yield database_1.connect();
             const data = yield conn.query('SELECT * FROM ' + table + ' WHERE ' + columnName + ' = ?', [value]);
+            conn.end();
             if (Object.keys(data[0]).length === 0)
                 return ({ ok: false, status: 200, message: 'No existe' });
             return ({ ok: true, status: 200, message: 'Ya existe', result: data[0] });

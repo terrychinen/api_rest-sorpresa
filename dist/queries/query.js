@@ -9,13 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.queryDelete = exports.queryUpdate = exports.queryInsert = exports.queryGetBy = exports.queryGet = void 0;
+exports.queryGetWithoutOffset = exports.queryOrderbyId = exports.queryDelete = exports.queryUpdate = exports.queryInsert = exports.queryGetBy = exports.queryGet = void 0;
 const database_1 = require("../database");
 function queryGet(table, column, offset, state) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const conn = yield database_1.connect();
             const query = yield conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY ${column} DESC LIMIT 10 OFFSET ${offset}`);
+            conn.end();
             if (!query)
                 return ({ ok: false, status: 400, message: 'GET error: ' + table, result: [] });
             return ({
@@ -36,6 +37,7 @@ function queryGetBy(table, columnName, value, state) {
         try {
             const conn = yield database_1.connect();
             const query = yield conn.query(`SELECT * FROM ${table} WHERE ${columnName} = "${value}" AND state = ${state}`);
+            conn.end();
             if (!query)
                 return ({ ok: false, status: 400, message: 'GET BY ' + columnName + ' error: ' + table, result: [] });
             return ({
@@ -56,6 +58,7 @@ function queryInsert(table, value) {
         try {
             const conn = yield database_1.connect();
             const query = yield conn.query('INSERT INTO ' + table + ' SET ?', value);
+            conn.end();
             if (!query)
                 return ({ ok: false, status: 400, message: 'INSERT error: ' + table });
             return ({ ok: true, status: 200, message: 'INSERT successful: ' + table });
@@ -71,6 +74,7 @@ function queryUpdate(table, columnName, value, id) {
         try {
             const conn = yield database_1.connect();
             const query = yield conn.query('UPDATE ' + table + ' SET ? WHERE ' + columnName + ' = ?', [value, id]);
+            conn.end();
             if (!query)
                 return ({ ok: false, status: 400, message: 'UPDATE error' + table });
             return ({ ok: true, status: 200, message: 'UPDATE successful: ' + table });
@@ -86,6 +90,7 @@ function queryDelete(table, columnName, value) {
         try {
             const conn = yield database_1.connect();
             const query = yield conn.query(`DELETE FROM ${table} WHERE ${columnName} = ${value}`);
+            conn.end();
             if (!query)
                 return ({ ok: false, status: 400, message: 'DELETE error' + table });
             return ({ ok: true, status: 200, message: 'DELETE successful: ' + table });
@@ -96,3 +101,45 @@ function queryDelete(table, columnName, value) {
     });
 }
 exports.queryDelete = queryDelete;
+function queryOrderbyId(table, columnName, value, offset, state) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const conn = yield database_1.connect();
+            const query = yield conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY FIELD(${columnName}, ${value}) DESC LIMIT 20 OFFSET ${offset}`);
+            conn.end();
+            if (!query)
+                return ({ ok: false, status: 400, message: 'GET error: ' + table, result: [] });
+            return ({
+                ok: true,
+                status: 200,
+                message: 'GET successful: ' + table,
+                result: query
+            });
+        }
+        catch (e) {
+            return ({ ok: false, status: 500, message: e.toString(), result: [] });
+        }
+    });
+}
+exports.queryOrderbyId = queryOrderbyId;
+function queryGetWithoutOffset(table, column, state) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const conn = yield database_1.connect();
+            const query = yield conn.query(`SELECT * FROM ${table} WHERE state = "${state}" ORDER BY ${column} DESC`);
+            conn.end();
+            if (!query)
+                return ({ ok: false, status: 400, message: 'GET error: ' + table, result: [] });
+            return ({
+                ok: true,
+                status: 200,
+                message: 'GET successful: ' + table,
+                result: query
+            });
+        }
+        catch (e) {
+            return ({ ok: false, status: 500, message: e.toString(), result: [] });
+        }
+    });
+}
+exports.queryGetWithoutOffset = queryGetWithoutOffset;
