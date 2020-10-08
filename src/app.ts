@@ -16,6 +16,7 @@ import CommodityRoutes from './routes/commodity.routes'
 import RoleRoutes from './routes/role.routes';
 import UnitRoutes from './routes/unit.routes';
 import StoreRoutes from './routes/store.routes';
+import StockHistoryRoutes from './routes/stock_history.routes';
 import CategoryRoutes from './routes/category.routes';
 
 
@@ -57,6 +58,7 @@ export class App {
         this.app.use('/role', checkVersionFlutterApp, tokenValidation, RoleRoutes);
         this.app.use('/unit', checkVersionFlutterApp, tokenValidation, UnitRoutes);
         this.app.use('/store', checkVersionFlutterApp, tokenValidation, StoreRoutes);
+        this.app.use('/stock_history', checkVersionFlutterApp, tokenValidation, StockHistoryRoutes);
     }
 
 }

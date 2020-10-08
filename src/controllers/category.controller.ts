@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { ICategory } from '../interfaces/category.interface';
 import { checkIfDataExist } from '../queries/search.query';
 import { queryGet, queryGetBy, queryOrderbyId, queryInsert, queryDelete, queryUpdate } from '../queries/query';
+import { connect } from '../database';
 
 
 //================== OBTENER TODAS LAS CATEGORIAS ==================//
@@ -115,4 +116,33 @@ export async function getCategoriesById(req: Request, res: Response){
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
+}
+
+
+//================== OBTENER TODAS LAS CATEGORIAS SEGUN EL ALMACEN ==================//
+export async function getCategoriesByStores(req: Request, res: Response){
+    const storeId = req.params.store_id;
+    const offset = req.query.offset;
+    const tableName = 'category';
+    const columnName = 'store_id';
+    const state = Number(req.query.state);
+
+    try{
+        const conn = await connect();
+
+        const queryString = `SELECT category_id, category_name FROM category c WHERE state = 1 AND c.category_id IN (SELECT category_id FROM commodity 
+                                 WHERE commodity_id IN (SELECT commodity_id FROM store_commodity WHERE store_id = "${storeId}"))  LIMIT 20 OFFSET ${offset}`;
+
+        const queryCategoryCommmodity = await conn.query(queryString);
+
+        conn.end();
+    
+        if(!queryCategoryCommmodity)  return res.status(400).json({ok: false, message: 'GET BY '+columnName +' error: store_commodity', result: []})
+        return res.status(200).json({
+            ok: true, 
+            message: 'GET BY '+columnName +' successful: Commodity',
+            result: queryCategoryCommmodity[0],
+        });
+
+    }catch(e){return res.status(500).json({ok: false, message: e.toString(), result: []});}
 }

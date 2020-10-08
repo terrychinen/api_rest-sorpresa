@@ -26,6 +26,7 @@ const commodity_routes_1 = __importDefault(require("./routes/commodity.routes"))
 const role_routes_1 = __importDefault(require("./routes/role.routes"));
 const unit_routes_1 = __importDefault(require("./routes/unit.routes"));
 const store_routes_1 = __importDefault(require("./routes/store.routes"));
+const stock_history_routes_1 = __importDefault(require("./routes/stock_history.routes"));
 const category_routes_1 = __importDefault(require("./routes/category.routes"));
 class App {
     constructor(port) {
@@ -56,6 +57,7 @@ class App {
         this.app.use('/role', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, role_routes_1.default);
         this.app.use('/unit', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, unit_routes_1.default);
         this.app.use('/store', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, store_routes_1.default);
+        this.app.use('/stock_history', check_version_app_1.checkVersionFlutterApp, authentication_1.tokenValidation, stock_history_routes_1.default);
     }
 }
 exports.App = App;

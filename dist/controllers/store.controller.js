@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCategoriesByStores = exports.getStoresByCommodityId = exports.getStoresOrderById = exports.deleteStore = exports.updateStore = exports.createStore = exports.getStore = exports.getStores = void 0;
+exports.getStoresByCommodityId = exports.getStoresOrderById = exports.deleteStore = exports.updateStore = exports.createStore = exports.getStore = exports.getStores = void 0;
 const database_1 = require("../database");
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
@@ -70,20 +70,20 @@ function updateStore(req, res) {
         const store = req.body;
         const storeId = req.params.store_id;
         const tableName = 'store';
-        const columnName = 'store_id';
-        console.log('STORE ID: ' + storeId);
+        const columnStoreID = 'store_id';
+        const columnStoreName = 'store_name';
         //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-        return yield search_query_1.checkIfDataExist(tableName, columnName, storeId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+        return yield search_query_1.checkIfDataExist(tableName, columnStoreID, storeId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (!dataCheck.ok) {
                 return res.status(404).json({ ok: false, message: dataCheck.message });
             }
             //VERIFICA SI YA HAY UN ALMACÉN CON EL MISMO NOMBRE PARA NO ACTUALIZAR
-            return yield search_query_1.checkIfDataExist(tableName, columnName, store.store_name).then((dataCheckRepeat) => __awaiter(this, void 0, void 0, function* () {
+            return yield search_query_1.checkIfDataExist(tableName, columnStoreName, store.store_name).then((dataCheckRepeat) => __awaiter(this, void 0, void 0, function* () {
                 if (dataCheckRepeat.ok) {
                     return res.status(400).json({ ok: false, message: dataCheckRepeat.message });
                 }
                 //ACTUALIZA EL REGISTRO
-                return yield query_1.queryUpdate(tableName, columnName, store, storeId).then(data => {
+                return yield query_1.queryUpdate(tableName, columnStoreID, store, storeId).then(data => {
                     if (!data.ok)
                         return res.status(data.status).json({ ok: false, message: data.message });
                     return res.status(data.status).json({ ok: true, message: data.message });
@@ -173,30 +173,3 @@ function getStoresByCommodityId(req, res) {
     });
 }
 exports.getStoresByCommodityId = getStoresByCommodityId;
-//================== OBTENER TODAS LAS CATEGORIAS SEGUN EL ALMACEN ==================//
-function getCategoriesByStores(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const storeId = req.params.store_id;
-        const tableName = 'category';
-        const columnName = 'store_id';
-        const state = Number(req.query.state);
-        try {
-            const conn = yield database_1.connect();
-            const queryString = `SELECT category_id, category_name FROM category c WHERE state = 1 AND c.category_id IN (SELECT category_id FROM commodity 
-                                 WHERE commodity_id IN (SELECT commodity_id FROM store_commodity WHERE store_id = "${storeId}"))`;
-            const queryCategoryCommmodity = yield conn.query(queryString);
-            conn.end();
-            if (!queryCategoryCommmodity)
-                return res.status(400).json({ ok: false, message: 'GET BY ' + columnName + ' error: store_commodity', result: [] });
-            return res.status(200).json({
-                ok: true,
-                message: 'GET BY ' + columnName + ' successful: Commodity',
-                result: queryCategoryCommmodity[0],
-            });
-        }
-        catch (e) {
-            return res.status(500).json({ ok: false, message: e.toString(), result: [] });
-        }
-    });
-}
-exports.getCategoriesByStores = getCategoriesByStores;

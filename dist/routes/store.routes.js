@@ -14,6 +14,4 @@ router.route('/:store_id')
     .delete(store_controller_1.deleteStore);
 router.route('/order/by_storeid')
     .get(store_controller_1.getStoresOrderById);
-router.route('/category/:store_id')
-    .get(store_controller_1.getCategoriesByStores);
 exports.default = router;

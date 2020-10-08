@@ -155,4 +155,6 @@ router.route('/:category_id')
     .delete(category_controller_1.deleteCategory);
 router.route('/order_by_categoryid/:category_id')
     .get(category_controller_1.getCategoriesById);
+router.route('/store/:store_id')
+    .get(category_controller_1.getCategoriesByStores);
 exports.default = router;

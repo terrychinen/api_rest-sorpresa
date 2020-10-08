@@ -60,20 +60,19 @@ export async function updateStore(req: Request, res: Response) {
     const store: IStore = req.body;
     const storeId = req.params.store_id;
     const tableName = 'store';
-    const columnName = 'store_id';
-
-    console.log('STORE ID: ' + storeId);
+    const columnStoreID = 'store_id';
+    const columnStoreName = 'store_name';
 
     //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-    return await checkIfDataExist(tableName, columnName, storeId).then( async dataCheck => {
+    return await checkIfDataExist(tableName, columnStoreID, storeId).then( async dataCheck => {
         if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
 
         //VERIFICA SI YA HAY UN ALMACÉN CON EL MISMO NOMBRE PARA NO ACTUALIZAR
-        return await checkIfDataExist(tableName, columnName, store.store_name).then( async dataCheckRepeat => {
+        return await checkIfDataExist(tableName, columnStoreName, store.store_name).then( async dataCheckRepeat => {
             if(dataCheckRepeat.ok) {return res.status(400).json({ok: false, message: dataCheckRepeat.message})}
 
             //ACTUALIZA EL REGISTRO
-            return await queryUpdate(tableName, columnName, store, storeId).then( data => {
+            return await queryUpdate(tableName, columnStoreID, store, storeId).then( data => {
                 if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
                 
                 return res.status(data.status).json({ok: true, message: data.message});
@@ -167,31 +166,4 @@ export async function getStoresByCommodityId(req: Request, res: Response) {
     }catch(e){return res.status(500).json({ok: false, message: e.toString(), result: []});}
 }
 
-
-//================== OBTENER TODAS LAS CATEGORIAS SEGUN EL ALMACEN ==================//
-export async function getCategoriesByStores(req: Request, res: Response){
-    const storeId = req.params.store_id;
-    const tableName = 'category';
-    const columnName = 'store_id';
-    const state = Number(req.query.state);
-
-    try{
-        const conn = await connect();
-
-        const queryString = `SELECT category_id, category_name FROM category c WHERE state = 1 AND c.category_id IN (SELECT category_id FROM commodity 
-                                 WHERE commodity_id IN (SELECT commodity_id FROM store_commodity WHERE store_id = "${storeId}"))`;
-
-         const queryCategoryCommmodity = await conn.query(queryString);
-
-        conn.end();
-    
-        if(!queryCategoryCommmodity)  return res.status(400).json({ok: false, message: 'GET BY '+columnName +' error: store_commodity', result: []})
-        return res.status(200).json({
-            ok: true, 
-            message: 'GET BY '+columnName +' successful: Commodity',
-            result: queryCategoryCommmodity[0],
-        });
-
-    }catch(e){return res.status(500).json({ok: false, message: e.toString(), result: []});}
-}
 

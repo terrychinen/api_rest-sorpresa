@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getStore, getStores, getStoresOrderById, getCategoriesByStores, getStoresByCommodityId, createStore, updateStore, deleteStore } from '../controllers/store.controller';
+import { getStore, getStores, getStoresOrderById, getStoresByCommodityId, createStore, updateStore, deleteStore } from '../controllers/store.controller';
 
 const router = Router();
 
@@ -18,7 +18,6 @@ router.route('/:store_id')
 router.route('/order/by_storeid')
     .get(getStoresOrderById);
 
-router.route('/category/:store_id')
-    .get(getCategoriesByStores);
+
 
 export default router;

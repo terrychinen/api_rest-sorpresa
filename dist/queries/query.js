@@ -9,13 +9,34 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.queryGetWithoutOffset = exports.queryOrderbyId = exports.queryDelete = exports.queryUpdate = exports.queryInsert = exports.queryGetBy = exports.queryGet = void 0;
+exports.queryGetWithoutOffset = exports.queryOrderbyId = exports.queryDelete = exports.queryUpdate = exports.queryInsert = exports.queryGetBy = exports.queryGet = exports.query = void 0;
 const database_1 = require("../database");
+function query(queryString) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const conn = yield database_1.connect();
+            const query = yield conn.query(queryString);
+            conn.end();
+            if (!query)
+                return ({ ok: false, status: 400, message: 'GET error', result: [] });
+            return ({
+                ok: true,
+                status: 200,
+                message: 'GET successful',
+                result: query
+            });
+        }
+        catch (e) {
+            return ({ ok: false, status: 500, message: e.toString(), result: [] });
+        }
+    });
+}
+exports.query = query;
 function queryGet(table, column, offset, state) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const conn = yield database_1.connect();
-            const query = yield conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY ${column} DESC LIMIT 10 OFFSET ${offset}`);
+            const query = yield conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY ${column} DESC LIMIT 20 OFFSET ${offset}`);
             conn.end();
             if (!query)
                 return ({ ok: false, status: 400, message: 'GET error: ' + table, result: [] });

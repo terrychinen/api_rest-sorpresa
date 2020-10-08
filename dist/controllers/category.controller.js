@@ -9,9 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCategoriesById = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategory = exports.getCategories = void 0;
+exports.getCategoriesByStores = exports.getCategoriesById = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategory = exports.getCategories = void 0;
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
+const database_1 = require("../database");
 //================== OBTENER TODAS LAS CATEGORIAS ==================//
 function getCategories(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -129,3 +130,31 @@ function getCategoriesById(req, res) {
     });
 }
 exports.getCategoriesById = getCategoriesById;
+//================== OBTENER TODAS LAS CATEGORIAS SEGUN EL ALMACEN ==================//
+function getCategoriesByStores(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const storeId = req.params.store_id;
+        const offset = req.query.offset;
+        const tableName = 'category';
+        const columnName = 'store_id';
+        const state = Number(req.query.state);
+        try {
+            const conn = yield database_1.connect();
+            const queryString = `SELECT category_id, category_name FROM category c WHERE state = 1 AND c.category_id IN (SELECT category_id FROM commodity 
+                                 WHERE commodity_id IN (SELECT commodity_id FROM store_commodity WHERE store_id = "${storeId}"))  LIMIT 20 OFFSET ${offset}`;
+            const queryCategoryCommmodity = yield conn.query(queryString);
+            conn.end();
+            if (!queryCategoryCommmodity)
+                return res.status(400).json({ ok: false, message: 'GET BY ' + columnName + ' error: store_commodity', result: [] });
+            return res.status(200).json({
+                ok: true,
+                message: 'GET BY ' + columnName + ' successful: Commodity',
+                result: queryCategoryCommmodity[0],
+            });
+        }
+        catch (e) {
+            return res.status(500).json({ ok: false, message: e.toString(), result: [] });
+        }
+    });
+}
+exports.getCategoriesByStores = getCategoriesByStores;

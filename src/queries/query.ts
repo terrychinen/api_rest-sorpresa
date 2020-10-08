@@ -1,9 +1,28 @@
 import { connect } from '../database';
 
+export async function query(queryString: string) {
+    try{
+        const conn = await connect();
+        const query = await conn.query(queryString);
+
+        conn.end();
+
+        if(!query) return ({ok: false, status: 400, message: 'GET error', result: []});
+        return ({
+            ok: true, 
+            status: 200, 
+            message: 'GET successful',
+            result: query
+        });
+
+    }catch(e){return ({ok: false, status: 500, message: e.toString(), result: []});}
+}
+
+
 export async function queryGet(table: String, column: String, offset: Number, state: Number) {
     try{
         const conn = await connect();
-        const query = await conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY ${column} DESC LIMIT 10 OFFSET ${offset}`);
+        const query = await conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY ${column} DESC LIMIT 20 OFFSET ${offset}`);
 
         conn.end();
 
