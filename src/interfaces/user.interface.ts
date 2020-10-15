@@ -1,7 +1,8 @@
 export interface IUser {
     user_id?    :    Number;
     role_id     :    Number;
-    token_id?    :   Number;
+    role_name   :    String;    
+    token_id?   :    Number;
     first_name  :    string;
     last_name   :    string;
     username    :    string;

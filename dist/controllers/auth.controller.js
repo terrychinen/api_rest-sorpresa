@@ -25,32 +25,43 @@ const moment_1 = __importDefault(require("moment"));
 function signIn(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const body = req.body;
-        const tableUser = 'user';
-        const columnUsername = 'username';
-        return yield search_query_1.checkIfDataExist(tableUser, columnUsername, body.username).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-            if (!dataCheck.ok)
-                return res.status(400).json({ ok: false, message: dataCheck.message });
-            const userDB = dataCheck.result[0];
-            const compare = yield bcrypt_1.default.compareSync(body.password, userDB.password);
-            if (!compare)
-                return res.status(400).json({ ok: false, message: 'The username or password is not correct' });
-            if (userDB.state == 0) {
-                return res.status(403).json({ ok: false, message: 'User deleted', username: userDB.username, state: 0 });
-            }
-            delete userDB.password;
-            let token = jsonwebtoken_1.default.sign({ user: userDB }, process.env.SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
-            return token_controller_1.saveNewToken(userDB, token).then(data => {
+        const queryString = `SELECT user_id, role_id, (SELECT role_name FROM role r WHERE r.role_id = u.role_id)role_name, token_id, first_name, last_name, 
+                            username, password, phone, email, street, state FROM user u WHERE username = "${body.username}"`;
+        return yield query_1.query(queryString).then((data) => __awaiter(this, void 0, void 0, function* () {
+            try {
                 if (!data.ok)
-                    return res.status(400).json({ ok: false, message: data.message });
-                return res.status(200).json({
-                    ok: true,
-                    message: 'Login successful!',
-                    user: userDB,
-                    token,
-                    expireIn: process.env.TOKEN_EXPIRATION,
-                    savedDate: moment_1.default().format('YYYY-MM-DD h:mm:ss')
+                    return res.status(data.status).json({ ok: false, message: data.message });
+                const userDB = data.result[0][0];
+                if (userDB == null) {
+                    return res.status(400).json({ ok: false, message: 'El usuario o la contraseña es incorrecto' });
+                }
+                const compare = yield bcrypt_1.default.compareSync(body.password, userDB.password);
+                if (!compare)
+                    return res.status(400).json({ ok: false, message: 'El usuario o la contraseña es incorrecto' });
+                if (userDB.state == 0) {
+                    return res.status(403).json({ ok: false, message: 'Cuenta eliminado', username: userDB.username, state: 0 });
+                }
+                delete userDB.password;
+                let token = jsonwebtoken_1.default.sign({ user: userDB }, process.env.SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
+                return token_controller_1.saveNewToken(userDB, token).then(data => {
+                    if (!data.ok)
+                        return res.status(400).json({ ok: false, message: data.message });
+                    return res.status(200).json({
+                        ok: true,
+                        message: 'Inicio de sesión correcto!',
+                        user: userDB,
+                        token,
+                        expireIn: process.env.TOKEN_EXPIRATION,
+                        savedDate: moment_1.default().format('YYYY-MM-DD h:mm:ss')
+                    });
                 });
-            });
+            }
+            catch (e) {
+                return res.status(400).json({
+                    ok: false,
+                    message: e.toString()
+                });
+            }
         }));
     });
 }

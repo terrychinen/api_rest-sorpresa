@@ -4,6 +4,7 @@ import { IUser } from '../interfaces/user.interface';
 export class UserModel implements IUser{
     user_id?: Number;
     role_id: Number;
+    role_name: String;
     token_id?: Number;
     first_name: string;
     last_name: string;
