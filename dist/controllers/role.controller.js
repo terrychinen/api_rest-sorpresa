@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteRole = exports.updateRole = exports.createRole = exports.getRole = exports.getRoles = void 0;
+exports.deleteRole = exports.updateRole = exports.createRole = exports.searchRole = exports.getRole = exports.getRoles = void 0;
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
 //================== OBTENER TODAS LOS ROLES ==================//
@@ -42,6 +42,20 @@ function getRole(req, res) {
     });
 }
 exports.getRole = getRole;
+//================== BUSCAR ROL POR SU NOMBRE  ==================//
+function searchRole(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const search = req.body.query;
+        const state = Number(req.body.state);
+        const queryString = `SELECT * FROM role WHERE role_name LIKE "%${search}%" AND state = ${state} LIMIT 10`;
+        return yield query_1.query(queryString).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
+    });
+}
+exports.searchRole = searchRole;
 //================== CREAR UN ROL ==================//
 function createRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {

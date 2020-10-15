@@ -22,7 +22,7 @@ export async function query(queryString: string) {
 export async function queryGet(table: String, column: String, offset: Number, state: Number) {
     try{
         const conn = await connect();
-        const query = await conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY ${column} DESC LIMIT 20 OFFSET ${offset}`);
+        const query = await conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY ${column} DESC LIMIT 10 OFFSET ${offset}`);
 
         conn.end();
 
@@ -104,7 +104,7 @@ export async function queryDelete(table: String, columnName: String, value: any)
 export async function queryOrderbyId(table: String, columnName: String, value: String, offset: Number, state: Number) {
     try{
         const conn = await connect();
-        const query = await conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY FIELD(${columnName}, ${value}) DESC LIMIT 20 OFFSET ${offset}`);
+        const query = await conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY FIELD(${columnName}, ${value}) DESC LIMIT 10 OFFSET ${offset}`);
 
         conn.end();
 

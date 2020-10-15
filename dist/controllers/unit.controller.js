@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUnitsById = exports.deleteUnit = exports.updateUnit = exports.createUnit = exports.getUnit = exports.getUnits = void 0;
+exports.getUnitsById = exports.deleteUnit = exports.updateUnit = exports.createUnit = exports.searchUnit = exports.getUnit = exports.getUnits = void 0;
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
 //================== OBTENER TODAS LAS UNIDADES ==================//
@@ -42,6 +42,20 @@ function getUnit(req, res) {
     });
 }
 exports.getUnit = getUnit;
+//================== BUSCAR UNIDAD POR SU NOMBRE  ==================//
+function searchUnit(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const search = req.body.query;
+        const state = Number(req.body.state);
+        const queryString = `SELECT * FROM unit WHERE unit_name LIKE "%${search}%" AND state = ${state} ORDER BY unit_name DESC`;
+        return yield query_1.query(queryString).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
+    });
+}
+exports.searchUnit = searchUnit;
 //================== CREAR UNA UNIDAD ==================//
 function createUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {

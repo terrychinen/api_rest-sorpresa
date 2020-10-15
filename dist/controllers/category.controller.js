@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCategoriesByStores = exports.getCategoriesById = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.getCategory = exports.getCategories = void 0;
+exports.getCategoriesByStores = exports.getCategoriesById = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.searchCategoryByStoreId = exports.searchCategory = exports.getCategory = exports.getCategories = void 0;
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
 const database_1 = require("../database");
@@ -43,6 +43,36 @@ function getCategory(req, res) {
     });
 }
 exports.getCategory = getCategory;
+//================== BUSCAR CATEGORIA POR SU NOMBRE  ==================//
+function searchCategory(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const search = req.body.query;
+        const state = Number(req.body.state);
+        const queryString = `SELECT * FROM category WHERE category_name LIKE "%${search}%" AND state = ${state} LIMIT 10`;
+        return yield query_1.query(queryString).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
+    });
+}
+exports.searchCategory = searchCategory;
+//================== BUSCAR CATEGORIA POR SU NOMBRE y POR STORE_ID  ==================//
+function searchCategoryByStoreId(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const storeId = req.params.store_id;
+        const search = req.body.query;
+        const state = Number(req.body.state);
+        const queryString = `SELECT category_id, category_name FROM category c WHERE category_name LIKE "%${search}%" AND state = ${state} AND c.category_id IN (SELECT category_id FROM commodity 
+        WHERE commodity_id IN (SELECT commodity_id FROM store_commodity WHERE store_id = "${storeId}"))  LIMIT 20`;
+        return yield query_1.query(queryString).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
+    });
+}
+exports.searchCategoryByStoreId = searchCategoryByStoreId;
 //================== CREAR UNA CATEGORIA ==================//
 function createCategory(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -135,9 +165,7 @@ function getCategoriesByStores(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const storeId = req.params.store_id;
         const offset = req.query.offset;
-        const tableName = 'category';
         const columnName = 'store_id';
-        const state = Number(req.query.state);
         try {
             const conn = yield database_1.connect();
             const queryString = `SELECT category_id, category_name FROM category c WHERE state = 1 AND c.category_id IN (SELECT category_id FROM commodity 

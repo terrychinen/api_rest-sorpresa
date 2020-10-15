@@ -36,7 +36,7 @@ function queryGet(table, column, offset, state) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const conn = yield database_1.connect();
-            const query = yield conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY ${column} DESC LIMIT 20 OFFSET ${offset}`);
+            const query = yield conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY ${column} DESC LIMIT 10 OFFSET ${offset}`);
             conn.end();
             if (!query)
                 return ({ ok: false, status: 400, message: 'GET error: ' + table, result: [] });
@@ -126,7 +126,7 @@ function queryOrderbyId(table, columnName, value, offset, state) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const conn = yield database_1.connect();
-            const query = yield conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY FIELD(${columnName}, ${value}) DESC LIMIT 20 OFFSET ${offset}`);
+            const query = yield conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY FIELD(${columnName}, ${value}) DESC LIMIT 10 OFFSET ${offset}`);
             conn.end();
             if (!query)
                 return ({ ok: false, status: 400, message: 'GET error: ' + table, result: [] });

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStoresByCommodityId = exports.getStoresOrderById = exports.deleteStore = exports.updateStore = exports.createStore = exports.getStore = exports.getStores = void 0;
+exports.getStoresByCommodityId = exports.getStoresOrderById = exports.deleteStore = exports.updateStore = exports.createStore = exports.searchStore = exports.getStore = exports.getStores = void 0;
 const database_1 = require("../database");
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
@@ -42,6 +42,20 @@ function getStore(req, res) {
     });
 }
 exports.getStore = getStore;
+//================== BUSCAR ALMACEN POR SU NOMBRE  ==================//
+function searchStore(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const search = req.body.query;
+        const state = Number(req.body.state);
+        const queryString = `SELECT * FROM store WHERE store_name LIKE "%${search}%" AND state = ${state} ORDER BY store_name DESC`;
+        return yield query_1.query(queryString).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
+    });
+}
+exports.searchStore = searchStore;
 //================== CREAR UN ALMACÉN ==================//
 function createStore(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -150,7 +164,6 @@ function getStoresByCommodityId(req, res) {
         const commodityId = req.query.commodity_id;
         const state = req.query.state;
         const columnName = 'commodity_id';
-        console.log('DATA: ' + commodityId);
         try {
             const conn = yield database_1.connect();
             const queryString = `SELECT store_id, 

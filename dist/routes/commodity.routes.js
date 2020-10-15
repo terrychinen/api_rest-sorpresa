@@ -8,8 +8,14 @@ router.route('/')
     .put(commodity_controller_1.updateCommodity);
 router.route('/:category_id')
     .get(commodity_controller_1.getCommoditiesByCategoryId);
+router.route('/search/:category_id')
+    .post(commodity_controller_1.searchCommodity);
+router.route('/search/:store_id/:category_id')
+    .post(commodity_controller_1.searchCommodityByStoreIddAndCategoryId);
 router.route('/by_commodity/:store_id/:commodity_id')
     .get(commodity_controller_1.getCommodityByCommodityId);
+router.route('/get_less_stock/:store_id')
+    .get(commodity_controller_1.getCommoditiesWithLessStock);
 router.route('/:store_id/:category_id')
     .get(commodity_controller_1.getCommoditiesByCategoryIdAndStoreId);
 exports.default = router;

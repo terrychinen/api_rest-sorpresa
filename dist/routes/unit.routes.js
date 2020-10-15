@@ -6,6 +6,8 @@ const router = express_1.Router();
 router.route('/')
     .get(unit_controller_1.getUnits)
     .post(unit_controller_1.createUnit);
+router.route('/search')
+    .post(unit_controller_1.searchUnit);
 router.route('/:unit_id')
     .get(unit_controller_1.getUnit)
     .put(unit_controller_1.updateUnit)

@@ -2,7 +2,7 @@ import { connect } from '../database';
 import { Request, Response } from 'express';
 import { IStore } from '../interfaces/store.interface';
 import { checkIfDataExist } from '../queries/search.query';
-import { queryGet, queryGetWithoutOffset, queryGetBy, queryOrderbyId, queryInsert, queryDelete, queryUpdate } from '../queries/query';
+import { query, queryGet, queryGetWithoutOffset, queryGetBy, queryOrderbyId, queryInsert, queryDelete, queryUpdate } from '../queries/query';
 
 
 //================== OBTENER TODAS LOS ALMACENES ==================//
@@ -32,6 +32,22 @@ export async function getStore(req: Request, res: Response) {
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
+
+
+//================== BUSCAR ALMACEN POR SU NOMBRE  ==================//
+export async function searchStore(req: Request, res: Response){
+    const search = req.body.query;
+    const state = Number(req.body.state);
+
+    const queryString = `SELECT * FROM store WHERE store_name LIKE "%${search}%" AND state = ${state} ORDER BY store_name DESC`;
+
+    return await query(queryString).then( data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+        
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+    });
+}
+
 
 //================== CREAR UN ALMACÉN ==================//
 export async function createStore(req: Request, res: Response) {
@@ -141,8 +157,6 @@ export async function getStoresByCommodityId(req: Request, res: Response) {
     const state = req.query.state;
 
     const columnName = 'commodity_id';
-
-    console.log('DATA: ' +commodityId);
 
     try{
         const conn = await connect();

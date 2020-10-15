@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ICategory } from '../interfaces/category.interface';
 import { checkIfDataExist } from '../queries/search.query';
-import { queryGet, queryGetBy, queryOrderbyId, queryInsert, queryDelete, queryUpdate } from '../queries/query';
+import { query, queryGet, queryGetBy, queryOrderbyId, queryInsert, queryDelete, queryUpdate } from '../queries/query';
 import { connect } from '../database';
 
 
@@ -28,6 +28,38 @@ export async function getCategory(req: Request, res: Response) {
     const columnName = 'category_id';
 
     return await queryGetBy(tableName, columnName, search, state).then( data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+        
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+    });
+}
+
+
+//================== BUSCAR CATEGORIA POR SU NOMBRE  ==================//
+export async function searchCategory(req: Request, res: Response){
+    const search = req.body.query;
+    const state = Number(req.body.state);
+
+    const queryString = `SELECT * FROM category WHERE category_name LIKE "%${search}%" AND state = ${state} LIMIT 10`;
+
+    return await query(queryString).then( data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+        
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+    });
+}
+
+
+//================== BUSCAR CATEGORIA POR SU NOMBRE y POR STORE_ID  ==================//
+export async function searchCategoryByStoreId(req: Request, res: Response) {
+    const storeId = req.params.store_id;
+    const search = req.body.query;
+    const state = Number(req.body.state);
+
+    const queryString = `SELECT category_id, category_name FROM category c WHERE category_name LIKE "%${search}%" AND state = ${state} AND c.category_id IN (SELECT category_id FROM commodity 
+        WHERE commodity_id IN (SELECT commodity_id FROM store_commodity WHERE store_id = "${storeId}"))  LIMIT 20`;
+
+    return await query(queryString).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
@@ -123,9 +155,7 @@ export async function getCategoriesById(req: Request, res: Response){
 export async function getCategoriesByStores(req: Request, res: Response){
     const storeId = req.params.store_id;
     const offset = req.query.offset;
-    const tableName = 'category';
     const columnName = 'store_id';
-    const state = Number(req.query.state);
 
     try{
         const conn = await connect();

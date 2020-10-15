@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCategories, createCategory, getCategory, getCategoriesById, getCategoriesByStores, deleteCategory, updateCategory } from '../controllers/category.controller';
+import { searchCategoryByStoreId, searchCategory, getCategories, createCategory, getCategory, getCategoriesById, getCategoriesByStores, deleteCategory, updateCategory } from '../controllers/category.controller';
 
 const router = Router();
 
@@ -160,6 +160,11 @@ router.route('/:category_id')
     .put(updateCategory)
     .delete(deleteCategory);
 
+router.route('/search')
+    .post(searchCategory);
+
+router.route('/search/:store_id')
+    .post(searchCategoryByStoreId);
 
 router.route('/order_by_categoryid/:category_id')
     .get(getCategoriesById);

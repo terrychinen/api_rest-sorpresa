@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { IRole } from '../interfaces/role.interface';
 import { checkIfDataExist } from '../queries/search.query';
-import { queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../queries/query';
+import { query, queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../queries/query';
 
 
 //================== OBTENER TODAS LOS ROLES ==================//
@@ -29,6 +29,21 @@ export async function getRole(req: Request, res: Response) {
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });   
+}
+
+
+//================== BUSCAR ROL POR SU NOMBRE  ==================//
+export async function searchRole(req: Request, res: Response){
+    const search = req.body.query;
+    const state = Number(req.body.state);
+
+    const queryString = `SELECT * FROM role WHERE role_name LIKE "%${search}%" AND state = ${state} LIMIT 10`;
+
+    return await query(queryString).then( data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+        
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+    });
 }
 
 
@@ -77,6 +92,7 @@ export async function updateRole(req: Request, res: Response) {
         });
     });
 }
+
 
 //================== ELIMINAR UN ROL POR SU ID ==================//
 export async function deleteRole(req: Request, res: Response) {

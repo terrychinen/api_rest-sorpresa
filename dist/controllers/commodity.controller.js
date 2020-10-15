@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCommodity = exports.updateCommodity = exports.createCommodity = exports.getCommoditiesByCategoryIdAndStoreId = exports.getCommodityByCommodityId = exports.getCommoditiesByCategoryId = exports.getCommodities = void 0;
+exports.deleteCommodity = exports.updateCommodity = exports.createCommodity = exports.getCommoditiesByCategoryIdAndStoreId = exports.searchCommodityByStoreIddAndCategoryId = exports.searchCommodity = exports.getCommoditiesWithLessStock = exports.getCommodityByCommodityId = exports.getCommoditiesByCategoryId = exports.getCommodities = void 0;
 const database_1 = require("../database");
 const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
@@ -37,13 +37,13 @@ function getCommoditiesByCategoryId(req, res) {
         const columnName = 'category_id';
         try {
             const conn = yield database_1.connect();
-            const queryString = 'SELECT commodity_id, commodity_name,  CAST(last_update AS CHAR) AS last_update, state,' +
-                '(SELECT cat.category_id FROM category cat WHERE cat.category_id = comm.category_id)category_id, ' +
-                '(SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, ' +
-                '(SELECT un.unit_id FROM unit un WHERE un.unit_id = comm.unit_id)unit_id, ' +
-                '(SELECT unit_name FROM unit un WHERE un.unit_id = comm.unit_id)unit_name, ' +
-                '(SELECT username FROM user us WHERE us.user_id = comm.user_id)username ' +
-                'FROM commodity comm WHERE category_id = ' + categoryId + ' AND state = ' + state + ' LIMIT 10 OFFSET ' + offset;
+            const queryString = `SELECT commodity_id, commodity_name, CAST(last_update AS CHAR) AS last_update, state, 
+                (SELECT cat.category_id FROM category cat WHERE cat.category_id = comm.category_id)category_id, 
+                (SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, 
+                (SELECT un.unit_id FROM unit un WHERE un.unit_id = comm.unit_id)unit_id, 
+                (SELECT unit_name FROM unit un WHERE un.unit_id = comm.unit_id)unit_name, 
+                (SELECT username FROM user us WHERE us.user_id = comm.user_id)username 
+                FROM commodity comm WHERE category_id = ${categoryId} AND state = ${state} LIMIT 10 OFFSET ${offset}`;
             const queryCommodity = yield conn.query(queryString);
             conn.end();
             if (!queryCommodity)
@@ -93,15 +93,73 @@ function getCommodityByCommodityId(req, res) {
     });
 }
 exports.getCommodityByCommodityId = getCommodityByCommodityId;
+//================== OBTENER LOS 5 MERCANCÍAS CON MENOS STOCK  ==================//
+function getCommoditiesWithLessStock(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const storeId = req.params.store_id;
+        const offset = Number(req.query.offset);
+        const queryString = `SELECT  distinct sc.store_commodity_id, sc.commodity_id, c.commodity_name, c.unit_id, u.unit_name, 
+                cate.category_id, cate.category_name, sc.stock_min, sc.stock_max, sc.current_stock, sc.last_update FROM store_commodity sc 
+                INNER JOIN commodity c ON sc.commodity_id = c.commodity_id 
+                INNER JOIN unit u ON c.unit_id = u.unit_id
+                INNER JOIN category cate ON cate.category_id = c.category_id
+                WHERE store_id = ${storeId} AND current_stock<stock_min  LIMIT 20 OFFSET ${offset}`;
+        return yield query_1.query(queryString).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
+    });
+}
+exports.getCommoditiesWithLessStock = getCommoditiesWithLessStock;
+//================== BUSCAR COMMODITY POR SU NOMBRE  ==================//
+function searchCommodity(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const categoryId = req.params.category_id;
+        const search = req.body.query;
+        const state = Number(req.body.state);
+        const queryString = `SELECT commodity_id, commodity_name, CAST(last_update AS CHAR) AS last_update, state, 
+                        (SELECT cat.category_id FROM category cat WHERE cat.category_id = comm.category_id)category_id, 
+                        (SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, 
+                        (SELECT un.unit_id FROM unit un WHERE un.unit_id = comm.unit_id)unit_id, 
+                        (SELECT unit_name FROM unit un WHERE un.unit_id = comm.unit_id)unit_name, 
+                        (SELECT username FROM user us WHERE us.user_id = comm.user_id)username 
+                        FROM commodity comm WHERE category_id = ${categoryId} AND state = ${state} AND commodity_name LIKE "%${search}%" LIMIT 10`;
+        return yield query_1.query(queryString).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
+    });
+}
+exports.searchCommodity = searchCommodity;
+//================== BUSCAR COMMODITY POR SU NOMBRE  ==================//
+function searchCommodityByStoreIddAndCategoryId(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const categoryId = req.params.category_id;
+        const storeId = req.params.store_id;
+        const search = req.body.query;
+        const state = Number(req.body.state);
+        const queryString = `SELECT  distinct sc.store_commodity_id, sc.commodity_id, c.commodity_name, c.unit_id, u.unit_name, 
+                        cate.category_id, cate.category_name, sc.stock_min, sc.stock_max, sc.current_stock, sc.last_update FROM store_commodity sc 
+                        INNER JOIN commodity c ON sc.commodity_id = c.commodity_id 
+                        INNER JOIN unit u ON c.unit_id = u.unit_id
+                        INNER JOIN category cate ON cate.category_id = c.category_id
+                        WHERE store_id = ${storeId} AND cate.category_id = ${categoryId} AND c.commodity_name LIKE "%${search}%" AND sc.state = ${state}`;
+        return yield query_1.query(queryString).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
+    });
+}
+exports.searchCommodityByStoreIddAndCategoryId = searchCommodityByStoreIddAndCategoryId;
 //================== OBTENER TODOS LAS MERCANCÍAS POR EL ID DE LA CATEGORÍA Y DEL ALMACEN ==================//
 function getCommoditiesByCategoryIdAndStoreId(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const categoryId = req.params.category_id;
         const storeId = req.params.store_id;
-        const state = req.query.state;
-        const offset = Number(req.query.offset);
         const columnName = 'category_id';
-        console.log('HOLA');
         try {
             const conn = yield database_1.connect();
             const queryString = `SELECT  distinct sc.store_commodity_id, sc.commodity_id, c.commodity_name, c.unit_id, u.unit_name, 

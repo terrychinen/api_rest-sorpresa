@@ -1,11 +1,14 @@
 import { Router } from 'express';
-import { getUnits, getUnitsById, createUnit, getUnit, updateUnit, deleteUnit } from '../controllers/unit.controller';
+import { searchUnit, getUnits, getUnitsById, createUnit, getUnit, updateUnit, deleteUnit } from '../controllers/unit.controller';
 
 const router = Router();
 
 router.route('/')
     .get(getUnits)
     .post(createUnit);
+
+router.route('/search')
+    .post(searchUnit);
 
 router.route('/:unit_id')
     .get(getUnit)

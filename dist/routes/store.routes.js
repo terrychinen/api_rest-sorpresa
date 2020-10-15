@@ -6,6 +6,8 @@ const router = express_1.Router();
 router.route('/')
     .get(store_controller_1.getStores)
     .post(store_controller_1.createStore);
+router.route('/search')
+    .post(store_controller_1.searchStore);
 router.route('/commodity')
     .get(store_controller_1.getStoresByCommodityId);
 router.route('/:store_id')
