@@ -10,16 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteRole = exports.updateRole = exports.createRole = exports.searchRole = exports.getRole = exports.getRoles = void 0;
-const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
 //================== OBTENER TODAS LOS ROLES ==================//
 function getRoles(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const tableName = 'role';
-        const columnName = 'role_id';
         const offset = Number(req.query.offset);
         const state = Number(req.query.state);
-        return yield query_1.queryGet(tableName, columnName, offset, state).then(data => {
+        const queryGet = `SELECT * FROM role WHERE state = ${state} ORDER BY role_id DESC LIMIT 10 OFFSET ${offset}`;
+        return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
@@ -32,9 +30,8 @@ function getRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const search = req.params.role_id;
         const state = req.params.state;
-        const tableName = 'role';
-        const columnName = 'role_id';
-        return yield query_1.queryGetBy(tableName, columnName, search, state).then(data => {
+        const queryGet = `SELECT * FROM role WHERE role_id = "${search}" AND state = ${state}`;
+        return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
@@ -62,15 +59,16 @@ function createRole(req, res) {
         const role = req.body;
         const tableName = 'role';
         const columnName = 'role_name';
-        //VERIFICA SI EL ROL EXISTE
-        return yield search_query_1.checkIfDataExist(tableName, columnName, role.role_name).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-            if (dataCheck.ok)
-                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
-            //INSERTA EL NUEVO ROL
-            return yield query_1.queryInsert(tableName, role).then(data => {
+        const queryCheck = `SELECT * FROM role WHERE role_name = "${role.role_name}"`;
+        return yield query_1.query(queryCheck).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+            if (dataCheck.result[0][0] != null) {
+                return res.status(400).json({ ok: false, message: 'El rol ya existe!' });
+            }
+            const queryInsert = `INSERT INTO role (role_name, state) VALUES ("${role.role_name}", "${role.state}")`;
+            return yield query_1.query(queryInsert).then(data => {
                 if (!data.ok)
                     return res.status(data.status).json({ ok: false, message: data.message });
-                return res.status(data.status).json({ ok: true, message: data.message });
+                return res.status(data.status).json({ ok: true, message: 'Rol creado correctamente' });
             });
         }));
     });
@@ -81,25 +79,23 @@ function updateRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const role = req.body;
         const roleId = req.params.role_id;
-        const tableName = 'role';
-        const columnId = 'role_id';
-        const columnName = 'role_name';
-        //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-        return yield search_query_1.checkIfDataExist(tableName, columnId, roleId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-            if (!dataCheck.ok) {
-                return res.status(404).json({ ok: false, message: dataCheck.message });
+        const queryCheckId = `SELECT * FROM role WHERE role_id = "${roleId}"`;
+        return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
+            if (dataCheckId.result[0][0] == null) {
+                return res.status(400).json({ ok: false, message: `El rol con el id ${roleId} no existe!` });
             }
-            //VERIFICA SI YA HAY UN ROL CON EL MISMO NOMBRE PARA NO ACTUALIZAR
-            return yield search_query_1.checkIfDataExist(tableName, columnName, role.role_name).then((dataCheckRepeat) => __awaiter(this, void 0, void 0, function* () {
-                if (dataCheckRepeat.ok) {
-                    return res.status(400).json({ ok: false, message: dataCheckRepeat.message });
+            ;
+            const queryCheck = `SELECT * FROM role WHERE role_name = "${role.role_name}"`;
+            return yield query_1.query(queryCheck).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+                if (dataCheck.result[0][0] != null) {
+                    return res.status(400).json({ ok: false, message: 'El rol ya existe!' });
                 }
-                //ACTUALIZA EL REGISTRO
-                return yield query_1.queryUpdate(tableName, columnId, role, roleId).then(data => {
-                    if (!data.ok)
-                        return res.status(data.status).json({ ok: false, message: data.message });
-                    return res.status(data.status).json({ ok: true, message: data.message });
-                });
+                const queryUpdate = `UPDATE role SET role_name="${role.role_name}", state = "${role.state}" WHERE role_id = "${roleId}"`;
+                return yield query_1.query(queryUpdate).then((dataUpdate) => __awaiter(this, void 0, void 0, function* () {
+                    if (!dataUpdate.ok)
+                        return res.status(dataUpdate.status).json({ ok: false, message: dataUpdate.message });
+                    return res.status(dataUpdate.status).json({ ok: true, message: 'El rol se actualizó correctamente' });
+                }));
             }));
         }));
     });
@@ -108,17 +104,18 @@ exports.updateRole = updateRole;
 //================== ELIMINAR UN ROL POR SU ID ==================//
 function deleteRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const tableName = 'role';
-        const columnName = 'role_id';
         const roleId = req.params.role_id;
-        return yield search_query_1.checkIfDataExist(tableName, columnName, roleId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-            if (!dataCheck.ok) {
-                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
+        const queryCheckId = `SELECT * FROM role WHERE role_id = "${roleId}"`;
+        return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
+            if (dataCheckId.result[0][0] == null) {
+                return res.status(400).json({ ok: false, message: `El rol con el id ${roleId} no existe!` });
             }
-            return yield query_1.queryDelete(tableName, columnName, roleId).then(data => {
-                if (!data.ok)
-                    return res.status(data.status).json({ ok: false, message: data.message });
-                return res.status(data.status).json({ ok: true, message: data.message });
+            ;
+            const queryDelete = `DELETE role WHERE role_id = "${roleId}"`;
+            return yield query_1.query(queryDelete).then(dataDelete => {
+                if (!dataDelete.ok)
+                    return res.status(dataDelete.status).json({ ok: false, message: dataDelete.message });
+                return res.status(dataDelete.status).json({ ok: true, message: 'El rol se eliminó correctamente' });
             });
         }));
     });

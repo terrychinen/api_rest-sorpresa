@@ -1,20 +1,17 @@
 import { Request, Response } from 'express';
 import { ICategory } from '../interfaces/category.interface';
-import { checkIfDataExist } from '../queries/search.query';
-import { query, queryGet, queryGetBy, queryOrderbyId, queryInsert, queryDelete, queryUpdate } from '../queries/query';
-import { connect } from '../database';
+import { query } from '../queries/query';
 
 
 //================== OBTENER TODAS LAS CATEGORIAS ==================//
 export async function getCategories(req: Request, res: Response){
-    const tableName = 'category';
-    const columnName = 'category_id';
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
 
-    return await queryGet(tableName, columnName, offset, state).then( data => {
+    const queryGet = `SELECT * FROM category WHERE state = ${state} ORDER BY category_id DESC LIMIT 10 OFFSET ${offset}`;
+
+    return await query(queryGet).then(data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
@@ -24,12 +21,11 @@ export async function getCategories(req: Request, res: Response){
 export async function getCategory(req: Request, res: Response) {
     const search = req.params.category_id;
     const state = req.params.state;
-    const tableName = 'category';
-    const columnName = 'category_id';
 
-    return await queryGetBy(tableName, columnName, search, state).then( data => {
+    const queryGet = `SELECT * FROM category WHERE category_id = "${search}" AND state = ${state}`;
+
+    return await query(queryGet).then(data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
@@ -40,11 +36,10 @@ export async function searchCategory(req: Request, res: Response){
     const search = req.body.query;
     const state = Number(req.body.state);
 
-    const queryString = `SELECT * FROM category WHERE category_name LIKE "%${search}%" AND state = ${state} LIMIT 10`;
+    const querySearch = `SELECT * FROM category WHERE category_name LIKE "%${search}%" AND state = ${state} LIMIT 10`;
 
-    return await query(queryString).then( data => {
+    return await query(querySearch).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
@@ -56,12 +51,11 @@ export async function searchCategoryByStoreId(req: Request, res: Response) {
     const search = req.body.query;
     const state = Number(req.body.state);
 
-    const queryString = `SELECT category_id, category_name FROM category c WHERE category_name LIKE "%${search}%" AND state = ${state} AND c.category_id IN (SELECT category_id FROM commodity 
+    const querySearch = `SELECT category_id, category_name FROM category c WHERE category_name LIKE "%${search}%" AND state = ${state} AND c.category_id IN (SELECT category_id FROM commodity 
         WHERE commodity_id IN (SELECT commodity_id FROM store_commodity WHERE store_id = "${storeId}"))  LIMIT 20`;
 
-    return await query(queryString).then( data => {
+    return await query(querySearch).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
@@ -70,21 +64,17 @@ export async function searchCategoryByStoreId(req: Request, res: Response) {
 //================== CREAR UNA CATEGORIA ==================//
 export async function createCategory(req: Request, res: Response) {
     const category: ICategory = req.body;
-    const tableName = 'category';
-    const columnName = 'category_name';
 
-    //VERIFICA SI LA CATEGORIA EXISTE
-    return await checkIfDataExist(tableName, columnName, category.category_name).then( async dataCheck => {
-        if(dataCheck.ok) return res.status(403).json({ok: false, message: dataCheck.message});
-        if(dataCheck.status == 500) return res.status(500).json({ok: false, message: dataCheck.message});
+    const queryCheck = `SELECT * FROM category WHERE category_name = "${category.category_name}"`;
+   
+    return await query(queryCheck).then(async dataCheck => {
+        if(dataCheck.result[0][0] != null) {return res.status(400).json({ok: false, message: 'La categoría ya existe!'});}
+        const queryInsert = `INSERT INTO category (category_name, state) VALUES ("${category.category_name}", "${category.state}")`;
 
-         //INSERTA LA NUEVA CATEGORIA
-         return await queryInsert(tableName, category).then( data => {
+        return await query(queryInsert).then(data => {
             if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-            
-            return res.status(data.status).json({ok: true, message: data.message});
+            return res.status(data.status).json({ok: true, message: 'Categoría creado correctamente'});
         });
-
     });
 }
 
@@ -93,22 +83,21 @@ export async function createCategory(req: Request, res: Response) {
 export async function updateCategory(req: Request, res: Response) {
     const category: ICategory = req.body;
     const categoryId = req.params.category_id;
-    const tableName = 'category';
-    const columnName = 'category_id';
 
-    //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-    return await checkIfDataExist(tableName, columnName, categoryId).then( async dataCheck => {
-        if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
+    const queryCheckId = `SELECT * FROM category WHERE category_id = "${categoryId}"`;
 
-        //VERIFICA SI YA HAY UNA CATEGORIA CON EL MISMO NOMBRE PARA NO ACTUALIZAR
-        return await checkIfDataExist(tableName, columnName, category.category_name).then( async dataCheckRepeat => {
-            if(dataCheckRepeat.ok) {return res.status(400).json({ok: false, message: dataCheckRepeat.message})}
+    return await query(queryCheckId).then(async dataCheckId => {
+        if(dataCheckId.result[0][0] == null) {return res.status(400).json({ok: false, message: `La categoría con el id ${categoryId} no existe!`});};
 
-            //ACTUALIZA EL REGISTRO
-            return await queryUpdate(tableName, columnName, category, categoryId).then( data => {
-                if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-                
-                return res.status(data.status).json({ok: true, message: data.message});
+        const queryCheck = `SELECT * FROM category WHERE category_name = "${category.category_name}"`;
+
+        return await query(queryCheck).then(async dataCheck => {
+            if(dataCheck.result[0][0] != null) {return res.status(400).json({ok: false, message: 'La categoría ya existe!'});}
+            const queryUpdate = `UPDATE category SET category_name="${category.category_name}", state = "${category.state}" WHERE category_id = "${categoryId}"`;    
+
+            return await query(queryUpdate).then(async dataUpdate => {
+                if(!dataUpdate.ok) return res.status(dataUpdate.status).json({ok: false, message: dataUpdate.message})    
+                return res.status(dataUpdate.status).json({ok: true, message: 'La categoría se actualizó correctamente'});
             });
         });
     });
@@ -118,18 +107,16 @@ export async function updateCategory(req: Request, res: Response) {
 //================== ELIMINAR UNA CATEGORIA POR SU ID ==================//
 export async function deleteCategory(req: Request, res: Response) {
     const categoryId = req.params.category_id;
-    const tableName = 'category';
-    const columnName = 'category_id';
 
-    //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-    return await checkIfDataExist(tableName, columnName, categoryId).then( async dataCheck => {
-        if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
+    const queryCheckId = `SELECT * FROM category WHERE category_id = "${categoryId}"`;
 
-        //ELIMINA EL REGISTRO
-        return await queryDelete(tableName, columnName, categoryId).then( data => {
-            if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-            
-            return res.status(data.status).json({ok: true, message: data.message});
+    return await query(queryCheckId).then(async dataCheckId => {
+        if(dataCheckId.result[0][0] == null) {return res.status(400).json({ok: false, message: `La categoría con el id ${categoryId} no existe!`});};
+        const queryDelete = `DELETE category WHERE category_id = "${categoryId}"`;
+
+        return await query(queryDelete).then(dataDelete => {
+            if(!dataDelete.ok) return res.status(dataDelete.status).json({ok: false, message: dataDelete.message})
+            return res.status(dataDelete.status).json({ok: true, message: 'La categoría se eliminó correctamente'});
         });
     });
 }
@@ -137,15 +124,14 @@ export async function deleteCategory(req: Request, res: Response) {
 
 //================== OBTENER TODAS LAS CATEGORIAS ORDER BY CATEGORY ID ==================//
 export async function getCategoriesById(req: Request, res: Response){
-    const tableName = 'category';
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
-    const categoryId = '"' +req.params.category_id +'"';
-    const columnName = `category_id`;
+    const categoryId = req.params.category_id;
 
-    return await queryOrderbyId(tableName, columnName, categoryId, offset, state).then( data => {
+    const queryGet = `SELECT * FROM category WHERE state = ${state} ORDER BY FIELD(category_id, "${categoryId}") DESC LIMIT 10 OFFSET ${offset}`;
+
+    return await query(queryGet).then(data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
@@ -155,24 +141,12 @@ export async function getCategoriesById(req: Request, res: Response){
 export async function getCategoriesByStores(req: Request, res: Response){
     const storeId = req.params.store_id;
     const offset = req.query.offset;
-    const columnName = 'store_id';
 
-    try{
-        const conn = await connect();
+    const queryGet =  `SELECT category_id, category_name FROM category c WHERE state = 1 AND c.category_id IN (SELECT category_id FROM commodity 
+                            WHERE commodity_id IN (SELECT commodity_id FROM store_commodity WHERE store_id = "${storeId}"))  LIMIT 20 OFFSET ${offset}`;
 
-        const queryString = `SELECT category_id, category_name FROM category c WHERE state = 1 AND c.category_id IN (SELECT category_id FROM commodity 
-                                 WHERE commodity_id IN (SELECT commodity_id FROM store_commodity WHERE store_id = "${storeId}"))  LIMIT 20 OFFSET ${offset}`;
-
-        const queryCategoryCommmodity = await conn.query(queryString);
-
-        conn.end();
-    
-        if(!queryCategoryCommmodity)  return res.status(400).json({ok: false, message: 'GET BY '+columnName +' error: store_commodity', result: []})
-        return res.status(200).json({
-            ok: true, 
-            message: 'GET BY '+columnName +' successful: Commodity',
-            result: queryCategoryCommmodity[0],
-        });
-
-    }catch(e){return res.status(500).json({ok: false, message: e.toString(), result: []});}
+    return await query(queryGet).then(data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+        return res.status(200).json({ok: true, message: data.message, result: data[0]});
+    });
 }

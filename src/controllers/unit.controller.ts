@@ -1,19 +1,18 @@
 import { Request, Response } from 'express';
 import { IUnit } from '../interfaces/unit.interface';
-import { checkIfDataExist } from '../queries/search.query';
-import { query, queryGet, queryGetBy, queryOrderbyId, queryInsert, queryDelete, queryUpdate } from '../queries/query';
+import { query } from '../queries/query';
 
 
 
 //================== OBTENER TODAS LAS UNIDADES ==================//
 export async function getUnits(req: Request, res: Response) {
-    const tableName = 'unit';
-    const columnName = 'unit_id';
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
-    return await queryGet(tableName, columnName, offset, state).then( data => {
+
+    const queryGet = `SELECT * FROM unit WHERE state = ${state} ORDER BY unit_id DESC LIMIT 10 OFFSET ${offset}`;
+
+    return await query(queryGet).then(data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
@@ -23,12 +22,11 @@ export async function getUnits(req: Request, res: Response) {
 export async function getUnit(req: Request, res: Response) {
     const search = req.params.unit_id;
     const state = req.params.state;
-    const tableName = 'unit';
-    const columnName = 'unit_id';
 
-    await await queryGetBy(tableName, columnName, search, state).then( data => {
+    const queryGet = `SELECT * FROM unit WHERE unit_id = "${search}" AND state = ${state}`;
+
+    return await query(queryGet).then(data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
@@ -43,7 +41,6 @@ export async function searchUnit(req: Request, res: Response){
 
     return await query(queryString).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
@@ -52,18 +49,16 @@ export async function searchUnit(req: Request, res: Response){
 //================== CREAR UNA UNIDAD ==================//
 export async function createUnit(req: Request, res: Response) {
     const unit: IUnit = req.body;
-    const tableName = 'unit';
-    const columnName = 'unit_name';
 
-    //VERIFICA SI LA UNIDAD EXISTE
-    return await checkIfDataExist(tableName, columnName, unit.unit_name).then( async dataCheck => {
-        if(dataCheck.ok) return res.status(dataCheck.status).json({ok: false, message: dataCheck.message});
-        
-        //INSERTA LA NUEVA UNIDAD
-        return await queryInsert(tableName, unit).then( data => {
+    const queryCheck = `SELECT * FROM unit WHERE unit_name = "${unit.unit_name}"`;
+   
+    return await query(queryCheck).then(async dataCheck => {
+        if(dataCheck.result[0][0] != null) {return res.status(400).json({ok: false, message: 'La unidad ya existe!'});}
+        const queryInsert = `INSERT INTO unit (unit_name, symbol, state) VALUES ("${unit.unit_name}", "${unit.symbol}", "${unit.state}")`;
+
+        return await query(queryInsert).then(data => {
             if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-            
-            return res.status(data.status).json({ok: true, message: data.message});
+            return res.status(data.status).json({ok: true, message: 'Unidad creado correctamente'});
         });
     });
 }
@@ -73,22 +68,27 @@ export async function createUnit(req: Request, res: Response) {
 export async function updateUnit(req: Request, res: Response) {
     const unit: IUnit = req.body;
     const unitId = req.params.unit_id;
-    const tableName = 'unit';
-    const columnId = 'unit_id';
-    const columnName = 'unit_name';
 
-    //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-    await checkIfDataExist(tableName, columnId, unitId).then( async dataCheck => {
-        if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
+    const queryCheckId = `SELECT * FROM unit WHERE unit_id = "${unitId}"`;
 
-        //VERIFICA SI YA HAY UNA UNIDAD CON EL MISMO NOMBRE PARA NO ACTUALIZAR
-        return await checkIfDataExist(tableName, columnName, unit.unit_name).then( async dataCheckRepeat => {
-            if(dataCheckRepeat.ok) {return res.status(400).json({ok: false, message: dataCheckRepeat.message})}
-            //ACTUALIZA EL REGISTRO
-            return await queryUpdate(tableName, columnId, unit, unitId).then( data => {
-                if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-            
-                return res.status(data.status).json({ok: true, message: data.message});
+    return await query(queryCheckId).then(async dataCheckId => {
+        if(dataCheckId.result[0][0] == null) {return res.status(400).json({ok: false, message: `La unidad con el id ${unitId} no existe!`});};
+
+        const queryCheckUnitName = `SELECT unit_id FROM unit WHERE unit_name = "${unit.unit_name}" AND unit_id != "${unitId}"`;
+
+        return await query(queryCheckUnitName).then(async dataCheckUnit => {
+            if(dataCheckUnit.result[0][0] != null) {return res.status(400).json({ok: false, message: 'El nombre de la unidad ya existe!'});}
+
+            const queryCheckUnitSymbol = `SELECT unit_id FROM unit WHERE symbol = "${unit.unit_name}" AND unit_id != "${unitId}"`;
+
+            return await query(queryCheckUnitSymbol).then(async dataCheckSymbol => {
+                if(dataCheckSymbol.result[0][0] != null) {return res.status(400).json({ok: false, message: 'El símbolo de la unidad ya existe!'});}
+                const queryUpdate = `UPDATE unit SET unit_name = "${unit.unit_name}", symbol = ${unit.symbol}, state = "${unit.state}" WHERE unit_id = "${unitId}"`;    
+
+                return await query(queryUpdate).then(async dataUpdate => {
+                    if(!dataUpdate.ok) return res.status(dataUpdate.status).json({ok: false, message: dataUpdate.message})    
+                    return res.status(dataUpdate.status).json({ok: true, message: 'La unidad se actualizó correctamente'});
+                });
             });
         });
     });
@@ -97,19 +97,18 @@ export async function updateUnit(req: Request, res: Response) {
 
 //================== ELIMINAR UNA UNIDAD POR SU ID ==================//
 export async function deleteUnit(req: Request, res: Response) {
-    const tableName = 'unit';
-    const columnName = 'unit_id';
     const unitId = req.params.unit_id;
 
-     //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-    await checkIfDataExist(tableName, columnName, unitId).then( async dataCheck => {
-        if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
+    const queryCheckId = `SELECT * FROM unit WHERE unit_id = "${unitId}"`;
 
-         //ELIMINA EL REGISTRO
-        return await queryDelete(tableName, columnName, unitId).then( data => {
-            if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+    return await query(queryCheckId).then(async dataCheckId => {
+        if(dataCheckId.result[0][0] == null) {return res.status(400).json({ok: false, message: `La unidad con el id ${unitId} no existe!`});};
+        const queryDelete = `DELETE unit WHERE unit_id = "${unitId}"`;
+
+        return await query(queryDelete).then(dataDelete => {
+            if(!dataDelete.ok) return res.status(dataDelete.status).json({ok: false, message: dataDelete.message})
             
-            return res.status(data.status).json({ok: true, message: data.message});
+            return res.status(dataDelete.status).json({ok: true, message: 'La unidad se eliminó correctamente'});
         });
     });
 }
@@ -117,15 +116,14 @@ export async function deleteUnit(req: Request, res: Response) {
 
 //================== OBTENER TODAS LAS UNIDADES ORDER BY UNIT ID ==================//
 export async function getUnitsById(req: Request, res: Response){
-    const tableName = 'unit';
+    const unitId = req.params.unit_id;
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
-    const unitId = '"' +req.params.unit_id +'"';
-    const columnName = `unit_id`;
 
-    return await queryOrderbyId(tableName, columnName, unitId, offset, state).then( data => {
+    const queryGet = `SELECT * FROM unit WHERE state = ${state} ORDER BY FIELD(unit_id, "${unitId}") DESC LIMIT 10 OFFSET ${offset}`;
+
+    return await query(queryGet).then(data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }

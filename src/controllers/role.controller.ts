@@ -1,18 +1,17 @@
 import { Request, Response } from 'express';
 import { IRole } from '../interfaces/role.interface';
-import { checkIfDataExist } from '../queries/search.query';
-import { query, queryGet, queryGetBy, queryInsert, queryDelete, queryUpdate } from '../queries/query';
+import { query } from '../queries/query';
 
 
 //================== OBTENER TODAS LOS ROLES ==================//
 export async function getRoles(req: Request, res: Response) {
-    const tableName = 'role';
-    const columnName = 'role_id';
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
-    return await queryGet(tableName, columnName, offset, state).then( data => {
+
+    const queryGet = `SELECT * FROM role WHERE state = ${state} ORDER BY role_id DESC LIMIT 10 OFFSET ${offset}`;
+
+    return await query(queryGet).then(data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
@@ -22,13 +21,13 @@ export async function getRoles(req: Request, res: Response) {
 export async function getRole(req: Request, res: Response) {
     const search = req.params.role_id;
     const state = req.params.state;
-    const tableName = 'role';
-    const columnName = 'role_id';
-    return await queryGetBy(tableName, columnName, search, state).then( data => {
+
+    const queryGet = `SELECT * FROM role WHERE role_id = "${search}" AND state = ${state}`;
+
+    return await query(queryGet).then(data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
-    });   
+    }); 
 }
 
 
@@ -41,7 +40,6 @@ export async function searchRole(req: Request, res: Response){
 
     return await query(queryString).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
@@ -53,15 +51,15 @@ export async function createRole(req: Request, res: Response) {
     const tableName = 'role';
     const columnName = 'role_name';
 
-    //VERIFICA SI EL ROL EXISTE
-    return await checkIfDataExist(tableName, columnName, role.role_name).then( async dataCheck => {
-        if(dataCheck.ok) return res.status(dataCheck.status).json({ok: false, message: dataCheck.message});
- 
-        //INSERTA EL NUEVO ROL
-        return await queryInsert(tableName, role).then( data => {
+    const queryCheck = `SELECT * FROM role WHERE role_name = "${role.role_name}"`;
+   
+    return await query(queryCheck).then(async dataCheck => {
+        if(dataCheck.result[0][0] != null) {return res.status(400).json({ok: false, message: 'El rol ya existe!'});}
+        const queryInsert = `INSERT INTO role (role_name, state) VALUES ("${role.role_name}", "${role.state}")`;
+
+        return await query(queryInsert).then(data => {
             if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-            
-            return res.status(data.status).json({ok: true, message: data.message});
+            return res.status(data.status).json({ok: true, message: 'Rol creado correctamente'});
         });
     });
 }
@@ -71,23 +69,21 @@ export async function createRole(req: Request, res: Response) {
 export async function updateRole(req: Request, res: Response) {
     const role: IRole = req.body;
     const roleId = req.params.role_id;
-    const tableName = 'role';
-    const columnId = 'role_id';
-    const columnName = 'role_name';
 
-    //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-    return await checkIfDataExist(tableName, columnId, roleId).then( async dataCheck => {
-        if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
+    const queryCheckId = `SELECT * FROM role WHERE role_id = "${roleId}"`;
 
-        //VERIFICA SI YA HAY UN ROL CON EL MISMO NOMBRE PARA NO ACTUALIZAR
-        return await checkIfDataExist(tableName, columnName, role.role_name).then( async dataCheckRepeat => {
-            if(dataCheckRepeat.ok) {return res.status(400).json({ok: false, message: dataCheckRepeat.message})}
+    return await query(queryCheckId).then(async dataCheckId => {
+        if(dataCheckId.result[0][0] == null) {return res.status(400).json({ok: false, message: `El rol con el id ${roleId} no existe!`});};
 
-             //ACTUALIZA EL REGISTRO
-            return await queryUpdate(tableName, columnId, role, roleId).then( data => {
-                if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-                
-                return res.status(data.status).json({ok: true, message: data.message});
+        const queryCheck = `SELECT * FROM role WHERE role_name = "${role.role_name}"`;
+
+        return await query(queryCheck).then(async dataCheck => {
+            if(dataCheck.result[0][0] != null) {return res.status(400).json({ok: false, message: 'El rol ya existe!'});}
+            const queryUpdate = `UPDATE role SET role_name="${role.role_name}", state = "${role.state}" WHERE role_id = "${roleId}"`;    
+
+            return await query(queryUpdate).then(async dataUpdate => {
+                if(!dataUpdate.ok) return res.status(dataUpdate.status).json({ok: false, message: dataUpdate.message})    
+                return res.status(dataUpdate.status).json({ok: true, message: 'El rol se actualizó correctamente'});
             });
         });
     });
@@ -96,17 +92,18 @@ export async function updateRole(req: Request, res: Response) {
 
 //================== ELIMINAR UN ROL POR SU ID ==================//
 export async function deleteRole(req: Request, res: Response) {
-    const tableName = 'role';
-    const columnName = 'role_id';
     const roleId = req.params.role_id;
 
-    return await checkIfDataExist(tableName, columnName, roleId).then( async dataCheck => {
-        if(!dataCheck.ok) {return res.status(dataCheck.status).json({ok: false, message: dataCheck.message})}
+    const queryCheckId = `SELECT * FROM role WHERE role_id = "${roleId}"`;
 
-        return await queryDelete(tableName, columnName, roleId).then( data => {
-            if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+    return await query(queryCheckId).then(async dataCheckId => {
+        if(dataCheckId.result[0][0] == null) {return res.status(400).json({ok: false, message: `El rol con el id ${roleId} no existe!`});};
+        const queryDelete = `DELETE role WHERE role_id = "${roleId}"`;
+
+        return await query(queryDelete).then(dataDelete => {
+            if(!dataDelete.ok) return res.status(dataDelete.status).json({ok: false, message: dataDelete.message})
             
-            return res.status(data.status).json({ok: true, message: data.message});
+            return res.status(dataDelete.status).json({ok: true, message: 'El rol se eliminó correctamente'});
         });
     });
 }

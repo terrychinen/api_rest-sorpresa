@@ -10,16 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUnitsById = exports.deleteUnit = exports.updateUnit = exports.createUnit = exports.searchUnit = exports.getUnit = exports.getUnits = void 0;
-const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
 //================== OBTENER TODAS LAS UNIDADES ==================//
 function getUnits(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const tableName = 'unit';
-        const columnName = 'unit_id';
         const offset = Number(req.query.offset);
         const state = Number(req.query.state);
-        return yield query_1.queryGet(tableName, columnName, offset, state).then(data => {
+        const queryGet = `SELECT * FROM unit WHERE state = ${state} ORDER BY unit_id DESC LIMIT 10 OFFSET ${offset}`;
+        return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
@@ -32,9 +30,8 @@ function getUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const search = req.params.unit_id;
         const state = req.params.state;
-        const tableName = 'unit';
-        const columnName = 'unit_id';
-        yield yield query_1.queryGetBy(tableName, columnName, search, state).then(data => {
+        const queryGet = `SELECT * FROM unit WHERE unit_id = "${search}" AND state = ${state}`;
+        return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
@@ -60,17 +57,16 @@ exports.searchUnit = searchUnit;
 function createUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const unit = req.body;
-        const tableName = 'unit';
-        const columnName = 'unit_name';
-        //VERIFICA SI LA UNIDAD EXISTE
-        return yield search_query_1.checkIfDataExist(tableName, columnName, unit.unit_name).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-            if (dataCheck.ok)
-                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
-            //INSERTA LA NUEVA UNIDAD
-            return yield query_1.queryInsert(tableName, unit).then(data => {
+        const queryCheck = `SELECT * FROM unit WHERE unit_name = "${unit.unit_name}"`;
+        return yield query_1.query(queryCheck).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+            if (dataCheck.result[0][0] != null) {
+                return res.status(400).json({ ok: false, message: 'La unidad ya existe!' });
+            }
+            const queryInsert = `INSERT INTO unit (unit_name, symbol, state) VALUES ("${unit.unit_name}", "${unit.symbol}", "${unit.state}")`;
+            return yield query_1.query(queryInsert).then(data => {
                 if (!data.ok)
                     return res.status(data.status).json({ ok: false, message: data.message });
-                return res.status(data.status).json({ ok: true, message: data.message });
+                return res.status(data.status).json({ ok: true, message: 'Unidad creado correctamente' });
             });
         }));
     });
@@ -81,25 +77,29 @@ function updateUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const unit = req.body;
         const unitId = req.params.unit_id;
-        const tableName = 'unit';
-        const columnId = 'unit_id';
-        const columnName = 'unit_name';
-        //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-        yield search_query_1.checkIfDataExist(tableName, columnId, unitId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-            if (!dataCheck.ok) {
-                return res.status(404).json({ ok: false, message: dataCheck.message });
+        const queryCheckId = `SELECT * FROM unit WHERE unit_id = "${unitId}"`;
+        return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
+            if (dataCheckId.result[0][0] == null) {
+                return res.status(400).json({ ok: false, message: `La unidad con el id ${unitId} no existe!` });
             }
-            //VERIFICA SI YA HAY UNA UNIDAD CON EL MISMO NOMBRE PARA NO ACTUALIZAR
-            return yield search_query_1.checkIfDataExist(tableName, columnName, unit.unit_name).then((dataCheckRepeat) => __awaiter(this, void 0, void 0, function* () {
-                if (dataCheckRepeat.ok) {
-                    return res.status(400).json({ ok: false, message: dataCheckRepeat.message });
+            ;
+            const queryCheckUnitName = `SELECT unit_id FROM unit WHERE unit_name = "${unit.unit_name}" AND unit_id != "${unitId}"`;
+            return yield query_1.query(queryCheckUnitName).then((dataCheckUnit) => __awaiter(this, void 0, void 0, function* () {
+                if (dataCheckUnit.result[0][0] != null) {
+                    return res.status(400).json({ ok: false, message: 'El nombre de la unidad ya existe!' });
                 }
-                //ACTUALIZA EL REGISTRO
-                return yield query_1.queryUpdate(tableName, columnId, unit, unitId).then(data => {
-                    if (!data.ok)
-                        return res.status(data.status).json({ ok: false, message: data.message });
-                    return res.status(data.status).json({ ok: true, message: data.message });
-                });
+                const queryCheckUnitSymbol = `SELECT unit_id FROM unit WHERE symbol = "${unit.unit_name}" AND unit_id != "${unitId}"`;
+                return yield query_1.query(queryCheckUnitSymbol).then((dataCheckSymbol) => __awaiter(this, void 0, void 0, function* () {
+                    if (dataCheckSymbol.result[0][0] != null) {
+                        return res.status(400).json({ ok: false, message: 'El símbolo de la unidad ya existe!' });
+                    }
+                    const queryUpdate = `UPDATE unit SET unit_name = "${unit.unit_name}", symbol = ${unit.symbol}, state = "${unit.state}" WHERE unit_id = "${unitId}"`;
+                    return yield query_1.query(queryUpdate).then((dataUpdate) => __awaiter(this, void 0, void 0, function* () {
+                        if (!dataUpdate.ok)
+                            return res.status(dataUpdate.status).json({ ok: false, message: dataUpdate.message });
+                        return res.status(dataUpdate.status).json({ ok: true, message: 'La unidad se actualizó correctamente' });
+                    }));
+                }));
             }));
         }));
     });
@@ -108,19 +108,18 @@ exports.updateUnit = updateUnit;
 //================== ELIMINAR UNA UNIDAD POR SU ID ==================//
 function deleteUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const tableName = 'unit';
-        const columnName = 'unit_id';
         const unitId = req.params.unit_id;
-        //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-        yield search_query_1.checkIfDataExist(tableName, columnName, unitId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-            if (!dataCheck.ok) {
-                return res.status(404).json({ ok: false, message: dataCheck.message });
+        const queryCheckId = `SELECT * FROM unit WHERE unit_id = "${unitId}"`;
+        return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
+            if (dataCheckId.result[0][0] == null) {
+                return res.status(400).json({ ok: false, message: `La unidad con el id ${unitId} no existe!` });
             }
-            //ELIMINA EL REGISTRO
-            return yield query_1.queryDelete(tableName, columnName, unitId).then(data => {
-                if (!data.ok)
-                    return res.status(data.status).json({ ok: false, message: data.message });
-                return res.status(data.status).json({ ok: true, message: data.message });
+            ;
+            const queryDelete = `DELETE unit WHERE unit_id = "${unitId}"`;
+            return yield query_1.query(queryDelete).then(dataDelete => {
+                if (!dataDelete.ok)
+                    return res.status(dataDelete.status).json({ ok: false, message: dataDelete.message });
+                return res.status(dataDelete.status).json({ ok: true, message: 'La unidad se eliminó correctamente' });
             });
         }));
     });
@@ -129,12 +128,11 @@ exports.deleteUnit = deleteUnit;
 //================== OBTENER TODAS LAS UNIDADES ORDER BY UNIT ID ==================//
 function getUnitsById(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const tableName = 'unit';
+        const unitId = req.params.unit_id;
         const offset = Number(req.query.offset);
         const state = Number(req.query.state);
-        const unitId = '"' + req.params.unit_id + '"';
-        const columnName = `unit_id`;
-        return yield query_1.queryOrderbyId(tableName, columnName, unitId, offset, state).then(data => {
+        const queryGet = `SELECT * FROM unit WHERE state = ${state} ORDER BY FIELD(unit_id, "${unitId}") DESC LIMIT 10 OFFSET ${offset}`;
+        return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });

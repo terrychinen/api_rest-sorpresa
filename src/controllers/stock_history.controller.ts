@@ -64,32 +64,3 @@ export async function createStockHistory(req: Request, res: Response) {
         });
     });
 }
-
-
-
-//================== ACTUALIZAR UN ALMACÉN ==================//
-/*export async function updateStore(req: Request, res: Response) {
-    const store: IStore = req.body;
-    const storeId = req.params.store_id;
-    const tableName = 'store';
-    const columnStoreID = 'store_id';
-    const columnStoreName = 'store_name';
-
-    //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-    return await checkIfDataExist(tableName, columnStoreID, storeId).then( async dataCheck => {
-        if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
-
-        //VERIFICA SI YA HAY UN ALMACÉN CON EL MISMO NOMBRE PARA NO ACTUALIZAR
-        return await checkIfDataExist(tableName, columnStoreName, store.store_name).then( async dataCheckRepeat => {
-            if(dataCheckRepeat.ok) {return res.status(400).json({ok: false, message: dataCheckRepeat.message})}
-
-            //ACTUALIZA EL REGISTRO
-            return await queryUpdate(tableName, columnStoreID, store, storeId).then( data => {
-                if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-                
-                return res.status(data.status).json({ok: true, message: data.message});
-            });
-        });
-    });
-}
-*/

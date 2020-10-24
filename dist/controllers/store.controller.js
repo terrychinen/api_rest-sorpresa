@@ -10,16 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStoresByCommodityId = exports.getStoresOrderById = exports.deleteStore = exports.updateStore = exports.createStore = exports.searchStore = exports.getStore = exports.getStores = void 0;
-const database_1 = require("../database");
-const search_query_1 = require("../queries/search.query");
 const query_1 = require("../queries/query");
 //================== OBTENER TODAS LOS ALMACENES ==================//
 function getStores(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const tableName = 'store';
-        const columnName = 'store_id';
+        const offset = Number(req.query.offset);
         const state = Number(req.query.state);
-        return yield query_1.queryGetWithoutOffset(tableName, columnName, state).then(data => {
+        const queryGet = `SELECT * FROM store WHERE state = ${state} ORDER BY store_id DESC LIMIT 10 OFFSET ${offset}`;
+        return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
@@ -32,9 +30,8 @@ function getStore(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const search = req.params.store_id;
         const state = req.params.state;
-        const tableName = 'store';
-        const columnName = 'store_id';
-        return yield query_1.queryGetBy(tableName, columnName, search, state).then(data => {
+        const queryGet = `SELECT * FROM store WHERE store_id = "${search}" AND state = ${state}`;
+        return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
@@ -60,19 +57,16 @@ exports.searchStore = searchStore;
 function createStore(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const store = req.body;
-        const tableName = 'store';
-        const columnName = 'store_name';
-        //VERIFICA SI EL ALMACÉN EXISTE
-        return yield search_query_1.checkIfDataExist(tableName, columnName, store.store_name).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-            if (dataCheck.ok)
-                return res.status(403).json({ ok: false, message: dataCheck.message });
-            if (dataCheck.status == 500)
-                return res.status(500).json({ ok: false, message: dataCheck.message });
-            //INSERTA EL NUEVO ALMACÉN
-            return yield query_1.queryInsert(tableName, store).then(data => {
+        const queryCheck = `SELECT * FROM store WHERE store_name = "${store.store_name}"`;
+        return yield query_1.query(queryCheck).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+            if (dataCheck.result[0][0] != null) {
+                return res.status(400).json({ ok: false, message: 'El almacen ya existe!' });
+            }
+            const queryInsert = `INSERT INTO store (store_name, state) VALUES ("${store.store_name}", "${store.state}")`;
+            return yield query_1.query(queryInsert).then(data => {
                 if (!data.ok)
                     return res.status(data.status).json({ ok: false, message: data.message });
-                return res.status(data.status).json({ ok: true, message: data.message });
+                return res.status(data.status).json({ ok: true, message: 'El Almacen se ha creado correctamente' });
             });
         }));
     });
@@ -83,25 +77,23 @@ function updateStore(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const store = req.body;
         const storeId = req.params.store_id;
-        const tableName = 'store';
-        const columnStoreID = 'store_id';
-        const columnStoreName = 'store_name';
-        //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-        return yield search_query_1.checkIfDataExist(tableName, columnStoreID, storeId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-            if (!dataCheck.ok) {
-                return res.status(404).json({ ok: false, message: dataCheck.message });
+        const queryCheckId = `SELECT * FROM store WHERE store_id = "${storeId}"`;
+        return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
+            if (dataCheckId.result[0][0] == null) {
+                return res.status(400).json({ ok: false, message: `El almacen con el id ${storeId} no existe!` });
             }
-            //VERIFICA SI YA HAY UN ALMACÉN CON EL MISMO NOMBRE PARA NO ACTUALIZAR
-            return yield search_query_1.checkIfDataExist(tableName, columnStoreName, store.store_name).then((dataCheckRepeat) => __awaiter(this, void 0, void 0, function* () {
-                if (dataCheckRepeat.ok) {
-                    return res.status(400).json({ ok: false, message: dataCheckRepeat.message });
+            ;
+            const queryCheck = `SELECT * FROM store WHERE store_name = "${store.store_name}"`;
+            return yield query_1.query(queryCheck).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+                if (dataCheck.result[0][0] != null) {
+                    return res.status(400).json({ ok: false, message: 'El almacen ya existe!' });
                 }
-                //ACTUALIZA EL REGISTRO
-                return yield query_1.queryUpdate(tableName, columnStoreID, store, storeId).then(data => {
-                    if (!data.ok)
-                        return res.status(data.status).json({ ok: false, message: data.message });
-                    return res.status(data.status).json({ ok: true, message: data.message });
-                });
+                const queryUpdate = `UPDATE store SET store_name = "${store.store_name}", state = "${store.state}" WHERE store_id = "${storeId}"`;
+                return yield query_1.query(queryUpdate).then((dataUpdate) => __awaiter(this, void 0, void 0, function* () {
+                    if (!dataUpdate.ok)
+                        return res.status(dataUpdate.status).json({ ok: false, message: dataUpdate.message });
+                    return res.status(dataUpdate.status).json({ ok: true, message: 'El almacen se actualizó correctamente' });
+                }));
             }));
         }));
     });
@@ -111,18 +103,17 @@ exports.updateStore = updateStore;
 function deleteStore(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const storeId = req.params.store_id;
-        const tableName = 'store';
-        const columnName = 'store_id';
-        //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-        return yield search_query_1.checkIfDataExist(tableName, columnName, storeId).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-            if (!dataCheck.ok) {
-                return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
+        const queryCheckId = `SELECT * FROM store WHERE store_id = "${storeId}"`;
+        return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
+            if (dataCheckId.result[0][0] == null) {
+                return res.status(400).json({ ok: false, message: `El almacen con el id ${storeId} no existe!` });
             }
-            //ELIMINA EL REGISTRO (state = 0)
-            return yield query_1.queryDelete(tableName, columnName, storeId).then(data => {
-                if (!data.ok)
-                    return res.status(data.status).json({ ok: false, message: data.message });
-                return res.status(data.status).json({ ok: true, message: data.message });
+            ;
+            const queryDelete = `DELETE store WHERE store_id = "${storeId}"`;
+            return yield query_1.query(queryDelete).then(dataDelete => {
+                if (!dataDelete.ok)
+                    return res.status(dataDelete.status).json({ ok: false, message: dataDelete.message });
+                return res.status(dataDelete.status).json({ ok: true, message: 'El almacen se eliminó correctamente' });
             });
         }));
     });
@@ -131,30 +122,26 @@ exports.deleteStore = deleteStore;
 //================== OBTENER TODAS LOS ALMACENES ORDER BY STORE ID ==================//
 function getStoresOrderById(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const tableName = 'store';
         const state = Number(req.query.state);
+        const offset = Number(req.query.offset);
         const storeIdList = req.query.store_id;
-        const columnName = `store_id`;
+        var queryGet = '';
         var storesIdsString = '';
         if (storeIdList != null) {
             for (var i = 0; i < storeIdList.length; i++) {
                 storesIdsString += '"' + storeIdList[i] + '"' + ',';
             }
             var cutStoresIdsString = storesIdsString.substring(0, storesIdsString.length - 1);
-            console.log(cutStoresIdsString);
-            return yield query_1.queryOrderbyId(tableName, columnName, cutStoresIdsString, 0, state).then(data => {
-                if (!data.ok)
-                    return res.status(data.status).json({ ok: false, message: data.message });
-                return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
-            });
+            const queryGet = `SELECT * FROM store WHERE state = ${state} ORDER BY FIELD(category_id, "${cutStoresIdsString}") DESC LIMIT 10 OFFSET ${offset}`;
         }
         else {
-            return yield query_1.queryGetWithoutOffset(tableName, columnName, state).then(data => {
-                if (!data.ok)
-                    return res.status(data.status).json({ ok: false, message: data.message });
-                return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
-            });
+            const queryGet = `SELECT * FROM store WHERE state = ${state} ORDER BY store_id DESC LIMIT 10 OFFSET ${offset}`;
         }
+        return yield query_1.query(queryGet).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
     });
 }
 exports.getStoresOrderById = getStoresOrderById;
@@ -163,26 +150,15 @@ function getStoresByCommodityId(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const commodityId = req.query.commodity_id;
         const state = req.query.state;
-        const columnName = 'commodity_id';
-        try {
-            const conn = yield database_1.connect();
-            const queryString = `SELECT store_id, 
-        (SELECT store_name FROM store s WHERE s.store_id = sm.store_id)store_name,  
-        (SELECT state FROM store s WHERE s.store_id = sm.store_id)state  
-        FROM store_commodity sm WHERE commodity_id = ${commodityId} and state = ${state}`;
-            const queryStoreCommmodity = yield conn.query(queryString);
-            conn.end();
-            if (!queryStoreCommmodity)
-                return res.status(400).json({ ok: false, message: 'GET BY ' + columnName + ' error: store_commodity', result: [] });
-            return res.status(200).json({
-                ok: true,
-                message: 'GET BY ' + columnName + ' successful: Commodity',
-                result: queryStoreCommmodity[0],
-            });
-        }
-        catch (e) {
-            return res.status(500).json({ ok: false, message: e.toString(), result: [] });
-        }
+        const queryGet = `SELECT store_id, 
+            (SELECT store_name FROM store s WHERE s.store_id = sm.store_id)store_name,  
+            (SELECT state FROM store s WHERE s.store_id = sm.store_id)state  
+            FROM store_commodity sm WHERE commodity_id = ${commodityId} and state = ${state}`;
+        return yield query_1.query(queryGet).then(data => {
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
     });
 }
 exports.getStoresByCommodityId = getStoresByCommodityId;

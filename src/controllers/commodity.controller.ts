@@ -1,19 +1,19 @@
 import { Request, Response } from 'express';
 import { connect } from '../database';
 import { checkIfDataExist } from '../queries/search.query';
-import { query, queryGet, queryDelete, queryUpdate } from '../queries/query';
+import { query, queryUpdate } from '../queries/query';
 import { ICommodity } from '../interfaces/commodity.interface';
 
 
 //================== OBTENER TODOS LAS MERCANCÍAS ==================//
 export async function getCommodities(req: Request, res: Response){
-    const tableName = 'commodity';
-    const columnName = 'commodity_id';
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
-    return await queryGet(tableName, columnName, offset, state).then( data => {
+
+    const queryGet = `SELECT * FROM commodity WHERE state = ${state} ORDER BY commodity_id DESC LIMIT 10 OFFSET ${offset}`;
+
+    return await query(queryGet).then(data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-        
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
@@ -25,32 +25,26 @@ export async function getCommoditiesByCategoryId(req: Request, res: Response) {
     const state = req.query.state;
     const offset = Number(req.query.offset);
 
-    const columnName = 'category_id';
+    const test = `SELECT commodity_id, unit_id, quantity_id, barcode, photo, user_id, last_update, state,
+                    (SELECT commodity_name FROM commodity comm WHERE comm.commodity_id = cuq.commodity_id)commodity_name,
+                    (SELECT unit_name FROM unit u WHERE u.unit_id = cuq.unit_id)unit_name,
+                    (SELECT quantity_name FROM quantity q WHERE q.quantity_id = cuq.quantity_id)quantity_name,
+                    (SELECT short_name FROM quantity q WHERE q.quantityt_id = cuq.quantity_id)short_name
+                    (SELECT username FROM user WHERE user.user_id = cuq.user_id)username
+                    FROM commodity_unit_quantity WHERE commodity_id IN (SELECT commodityid FROM commodity WHERE category_id = ${categoryId})`;
 
-    try{
-        const conn = await connect();
-        const queryString = `SELECT commodity_id, commodity_name, CAST(last_update AS CHAR) AS last_update, state, 
-                (SELECT cat.category_id FROM category cat WHERE cat.category_id = comm.category_id)category_id, 
-                (SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, 
-                (SELECT un.unit_id FROM unit un WHERE un.unit_id = comm.unit_id)unit_id, 
-                (SELECT unit_name FROM unit un WHERE un.unit_id = comm.unit_id)unit_name, 
-                (SELECT username FROM user us WHERE us.user_id = comm.user_id)username 
-                FROM commodity comm WHERE category_id = ${categoryId} AND state = ${state} LIMIT 10 OFFSET ${offset}`;
+   /* const queryGet = `SELECT commodity_id, commodity_name, CAST(last_update AS CHAR) AS last_update, state, 
+            (SELECT cat.category_id FROM category cat WHERE cat.category_id = comm.category_id)category_id, 
+            (SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, 
+            (SELECT un.unit_id FROM unit un WHERE un.unit_id = comm.unit_id)unit_id, 
+            (SELECT unit_name FROM unit un WHERE un.unit_id = comm.unit_id)unit_name, 
+            (SELECT username FROM user us WHERE us.user_id = comm.user_id)username 
+            FROM commodity comm WHERE category_id = ${categoryId} AND state = ${state} LIMIT 10 OFFSET ${offset}`; */
 
-    
-        const queryCommodity = await conn.query(queryString);
-
-        conn.end();
-    
-        if(!queryCommodity)  return res.status(400).json({ok: false, message: 'GET BY '+columnName +' error: Commodity', result: []})
-
-        return res.status(200).json({
-            ok: true, 
-            message: 'GET BY '+columnName +' successful: Commodity',
-            result: queryCommodity[0],
-        });
-
-    }catch(e){return res.status(500).json({ok: false, message: e.toString(), result: []});}
+    return await query(test).then(data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+    });
 }
 
 
@@ -58,34 +52,22 @@ export async function getCommoditiesByCategoryId(req: Request, res: Response) {
 export async function getCommodityByCommodityId(req: Request, res: Response) {
     const storeId = req.params.store_id;
     const commodityId = req.params.commodity_id;
-    
-    try{
-        const conn = await connect();
-        const queryString = `SELECT commodity_id, commodity_name, CAST(last_update AS CHAR) AS last_update, state, 
-                (SELECT cat.category_id FROM category cat WHERE cat.category_id = comm.category_id)category_id, 
-                (SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, 
-                (SELECT un.unit_id FROM unit un WHERE un.unit_id = comm.unit_id)unit_id,   
-                (SELECT unit_name FROM unit un WHERE un.unit_id = comm.unit_id)unit_name,  
-                (SELECT username FROM user us WHERE us.user_id = comm.user_id)username, 
-                (SELECT stock_min FROM store_commodity sc WHERE sc.commodity_id =  ${commodityId} AND sc.store_id = ${storeId})stock_min, 
-                (SELECT stock_max FROM store_commodity sc WHERE sc.commodity_id = ${commodityId} AND sc.store_id = ${storeId})stock_max, 
-                (SELECT current_stock FROM store_commodity sc WHERE sc.commodity_id = ${commodityId} AND sc.store_id = ${storeId})current_stock 
-                FROM commodity comm WHERE commodity_id = ${commodityId}`;
 
-    
-        const queryCommodity = await conn.query(queryString);
+    const queryGet = `SELECT commodity_id, commodity_name, CAST(last_update AS CHAR) AS last_update, state, 
+            (SELECT cat.category_id FROM category cat WHERE cat.category_id = comm.category_id)category_id, 
+            (SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, 
+            (SELECT un.unit_id FROM unit un WHERE un.unit_id = comm.unit_id)unit_id,   
+            (SELECT unit_name FROM unit un WHERE un.unit_id = comm.unit_id)unit_name,  
+            (SELECT username FROM user us WHERE us.user_id = comm.user_id)username, 
+            (SELECT stock_min FROM store_commodity sc WHERE sc.commodity_id =  ${commodityId} AND sc.store_id = ${storeId})stock_min, 
+            (SELECT stock_max FROM store_commodity sc WHERE sc.commodity_id = ${commodityId} AND sc.store_id = ${storeId})stock_max, 
+            (SELECT current_stock FROM store_commodity sc WHERE sc.commodity_id = ${commodityId} AND sc.store_id = ${storeId})current_stock 
+            FROM commodity comm WHERE commodity_id = ${commodityId}`;
 
-        conn.end();
-    
-        if(!queryCommodity)  return res.status(400).json({ok: false, message: 'GET BY error: Commodity', result: []})
-
-        return res.status(200).json({
-            ok: true, 
-            message: 'GET BY successful: Commodity',
-            result: queryCommodity[0],
-        });
-
-    }catch(e){return res.status(500).json({ok: false, message: e.toString(), result: []});}
+    return await query(queryGet).then(data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+    });
 }
 
 
@@ -94,14 +76,14 @@ export async function getCommoditiesWithLessStock(req: Request, res: Response){
     const storeId = req.params.store_id
     const offset = Number(req.query.offset);
 
-    const queryString = `SELECT  distinct sc.store_commodity_id, sc.commodity_id, c.commodity_name, c.unit_id, u.unit_name, 
+    const queryGet = `SELECT  distinct sc.store_commodity_id, sc.commodity_id, c.commodity_name, c.unit_id, u.unit_name, 
                 cate.category_id, cate.category_name, sc.stock_min, sc.stock_max, sc.current_stock, sc.last_update FROM store_commodity sc 
                 INNER JOIN commodity c ON sc.commodity_id = c.commodity_id 
                 INNER JOIN unit u ON c.unit_id = u.unit_id
                 INNER JOIN category cate ON cate.category_id = c.category_id
                 WHERE store_id = ${storeId} AND current_stock<stock_min  LIMIT 20 OFFSET ${offset}`;
     
-    return await query(queryString).then( data => {
+    return await query(queryGet).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
@@ -114,7 +96,7 @@ export async function searchCommodity(req: Request, res: Response){
     const search = req.body.query;
     const state = Number(req.body.state);
 
-    const queryString = `SELECT commodity_id, commodity_name, CAST(last_update AS CHAR) AS last_update, state, 
+    const queryGet = `SELECT commodity_id, commodity_name, CAST(last_update AS CHAR) AS last_update, state, 
                         (SELECT cat.category_id FROM category cat WHERE cat.category_id = comm.category_id)category_id, 
                         (SELECT category_name FROM category cat WHERE cat.category_id = comm.category_id)category_name, 
                         (SELECT un.unit_id FROM unit un WHERE un.unit_id = comm.unit_id)unit_id, 
@@ -122,7 +104,7 @@ export async function searchCommodity(req: Request, res: Response){
                         (SELECT username FROM user us WHERE us.user_id = comm.user_id)username 
                         FROM commodity comm WHERE category_id = ${categoryId} AND state = ${state} AND commodity_name LIKE "%${search}%" LIMIT 10`;
 
-    return await query(queryString).then( data => {
+    return await query(queryGet).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
@@ -131,20 +113,20 @@ export async function searchCommodity(req: Request, res: Response){
 
 
 //================== BUSCAR COMMODITY POR SU NOMBRE  ==================//
-export async function searchCommodityByStoreIddAndCategoryId(req: Request, res: Response){
+export async function searchCommodityByStoreIdAndCategoryId(req: Request, res: Response){
     const categoryId = req.params.category_id;
     const storeId = req.params.store_id;
     const search = req.body.query;
     const state = Number(req.body.state);
 
-    const queryString = `SELECT  distinct sc.store_commodity_id, sc.commodity_id, c.commodity_name, c.unit_id, u.unit_name, 
+    const queryGet = `SELECT  distinct sc.store_commodity_id, sc.commodity_id, c.commodity_name, c.unit_id, u.unit_name, 
                         cate.category_id, cate.category_name, sc.stock_min, sc.stock_max, sc.current_stock, sc.last_update FROM store_commodity sc 
                         INNER JOIN commodity c ON sc.commodity_id = c.commodity_id 
                         INNER JOIN unit u ON c.unit_id = u.unit_id
                         INNER JOIN category cate ON cate.category_id = c.category_id
                         WHERE store_id = ${storeId} AND cate.category_id = ${categoryId} AND c.commodity_name LIKE "%${search}%" AND sc.state = ${state}`;
 
-    return await query(queryString).then( data => {
+    return await query(queryGet).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
@@ -157,31 +139,18 @@ export async function getCommoditiesByCategoryIdAndStoreId(req: Request, res: Re
     const categoryId = req.params.category_id;
     const storeId = req.params.store_id;
 
-    const columnName = 'category_id';
-    
-    try{
-        const conn = await connect();
-        const queryString = `SELECT  distinct sc.store_commodity_id, sc.commodity_id, c.commodity_name, c.unit_id, u.unit_name, 
-		            cate.category_id, cate.category_name, sc.stock_min, sc.stock_max, sc.current_stock, sc.last_update FROM store_commodity sc 
+    const queryGet = `SELECT  distinct sc.store_commodity_id, sc.commodity_id, c.commodity_name, c.unit_id, 
+                    u.unit_name, cate.category_id, cate.category_name, sc.stock_min, sc.stock_max, sc.current_stock, 
+                    sc.last_update FROM store_commodity_unit_quantity sc 
                     INNER JOIN commodity c ON sc.commodity_id = c.commodity_id 
                     INNER JOIN unit u ON c.unit_id = u.unit_id
                     INNER JOIN category cate ON cate.category_id = c.category_id
                     WHERE store_id = ${storeId} AND cate.category_id = ${categoryId}`;
 
-    
-        const queryCommodity = await conn.query(queryString);
-
-        conn.end();
-    
-        if(!queryCommodity)  return res.status(400).json({ok: false, message: 'GET BY '+columnName +' error: Commodity', result: []})
-
-        return res.status(200).json({
-            ok: true, 
-            message: 'GET BY '+columnName +' successful: Commodity',
-            result: queryCommodity[0],
-        });
-
-    }catch(e){return res.status(500).json({ok: false, message: e.toString(), result: []});}
+    return await query(queryGet).then( data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+    });
 }
 
 
@@ -191,34 +160,16 @@ export async function createCommodity(req: Request, res: Response) {
     const lastUpdate = req.body.last_update;
     const storesIdList = req.query.store_id;
 
-    const tableCommodity = 'commodity';
-    const columnName = 'commodity_name';
+    const queryCheck = `SELECT * FROM commodity WHERE commodity_name = "${commodity.commodity_name}"`;
+   
+    return await query(queryCheck).then(async dataCheck => {
+        if(dataCheck.result[0][0] != null) {return res.status(400).json({ok: false, message: 'El producto ya existe!'});}
+        const queryInsert = `INSERT INTO commodity (category_id, commodity_name, state) 
+           VALUES ("${commodity.category_id}", "${commodity.commodity_name}", ${commodity.state})`;
 
-    //VERIFICA SI LA MERCANCÍA EXISTE
-    return await checkIfDataExist(tableCommodity, columnName, commodity.commodity_name).then( async dataCheck => {
-        if(dataCheck.ok) return res.status(403).json({ok: false, message: dataCheck.message});
-        if(dataCheck.status == 500) return res.status(500).json({ok: false, message: dataCheck.message});
-
-        const conn = await connect();
-
-        return await conn.query({
-           sql: 'INSERT INTO commodity SET ?', 
-           values: commodity
-        }, async function(err, result) {
-               if(err) return res.status(400).json({ok: false, message: err.toString()});
-
-               try{
-                for(var i=0; i < storesIdList.length; i++) {                
-                    await conn.query(`INSERT INTO  store_commodity (commodity_id, store_id, last_update) VALUES 
-                                         ('${result.insertId}', '${storesIdList[i]}', '${lastUpdate.toString()}')`);
-                 }
-
-                 conn.end();
-
-                return res.status(200).json({ok: true, message: 'Se creo exitosamente'});
-               }catch(e){
-                return res.status(500).json({ok: true, message: e.toString()});
-               }
+        return await query(queryInsert).then(data => {
+            if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+            return res.status(data.status).json({ok: true, message: 'El Producto ha sido creado correctamente'});
         });
     });
 }
@@ -284,18 +235,16 @@ export async function updateCommodity(req: Request, res: Response) {
 //================== ELIMINAR UNA MERCANCÍA POR SU ID ==================//
 export async function deleteCommodity(req: Request, res: Response) {
     const commodityId = req.params.commodity_id;
-    const tableName = 'commoity';
-    const columnName = 'commodity_id';
 
-    //VERIFICA SI EXISTE EL ID PARA ACTUALIZAR
-    return await checkIfDataExist(tableName, columnName, commodityId).then( async dataCheck => {
-        if(!dataCheck.ok) {return res.status(404).json({ok: false, message: dataCheck.message})}
+    const queryCheckId = `SELECT * FROM commodity WHERE commodity_id = "${commodityId}"`;
 
-        //ELIMINA EL REGISTRO
-        return await queryDelete(tableName, columnName, commodityId).then( data => {
-            if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-            
-            return res.status(data.status).json({ok: true, message: data.message});
+    return await query(queryCheckId).then(async dataCheckId => {
+        if(dataCheckId.result[0][0] == null) {return res.status(400).json({ok: false, message: `El producto con el id ${commodityId} no existe!`});};
+        const queryDelete = `DELETE commodity WHERE commodity_id = "${commodityId}"`;
+
+        return await query(queryDelete).then(dataDelete => {
+            if(!dataDelete.ok) return res.status(dataDelete.status).json({ok: false, message: dataDelete.message})
+            return res.status(dataDelete.status).json({ok: true, message: 'El producto se eliminó correctamente'});
         });
     });
 }

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { searchCommodity, searchCommodityByStoreIddAndCategoryId, getCommodityByCommodityId, getCommoditiesByCategoryId, getCommoditiesByCategoryIdAndStoreId, getCommoditiesWithLessStock, updateCommodity, createCommodity} from '../controllers/commodity.controller';
+import { searchCommodity, searchCommodityByStoreIdAndCategoryId, getCommodityByCommodityId, getCommoditiesByCategoryId, getCommoditiesByCategoryIdAndStoreId, getCommoditiesWithLessStock, updateCommodity, createCommodity} from '../controllers/commodity.controller';
 
 const router = Router();
 
@@ -17,7 +17,7 @@ router.route('/search/:category_id')
 
 
 router.route('/search/:store_id/:category_id')
-    .post(searchCommodityByStoreIddAndCategoryId);
+    .post(searchCommodityByStoreIdAndCategoryId);
 
 
 router.route('/by_commodity/:store_id/:commodity_id')

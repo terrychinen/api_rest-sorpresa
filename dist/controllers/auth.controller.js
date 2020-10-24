@@ -13,21 +13,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.signUp = exports.signIn = void 0;
-const database_1 = require("../database");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const token_controller_1 = require("./token_controller");
 const query_1 = require("../queries/query");
-const search_query_1 = require("../queries/search.query");
 const token_model_1 = require("../models/token.model");
 const user_model_1 = require("../models/user.model");
 const moment_1 = __importDefault(require("moment"));
 function signIn(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const body = req.body;
-        const queryString = `SELECT user_id, role_id, (SELECT role_name FROM role r WHERE r.role_id = u.role_id)role_name, token_id, first_name, last_name, 
-                            username, password, phone, email, street, state FROM user u WHERE username = "${body.username}"`;
-        return yield query_1.query(queryString).then((data) => __awaiter(this, void 0, void 0, function* () {
+        const queryGet = `SELECT user_id, role_id, token_id, username, password, state, 
+                            (SELECT role_name FROM role r WHERE r.role_id = u.role_id)role_name, 
+                            (SELECT first_name FROM person p WHERE p.person_id = u.user_id)first_name, 
+                            (SELECT last_name FROM person p WHERE p.person_id = u.user_id)last_name 
+                            FROM user u WHERE username = "${body.username}"`;
+        return yield query_1.query(queryGet).then((data) => __awaiter(this, void 0, void 0, function* () {
             try {
                 if (!data.ok)
                     return res.status(data.status).json({ ok: false, message: data.message });
@@ -69,42 +70,36 @@ exports.signIn = signIn;
 function signUp(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const person = req.body;
             const user = req.body;
-            const tableName = 'user';
-            const columnName = 'username';
-            const conn = yield database_1.connect();
-            return yield search_query_1.checkIfDataExist(tableName, columnName, user.username).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-                if (dataCheck.ok)
-                    return res.status(dataCheck.status).json({ ok: false, message: dataCheck.message });
-                let password = yield bcrypt_1.default.hashSync(user.password, 10);
-                let newUser = new user_model_1.UserModel();
-                newUser.role_id = user.role_id;
-                newUser.first_name = user.first_name;
-                newUser.last_name = user.last_name;
-                newUser.username = user.username;
-                newUser.password = password;
-                newUser.phone = user.phone;
-                newUser.email = user.email;
-                newUser.street = user.street;
-                newUser.state = user.state;
-                yield conn.query({
-                    sql: 'INSERT INTO user SET ?',
-                    values: newUser
-                }, function (error, resultUser) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        if (error)
-                            return res.status(400).json({ ok: false, message: 'INSERT new User Error', error });
-                        newUser.user_id = resultUser.insertID;
-                        delete newUser.first_name;
-                        delete newUser.last_name;
-                        delete newUser.role_id;
-                        delete newUser.phone;
-                        delete newUser.password;
-                        delete newUser.street;
-                        delete newUser.state;
-                        delete newUser.token_id;
-                        delete newUser.email;
-                        //GENERATE NEW TOKEN
+            const queryGet = `SELECT * FROM user WHERE username = "${user.username}"`;
+            return yield query_1.query(queryGet).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
+                if (!dataCheck.ok) {
+                    return res.status(400).json({ ok: false, message: dataCheck.message });
+                }
+                const userDB = dataCheck.result[0][0];
+                if (userDB != null) {
+                    return res.status(400).json({ ok: false, message: 'El nombre de usuario ya existe' });
+                }
+                const queryInsertPerson = `INSERT INTO person (first_name, last_name, dni, ruc, photo, state) 
+                                        VALUES ('${person.first_name}', '${person.last_name}', '${person.dni}', '${person.ruc}', 
+                                        '${person.photo}', '${person.state}')`;
+                return yield query_1.query(queryInsertPerson).then((dataInsertPerson) => __awaiter(this, void 0, void 0, function* () {
+                    if (!dataInsertPerson.ok) {
+                        return res.status(dataInsertPerson.status).json({ ok: false, message: dataInsertPerson.message });
+                    }
+                    const personId = dataInsertPerson.result[0].insertId;
+                    let password = yield bcrypt_1.default.hashSync(user.password, 10);
+                    const queryInsertUser = `INSERT INTO user (user_id, role_id, username, password, state) 
+                                         VALUES ('${personId}', '${user.role_id}', '${user.username}', 
+                                         '${password}', '${user.state}')`;
+                    return yield query_1.query(queryInsertUser).then((dataInsertUser) => __awaiter(this, void 0, void 0, function* () {
+                        if (!dataInsertUser.ok) {
+                            return res.status(dataInsertUser.status).json({ ok: false, message: dataInsertUser.message });
+                        }
+                        const newUser = new user_model_1.UserModel();
+                        newUser.user_id = personId;
+                        newUser.username = user.username;
                         let jwt = jsonwebtoken_1.default.sign({
                             user: newUser
                         }, process.env.SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
@@ -112,25 +107,21 @@ function signUp(req, res) {
                         token.token_key = jwt;
                         token.created_at = moment_1.default().format('YYYY-MM-DD h:mm:ss');
                         token.expires_in = Number(process.env.TOKEN_EXPIRATION);
-                        yield conn.query({
-                            sql: 'INSERT INTO token SET ?',
-                            values: token
-                        }, function (error, resultToken) {
-                            return __awaiter(this, void 0, void 0, function* () {
-                                if (error)
-                                    return res.status(400).json({ ok: false, message: 'INSERT Token Error', error });
-                                const user = new user_model_1.UserModel();
-                                const user_id = resultUser.insertId;
-                                user.token_id = resultToken.insertId;
-                                return query_1.queryUpdate(tableName, 'user_id', user, user_id).then(data => {
-                                    if (!data.ok)
-                                        return res.status(data.status).json({ ok: false, message: data.message });
-                                    return res.status(data.status).json({ ok: true, message: 'User created successfully' });
-                                });
+                        const queryInsertToken = `INSERT INTO token (token_key, created_at, expires_in, state)
+                                              VALUES ('${token.token_key}', '${token.created_at}', '${token.expires_in}', '1')`;
+                        return yield query_1.query(queryInsertToken).then((dataInsertToken) => __awaiter(this, void 0, void 0, function* () {
+                            if (!dataInsertToken.ok)
+                                return res.status(dataInsertToken.status).json({ ok: false, message: dataInsertToken.message });
+                            const tokenId = dataInsertToken.result[0].insertId;
+                            const queryUpdateUserToken = `UPDATE user SET token_id = ${tokenId} WHERE user_id = ${newUser.user_id}`;
+                            return yield query_1.query(queryUpdateUserToken).then(dataUpdateUserToken => {
+                                if (!dataUpdateUserToken.ok)
+                                    return res.status(dataUpdateUserToken.status).json({ ok: false, message: dataUpdateUserToken.message });
+                                return res.status(dataUpdateUserToken.status).json({ ok: true, message: 'Usuario creado satisfactoriamente' });
                             });
-                        });
-                    });
-                });
+                        }));
+                    }));
+                }));
             }));
         }
         catch (error) {

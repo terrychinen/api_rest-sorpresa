@@ -11,7 +11,7 @@ router.route('/:category_id')
 router.route('/search/:category_id')
     .post(commodity_controller_1.searchCommodity);
 router.route('/search/:store_id/:category_id')
-    .post(commodity_controller_1.searchCommodityByStoreIddAndCategoryId);
+    .post(commodity_controller_1.searchCommodityByStoreIdAndCategoryId);
 router.route('/by_commodity/:store_id/:commodity_id')
     .get(commodity_controller_1.getCommodityByCommodityId);
 router.route('/get_less_stock/:store_id')

@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import axios from 'axios';
 import { Request, Response } from 'express';
 
 export async function getFullNameByDni(req: Request, res: Response) {
@@ -75,7 +76,7 @@ export async function getDniByName(req: Request, res: Response) {
                 }
             }
             return arrayPeople;
-        });
+        })
 
         await browser.close();
         return res.status(200).json({ok:true, result: people});

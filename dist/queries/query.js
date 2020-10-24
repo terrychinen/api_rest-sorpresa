@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.queryGetWithoutOffset = exports.queryOrderbyId = exports.queryDelete = exports.queryUpdate = exports.queryInsert = exports.queryGetBy = exports.queryGet = exports.query = void 0;
+exports.queryUpdate = exports.query = void 0;
 const database_1 = require("../database");
 function query(queryString) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -18,11 +18,11 @@ function query(queryString) {
             const query = yield conn.query(queryString);
             conn.end();
             if (!query)
-                return ({ ok: false, status: 400, message: 'GET error', result: [] });
+                return ({ ok: false, status: 400, message: 'Query error', result: [] });
             return ({
                 ok: true,
                 status: 200,
-                message: 'GET successful',
+                message: 'Query successful',
                 result: query
             });
         }
@@ -32,64 +32,6 @@ function query(queryString) {
     });
 }
 exports.query = query;
-function queryGet(table, column, offset, state) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const conn = yield database_1.connect();
-            const query = yield conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY ${column} DESC LIMIT 10 OFFSET ${offset}`);
-            conn.end();
-            if (!query)
-                return ({ ok: false, status: 400, message: 'GET error: ' + table, result: [] });
-            return ({
-                ok: true,
-                status: 200,
-                message: 'GET successful: ' + table,
-                result: query
-            });
-        }
-        catch (e) {
-            return ({ ok: false, status: 500, message: e.toString(), result: [] });
-        }
-    });
-}
-exports.queryGet = queryGet;
-function queryGetBy(table, columnName, value, state) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const conn = yield database_1.connect();
-            const query = yield conn.query(`SELECT * FROM ${table} WHERE ${columnName} = "${value}" AND state = ${state}`);
-            conn.end();
-            if (!query)
-                return ({ ok: false, status: 400, message: 'GET BY ' + columnName + ' error: ' + table, result: [] });
-            return ({
-                ok: true,
-                status: 200,
-                message: 'GET BY ' + columnName + ' successful: ' + table,
-                result: query
-            });
-        }
-        catch (e) {
-            return ({ ok: false, status: 500, message: e.toString(), result: [] });
-        }
-    });
-}
-exports.queryGetBy = queryGetBy;
-function queryInsert(table, value) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const conn = yield database_1.connect();
-            const query = yield conn.query('INSERT INTO ' + table + ' SET ?', value);
-            conn.end();
-            if (!query)
-                return ({ ok: false, status: 400, message: 'INSERT error: ' + table });
-            return ({ ok: true, status: 200, message: 'INSERT successful: ' + table });
-        }
-        catch (e) {
-            return ({ ok: false, status: 500, message: e.toString() });
-        }
-    });
-}
-exports.queryInsert = queryInsert;
 function queryUpdate(table, columnName, value, id) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -106,61 +48,3 @@ function queryUpdate(table, columnName, value, id) {
     });
 }
 exports.queryUpdate = queryUpdate;
-function queryDelete(table, columnName, value) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const conn = yield database_1.connect();
-            const query = yield conn.query(`DELETE FROM ${table} WHERE ${columnName} = ${value}`);
-            conn.end();
-            if (!query)
-                return ({ ok: false, status: 400, message: 'DELETE error' + table });
-            return ({ ok: true, status: 200, message: 'DELETE successful: ' + table });
-        }
-        catch (e) {
-            return ({ ok: false, status: 500, message: e.toString() });
-        }
-    });
-}
-exports.queryDelete = queryDelete;
-function queryOrderbyId(table, columnName, value, offset, state) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const conn = yield database_1.connect();
-            const query = yield conn.query(`SELECT * FROM ${table} WHERE state = ${state} ORDER BY FIELD(${columnName}, ${value}) DESC LIMIT 10 OFFSET ${offset}`);
-            conn.end();
-            if (!query)
-                return ({ ok: false, status: 400, message: 'GET error: ' + table, result: [] });
-            return ({
-                ok: true,
-                status: 200,
-                message: 'GET successful: ' + table,
-                result: query
-            });
-        }
-        catch (e) {
-            return ({ ok: false, status: 500, message: e.toString(), result: [] });
-        }
-    });
-}
-exports.queryOrderbyId = queryOrderbyId;
-function queryGetWithoutOffset(table, column, state) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const conn = yield database_1.connect();
-            const query = yield conn.query(`SELECT * FROM ${table} WHERE state = "${state}" ORDER BY ${column} DESC`);
-            conn.end();
-            if (!query)
-                return ({ ok: false, status: 400, message: 'GET error: ' + table, result: [] });
-            return ({
-                ok: true,
-                status: 200,
-                message: 'GET successful: ' + table,
-                result: query
-            });
-        }
-        catch (e) {
-            return ({ ok: false, status: 500, message: e.toString(), result: [] });
-        }
-    });
-}
-exports.queryGetWithoutOffset = queryGetWithoutOffset;
