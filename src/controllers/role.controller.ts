@@ -48,8 +48,9 @@ export async function searchRole(req: Request, res: Response){
 //================== CREAR UN ROL ==================//
 export async function createRole(req: Request, res: Response) {
     const role: IRole = req.body;
-    const tableName = 'role';
-    const columnName = 'role_name';
+
+    const roleName = role.role_name;
+    role.role_name = roleName.charAt(0).toUpperCase() + roleName.slice(1);
 
     const queryCheck = `SELECT * FROM role WHERE role_name = "${role.role_name}"`;
    
@@ -69,6 +70,9 @@ export async function createRole(req: Request, res: Response) {
 export async function updateRole(req: Request, res: Response) {
     const role: IRole = req.body;
     const roleId = req.params.role_id;
+
+    const roleName = role.role_name;
+    role.role_name = roleName.charAt(0).toUpperCase() + roleName.slice(1);
 
     const queryCheckId = `SELECT * FROM role WHERE role_id = "${roleId}"`;
 

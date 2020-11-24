@@ -65,6 +65,9 @@ export async function searchCategoryByStoreId(req: Request, res: Response) {
 export async function createCategory(req: Request, res: Response) {
     const category: ICategory = req.body;
 
+    const categoryName = category.category_name;
+    category.category_name = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+
     const queryCheck = `SELECT * FROM category WHERE category_name = "${category.category_name}"`;
    
     return await query(queryCheck).then(async dataCheck => {
@@ -84,19 +87,25 @@ export async function updateCategory(req: Request, res: Response) {
     const category: ICategory = req.body;
     const categoryId = req.params.category_id;
 
+    const categoryName = category.category_name;
+    category.category_name = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+
     const queryCheckId = `SELECT * FROM category WHERE category_id = "${categoryId}"`;
 
     return await query(queryCheckId).then(async dataCheckId => {
-        if(dataCheckId.result[0][0] == null) {return res.status(400).json({ok: false, message: `La categoría con el id ${categoryId} no existe!`});};
+        if(!dataCheckId.ok) return res.status(500).json({ok: false, message: dataCheckId.message});
+        if(dataCheckId.result[0][0] == null) return res.status(400).json({ok: false, message: `La categoría con el id ${categoryId} no existe!`});
 
         const queryCheck = `SELECT * FROM category WHERE category_name = "${category.category_name}"`;
 
         return await query(queryCheck).then(async dataCheck => {
-            if(dataCheck.result[0][0] != null) {return res.status(400).json({ok: false, message: 'La categoría ya existe!'});}
+            if(!dataCheck.ok) return res.status(500).json({ok: false, message: dataCheck.message});
+            if(dataCheck.result[0][0] != null) return res.status(400).json({ok: false, message: 'La categoría ya existe!'});
+
             const queryUpdate = `UPDATE category SET category_name="${category.category_name}", state = "${category.state}" WHERE category_id = "${categoryId}"`;    
 
             return await query(queryUpdate).then(async dataUpdate => {
-                if(!dataUpdate.ok) return res.status(dataUpdate.status).json({ok: false, message: dataUpdate.message})    
+                if(!dataUpdate.ok) return res.status(dataUpdate.status).json({ok: false, message: dataUpdate.message});    
                 return res.status(dataUpdate.status).json({ok: true, message: 'La categoría se actualizó correctamente'});
             });
         });

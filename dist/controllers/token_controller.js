@@ -96,7 +96,7 @@ function updateToken(res, tokenID, newToken, expiresIn) {
                 ok: true,
                 message: 'Token updated',
                 token: newToken,
-                expiresIn
+                expires_in: expiresIn
             });
         });
     });

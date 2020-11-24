@@ -14,4 +14,6 @@ router.route('/:unit_id')
     .delete(unit_controller_1.deleteUnit);
 router.route('/order_by_unitid/:unit_id')
     .get(unit_controller_1.getUnitsById);
+router.route('/commodity/by_id')
+    .get(unit_controller_1.getUnitsByCommodityId);
 exports.default = router;

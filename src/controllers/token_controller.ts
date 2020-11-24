@@ -93,7 +93,7 @@ async function updateToken(res: Response, tokenID: String, newToken: string, exp
             ok: true,
             message: 'Token updated',
             token: newToken,
-            expiresIn
+            expires_in: expiresIn
         });
     });
 }

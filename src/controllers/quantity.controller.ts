@@ -49,15 +49,28 @@ export async function searchQuantity(req: Request, res: Response){
 export async function createQuantity(req: Request, res: Response) {
     const quantity: IQuantity = req.body;
 
-    const queryCheckQuantityName = `SELECT * FROM quantity WHERE quantity_name = "${quantity.quantity_name}"`;
+    const quantityName = quantity.quantity_name;
+    quantity.quantity_name = quantityName.charAt(0).toUpperCase() + quantityName.slice(1);
 
-    return await query(queryCheckQuantityName).then(async dataCheckQuantityName => {
-        if(dataCheckQuantityName.result[0][0] != null) {return res.status(400).json({ok: false, message: 'La abreviatura del nombre de la cantidad ya existe!'});}
-        const queryCheckShortName = `SELECT * FROM quantity WHERE short_name = "${quantity.short_name}"`;
+    const shortName = quantity.short_name;
+    if(shortName != '') {
+        quantity.short_name = shortName.charAt(0).toUpperCase() + shortName.slice(1);
+    }else{
+        quantity.short_name = '';
+    }
 
-        return await query(queryCheckShortName).then(async dataCheckShortName => {
-            if(dataCheckShortName.result[0][0] != null) {return res.status(400).json({ok: false, message: 'El nombre de la "cantidad" ya existe!'});}
-            const queryInsert = `INSERT INTO role (quantity_name, short_name state) VALUES ("${quantity.quantity_name}", "${quantity.short_name} "${quantity.state}")`;
+
+    const queryCheckQuantityName = `SELECT * FROM quantity WHERE short_name = "${quantity.short_name}"`;
+
+    return await query(queryCheckQuantityName).then(async dataCheckShortName => {
+        if(quantity.short_name != ''){if(dataCheckShortName.result[0][0] != null) {return res.status(400).json({ok: false, message: 'La abreviatura del nombre de la cantidad ya existe!'});}}
+        
+        
+        const queryCheckShortName = `SELECT * FROM quantity WHERE quantity_name = "${quantity.quantity_name}"`;
+
+        return await query(queryCheckShortName).then(async dataCheckQuantityName => {
+            if(dataCheckQuantityName.result[0][0] != null) {return res.status(400).json({ok: false, message: 'El nombre de la "cantidad" ya existe!'});}
+            const queryInsert = `INSERT INTO quantity (quantity_name, short_name, state) VALUES ("${quantity.quantity_name}", "${quantity.short_name}", "${quantity.state}")`;
     
             return await query(queryInsert).then(data => {
                 if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
@@ -73,6 +86,19 @@ export async function updateQuantity(req: Request, res: Response) {
     const quantity: IQuantity = req.body;
     const quantityId = req.params.quantity_id;
 
+    const quantityName = quantity.quantity_name;
+    quantity.quantity_name = quantityName.charAt(0).toUpperCase() + quantityName.slice(1);
+
+    const shortName = quantity.short_name;
+
+    if(shortName == ''){
+        quantity.short_name = shortName.charAt(0).toUpperCase() + shortName.slice(1);
+    }else{
+        quantity.short_name = '';
+    }
+    
+
+
     const queryCheckId = `SELECT * FROM quantity WHERE quantity_id = "${quantityId}"`;
 
     return await query(queryCheckId).then(async dataCheckId => {
@@ -86,9 +112,9 @@ export async function updateQuantity(req: Request, res: Response) {
             const queryCheckShortName = `SELECT quantity_id FROM quantity WHERE short_name = "${quantity.short_name}" AND quantity_id != "${quantityId}"`;
 
             return await query(queryCheckShortName).then(async dataCheckShortName => {
-                if(dataCheckShortName.result[0][0] != null) {return res.status(400).json({ok: false, message: 'La abreviatura de la cantidad ya existe!'});}
-                const queryUpdate = `UPDATE quantity SET quantity_name = "${quantity.quantity_name}", short_name = ${quantity.short_name}, 
-                                        state = "${quantity.state}" WHERE quantity = "${quantityId}"`;    
+                if(shortName != ''){if(dataCheckShortName.result[0][0] != null) {return res.status(400).json({ok: false, message: 'La abreviatura de la cantidad ya existe!'});}}
+                const queryUpdate = `UPDATE quantity SET quantity_name = "${quantity.quantity_name}", short_name = "${quantity.short_name}", 
+                                        state = "${quantity.state}" WHERE quantity_id = "${quantityId}"`;    
 
                 return await query(queryUpdate).then(async dataUpdate => {
                     if(!dataUpdate.ok) return res.status(dataUpdate.status).json({ok: false, message: dataUpdate.message})    

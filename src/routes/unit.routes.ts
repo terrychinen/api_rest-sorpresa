@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { searchUnit, getUnits, getUnitsById, createUnit, getUnit, updateUnit, deleteUnit } from '../controllers/unit.controller';
+import { searchUnit, getUnits, getUnitsById, createUnit, getUnit, updateUnit, deleteUnit, getUnitsByCommodityId } from '../controllers/unit.controller';
 
 const router = Router();
 
@@ -15,7 +15,10 @@ router.route('/:unit_id')
     .put(updateUnit)
     .delete(deleteUnit);
 
-    router.route('/order_by_unitid/:unit_id')
+router.route('/order_by_unitid/:unit_id')
     .get(getUnitsById);
+
+router.route('/commodity/by_id')
+    .get(getUnitsByCommodityId);
 
 export default router;

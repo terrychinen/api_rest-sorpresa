@@ -8,7 +8,7 @@ export async function getStores(req: Request, res: Response){
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
 
-    const queryGet = `SELECT * FROM store WHERE state = ${state} ORDER BY store_id DESC LIMIT 10 OFFSET ${offset}`;
+    const queryGet = `SELECT * FROM store WHERE state = ${state} ORDER BY store_id DESC`;
 
     return await query(queryGet).then(data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
@@ -49,6 +49,10 @@ export async function searchStore(req: Request, res: Response){
 export async function createStore(req: Request, res: Response) {
     const store: IStore = req.body;
 
+    const storeName = store.store_name;
+    store.store_name = storeName.charAt(0).toUpperCase() + storeName.slice(1);
+
+
     const queryCheck = `SELECT * FROM store WHERE store_name = "${store.store_name}"`;
    
     return await query(queryCheck).then(async dataCheck => {
@@ -67,6 +71,9 @@ export async function createStore(req: Request, res: Response) {
 export async function updateStore(req: Request, res: Response) {
     const store: IStore = req.body;
     const storeId = req.params.store_id;
+
+     const storeName = store.store_name;
+     store.store_name = storeName.charAt(0).toUpperCase() + storeName.slice(1);
 
     const queryCheckId = `SELECT * FROM store WHERE store_id = "${storeId}"`;
 
@@ -117,12 +124,13 @@ export async function getStoresOrderById(req: Request, res: Response){
     if(storeIdList != null){
         for(var i=0; i<storeIdList.length; i++){storesIdsString += '"'+storeIdList[i]+'"' + ',';}
         var cutStoresIdsString = storesIdsString.substring(0, storesIdsString.length - 1);
-        const queryGet = `SELECT * FROM store WHERE state = ${state} ORDER BY FIELD(category_id, "${cutStoresIdsString}") DESC LIMIT 10 OFFSET ${offset}`;
+        queryGet = `SELECT * FROM store WHERE state = ${state} ORDER BY FIELD(category_id, "${cutStoresIdsString}") DESC LIMIT 10 OFFSET ${offset}`;
     }else{
-        const queryGet = `SELECT * FROM store WHERE state = ${state} ORDER BY store_id DESC LIMIT 10 OFFSET ${offset}`;
+        queryGet = `SELECT * FROM store WHERE state = ${state} ORDER BY store_id DESC LIMIT 10 OFFSET ${offset}`;
     }
 
     return await query(queryGet).then(data => {
+        console.log(data.message);
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
@@ -134,10 +142,11 @@ export async function getStoresByCommodityId(req: Request, res: Response) {
     const commodityId = req.query.commodity_id;
     const state = req.query.state;
 
-    const queryGet = `SELECT store_id, 
-            (SELECT store_name FROM store s WHERE s.store_id = sm.store_id)store_name,  
-            (SELECT state FROM store s WHERE s.store_id = sm.store_id)state  
-            FROM store_commodity sm WHERE commodity_id = ${commodityId} and state = ${state}`;
+    const queryGet = `SELECT DISTINCT scuq.store_id, 
+            (SELECT DISTINCT store_name FROM store s WHERE s.store_id = scuq.store_id)store_name 
+            FROM store_commodity_unit_quantity scuq 
+            WHERE commodity_unit_quantity_id IN (SELECT commodity_unit_quantity_id FROM commodity_unit_quantity WHERE commodity_id = "${commodityId}") 
+            AND scuq.state = ${state}`;
 
     return await query(queryGet).then(data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})

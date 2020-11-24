@@ -43,8 +43,8 @@ export async function signIn(req: Request, res: Response) {
                     message: 'Inicio de sesión correcto!',
                     user: userDB,
                     token,
-                    expireIn: process.env.TOKEN_EXPIRATION,
-                    savedDate: moment().format('YYYY-MM-DD h:mm:ss')
+                    expires_in: process.env.TOKEN_EXPIRATION,
+                    date: moment().format('YYYY-MM-DD h:mm:ss')
                 });
             });   
         }catch(e){

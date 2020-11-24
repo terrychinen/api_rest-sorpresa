@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUnitsById = exports.deleteUnit = exports.updateUnit = exports.createUnit = exports.searchUnit = exports.getUnit = exports.getUnits = void 0;
+exports.getUnitsByCommodityId = exports.getUnitsById = exports.deleteUnit = exports.updateUnit = exports.createUnit = exports.searchUnit = exports.getUnit = exports.getUnits = void 0;
 const query_1 = require("../queries/query");
 //================== OBTENER TODAS LAS UNIDADES ==================//
 function getUnits(req, res) {
@@ -57,6 +57,8 @@ exports.searchUnit = searchUnit;
 function createUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const unit = req.body;
+        const unitName = unit.unit_name;
+        unit.unit_name = unitName.charAt(0).toUpperCase() + unitName.slice(1);
         const queryCheck = `SELECT * FROM unit WHERE unit_name = "${unit.unit_name}"`;
         return yield query_1.query(queryCheck).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheck.result[0][0] != null) {
@@ -77,6 +79,8 @@ function updateUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const unit = req.body;
         const unitId = req.params.unit_id;
+        const unitName = unit.unit_name;
+        unit.unit_name = unitName.charAt(0).toUpperCase() + unitName.slice(1);
         const queryCheckId = `SELECT * FROM unit WHERE unit_id = "${unitId}"`;
         return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheckId.result[0][0] == null) {
@@ -93,7 +97,7 @@ function updateUnit(req, res) {
                     if (dataCheckSymbol.result[0][0] != null) {
                         return res.status(400).json({ ok: false, message: 'El símbolo de la unidad ya existe!' });
                     }
-                    const queryUpdate = `UPDATE unit SET unit_name = "${unit.unit_name}", symbol = ${unit.symbol}, state = "${unit.state}" WHERE unit_id = "${unitId}"`;
+                    const queryUpdate = `UPDATE unit SET unit_name = "${unit.unit_name}", symbol = "${unit.symbol}", state = "${unit.state}" WHERE unit_id = "${unitId}"`;
                     return yield query_1.query(queryUpdate).then((dataUpdate) => __awaiter(this, void 0, void 0, function* () {
                         if (!dataUpdate.ok)
                             return res.status(dataUpdate.status).json({ ok: false, message: dataUpdate.message });
@@ -140,3 +144,22 @@ function getUnitsById(req, res) {
     });
 }
 exports.getUnitsById = getUnitsById;
+//================== OBTENER LAS UNIDADES POR EL ID DEL PRODUCTO ==================//
+function getUnitsByCommodityId(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const commodityId = req.query.commodity_id;
+        const state = req.query.state;
+        const queryGet = `SELECT DISTINCT cuq.unit_id, 
+            (SELECT DISTINCT unit_name FROM unit u WHERE u.unit_id = cuq.unit_id)unit_name 
+            FROM commodity_unit_quantity cuq 
+            WHERE commodity_unit_quantity_id IN (SELECT commodity_unit_quantity_id FROM commodity_unit_quantity WHERE commodity_id = "${commodityId}") 
+            AND cuq.state = "${state}"`;
+        return yield query_1.query(queryGet).then(data => {
+            console.log(data.message);
+            if (!data.ok)
+                return res.status(data.status).json({ ok: false, message: data.message });
+            return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0] });
+        });
+    });
+}
+exports.getUnitsByCommodityId = getUnitsByCommodityId;

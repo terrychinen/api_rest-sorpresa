@@ -73,6 +73,8 @@ exports.searchCategoryByStoreId = searchCategoryByStoreId;
 function createCategory(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const category = req.body;
+        const categoryName = category.category_name;
+        category.category_name = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
         const queryCheck = `SELECT * FROM category WHERE category_name = "${category.category_name}"`;
         return yield query_1.query(queryCheck).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheck.result[0][0] != null) {
@@ -93,17 +95,20 @@ function updateCategory(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const category = req.body;
         const categoryId = req.params.category_id;
+        const categoryName = category.category_name;
+        category.category_name = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
         const queryCheckId = `SELECT * FROM category WHERE category_id = "${categoryId}"`;
         return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
-            if (dataCheckId.result[0][0] == null) {
+            if (!dataCheckId.ok)
+                return res.status(500).json({ ok: false, message: dataCheckId.message });
+            if (dataCheckId.result[0][0] == null)
                 return res.status(400).json({ ok: false, message: `La categoría con el id ${categoryId} no existe!` });
-            }
-            ;
             const queryCheck = `SELECT * FROM category WHERE category_name = "${category.category_name}"`;
             return yield query_1.query(queryCheck).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-                if (dataCheck.result[0][0] != null) {
+                if (!dataCheck.ok)
+                    return res.status(500).json({ ok: false, message: dataCheck.message });
+                if (dataCheck.result[0][0] != null)
                     return res.status(400).json({ ok: false, message: 'La categoría ya existe!' });
-                }
                 const queryUpdate = `UPDATE category SET category_name="${category.category_name}", state = "${category.state}" WHERE category_id = "${categoryId}"`;
                 return yield query_1.query(queryUpdate).then((dataUpdate) => __awaiter(this, void 0, void 0, function* () {
                     if (!dataUpdate.ok)

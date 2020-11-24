@@ -57,8 +57,8 @@ exports.searchRole = searchRole;
 function createRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const role = req.body;
-        const tableName = 'role';
-        const columnName = 'role_name';
+        const roleName = role.role_name;
+        role.role_name = roleName.charAt(0).toUpperCase() + roleName.slice(1);
         const queryCheck = `SELECT * FROM role WHERE role_name = "${role.role_name}"`;
         return yield query_1.query(queryCheck).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheck.result[0][0] != null) {
@@ -79,6 +79,8 @@ function updateRole(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const role = req.body;
         const roleId = req.params.role_id;
+        const roleName = role.role_name;
+        role.role_name = roleName.charAt(0).toUpperCase() + roleName.slice(1);
         const queryCheckId = `SELECT * FROM role WHERE role_id = "${roleId}"`;
         return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheckId.result[0][0] == null) {

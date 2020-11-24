@@ -50,6 +50,10 @@ export async function searchUnit(req: Request, res: Response){
 export async function createUnit(req: Request, res: Response) {
     const unit: IUnit = req.body;
 
+    const unitName = unit.unit_name;
+    unit.unit_name = unitName.charAt(0).toUpperCase() + unitName.slice(1);
+
+
     const queryCheck = `SELECT * FROM unit WHERE unit_name = "${unit.unit_name}"`;
    
     return await query(queryCheck).then(async dataCheck => {
@@ -69,6 +73,9 @@ export async function updateUnit(req: Request, res: Response) {
     const unit: IUnit = req.body;
     const unitId = req.params.unit_id;
 
+    const unitName = unit.unit_name;
+    unit.unit_name = unitName.charAt(0).toUpperCase() + unitName.slice(1);
+
     const queryCheckId = `SELECT * FROM unit WHERE unit_id = "${unitId}"`;
 
     return await query(queryCheckId).then(async dataCheckId => {
@@ -83,7 +90,7 @@ export async function updateUnit(req: Request, res: Response) {
 
             return await query(queryCheckUnitSymbol).then(async dataCheckSymbol => {
                 if(dataCheckSymbol.result[0][0] != null) {return res.status(400).json({ok: false, message: 'El símbolo de la unidad ya existe!'});}
-                const queryUpdate = `UPDATE unit SET unit_name = "${unit.unit_name}", symbol = ${unit.symbol}, state = "${unit.state}" WHERE unit_id = "${unitId}"`;    
+                const queryUpdate = `UPDATE unit SET unit_name = "${unit.unit_name}", symbol = "${unit.symbol}", state = "${unit.state}" WHERE unit_id = "${unitId}"`;    
 
                 return await query(queryUpdate).then(async dataUpdate => {
                     if(!dataUpdate.ok) return res.status(dataUpdate.status).json({ok: false, message: dataUpdate.message})    
@@ -123,6 +130,26 @@ export async function getUnitsById(req: Request, res: Response){
     const queryGet = `SELECT * FROM unit WHERE state = ${state} ORDER BY FIELD(unit_id, "${unitId}") DESC LIMIT 10 OFFSET ${offset}`;
 
     return await query(queryGet).then(data => {
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+    });
+}
+
+
+
+//================== OBTENER LAS UNIDADES POR EL ID DEL PRODUCTO ==================//
+export async function getUnitsByCommodityId(req: Request, res: Response) {
+    const commodityId = req.query.commodity_id;
+    const state = req.query.state;
+
+    const queryGet = `SELECT DISTINCT cuq.unit_id, 
+            (SELECT DISTINCT unit_name FROM unit u WHERE u.unit_id = cuq.unit_id)unit_name 
+            FROM commodity_unit_quantity cuq 
+            WHERE commodity_unit_quantity_id IN (SELECT commodity_unit_quantity_id FROM commodity_unit_quantity WHERE commodity_id = "${commodityId}") 
+            AND cuq.state = "${state}"`;
+
+    return await query(queryGet).then(data => {
+        console.log(data.message);
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });

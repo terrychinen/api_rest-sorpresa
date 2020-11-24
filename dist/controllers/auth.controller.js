@@ -52,8 +52,8 @@ function signIn(req, res) {
                         message: 'Inicio de sesión correcto!',
                         user: userDB,
                         token,
-                        expireIn: process.env.TOKEN_EXPIRATION,
-                        savedDate: moment_1.default().format('YYYY-MM-DD h:mm:ss')
+                        expires_in: process.env.TOKEN_EXPIRATION,
+                        date: moment_1.default().format('YYYY-MM-DD h:mm:ss')
                     });
                 });
             }
