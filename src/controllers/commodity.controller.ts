@@ -122,7 +122,6 @@ export async function getCommoditiesWithLessStock(req: Request, res: Response){
 
 //================== BUSCAR COMMODITY POR SU NOMBRE  ==================//
 export async function searchCommodity(req: Request, res: Response){
-    const categoryId = req.params.category_id;
     const search = req.body.query;
     const state = Number(req.body.state);
 
@@ -137,9 +136,8 @@ export async function searchCommodity(req: Request, res: Response){
         INNER JOIN commodity_unit_quantity cuq ON scuq.commodity_unit_quantity_id = cuq.commodity_unit_quantity_id
         INNER JOIN unit u ON cuq.unit_id = u.unit_id
         INNER JOIN commodity comm ON cuq.commodity_id = comm.commodity_id
-        INNER JOIN category cate ON comm.category_id = cate.category_id
         INNER JOIN user ON scuq.user_id = user.user_id
-        WHERE comm.category_id = ${categoryId} AND scuq.state = ${state} AND commodity_name LIKE "%${search}%" LIMIT 10`;
+        WHERE scuq.state = ${state} AND commodity_name LIKE "%${search}%" LIMIT 10`;
 
     return await query(queryGet).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
