@@ -12,7 +12,7 @@ router.route('/:category_id')
     .get(getCommoditiesByCategoryId);
 
 
-router.route('/search/:category_id')
+router.route('/search')
     .post(searchCommodity);
 
 
