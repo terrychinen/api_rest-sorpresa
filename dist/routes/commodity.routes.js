@@ -8,7 +8,7 @@ router.route('/')
     .put(commodity_controller_1.updateCommodity);
 router.route('/:category_id')
     .get(commodity_controller_1.getCommoditiesByCategoryId);
-router.route('/search/:category_id')
+router.route('/search')
     .post(commodity_controller_1.searchCommodity);
 router.route('/search/:store_id/:category_id')
     .post(commodity_controller_1.searchCommodityByStoreIdAndCategoryId);

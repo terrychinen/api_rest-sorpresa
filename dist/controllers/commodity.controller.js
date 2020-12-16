@@ -128,23 +128,8 @@ exports.getCommoditiesWithLessStock = getCommoditiesWithLessStock;
 //================== BUSCAR COMMODITY POR SU NOMBRE  ==================//
 function searchCommodity(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const categoryId = req.params.category_id;
         const search = req.body.query;
-        const state = Number(req.body.state);
-        const queryGet = `SELECT  distinct scuq.store_commodity_unit_quantity_id, scuq.commodity_unit_quantity_id, 
-        scuq.store_id, scuq.stock_min, scuq.stock_max, scuq.current_stock, CAST(scuq.last_update AS CHAR) AS last_update, 
-        scuq.favorite, scuq.user_id, scuq.state, s.store_name, 
-        cuq.commodity_id, cuq.unit_id, cuq.unit_value, cuq.quantity_id, cuq.barcode, cuq.photo, 
-        comm.category_id, comm.commodity_name, 
-        u.unit_name, u.symbol, cate.category_name, user.username
-        FROM store_commodity_unit_quantity scuq
-        INNER JOIN store s ON scuq.store_id = s.store_id
-        INNER JOIN commodity_unit_quantity cuq ON scuq.commodity_unit_quantity_id = cuq.commodity_unit_quantity_id
-        INNER JOIN unit u ON cuq.unit_id = u.unit_id
-        INNER JOIN commodity comm ON cuq.commodity_id = comm.commodity_id
-        INNER JOIN category cate ON comm.category_id = cate.category_id
-        INNER JOIN user ON scuq.user_id = user.user_id
-        WHERE comm.category_id = ${categoryId} AND scuq.state = ${state} AND commodity_name LIKE "%${search}%" LIMIT 10`;
+        const queryGet = `SELECT commodity_name FROM commodity WHERE commodity_name = '${search}'`;
         return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
