@@ -127,9 +127,11 @@ export async function searchCommodity(req: Request, res: Response){
     const queryGet = `SELECT commodity_name FROM commodity WHERE commodity_name = '${search}'`;
 
     return await query(queryGet).then( data => {
-        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+        if(!data.ok) return res.status(data.status).json({ok: false, message: data.message});
+
+        if(data.result[0][0] == null) data.result[0][0] = '';
         
-        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0][0]});
     });
 }
 

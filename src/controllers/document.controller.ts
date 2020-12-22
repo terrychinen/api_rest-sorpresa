@@ -1,5 +1,4 @@
 import puppeteer from 'puppeteer';
-import axios from 'axios';
 import { Request, Response } from 'express';
 
 export async function getFullNameByDni(req: Request, res: Response) {
