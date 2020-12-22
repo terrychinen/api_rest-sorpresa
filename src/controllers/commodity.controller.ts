@@ -129,7 +129,7 @@ export async function searchCommodity(req: Request, res: Response){
     return await query(queryGet).then( data => {
         if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
         
-        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0][0]});
+        return res.status(data.status).json({ok: true, message: data.message, result: data.result[0]});
     });
 }
 
