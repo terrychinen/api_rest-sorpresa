@@ -1,7 +1,7 @@
 require('./config/config');
 
 import express, { Application } from 'express';
-import morgan from 'morgan';
+import morgan, { token } from 'morgan';
 
 import { tokenValidation } from './middlewares/authentication';
 import { checkVersionFlutterApp } from './middlewares/check_version_app';
@@ -18,6 +18,7 @@ import UnitRoutes from './routes/unit.routes';
 import StoreRoutes from './routes/store.routes';
 import StockHistoryRoutes from './routes/stock_history.routes';
 import CategoryRoutes from './routes/category.routes';
+import BrandRoutes from './routes/brand.routes';
 import QuantityRoutes from './routes/quantity.routes';
 
 
@@ -54,7 +55,8 @@ export class App {
         this.app.use('/auth', checkVersionFlutterApp, AuthRoutes);
         this.app.use('/token', checkVersionFlutterApp, TokenRoutes);
         this.app.use('/document', DocumentRoutes);
-        this.app.use('/commodity', checkVersionFlutterApp, tokenValidation, CommodityRoutes)
+        this.app.use('/commodity', checkVersionFlutterApp, tokenValidation, CommodityRoutes);
+        this.app.use('/brand', checkVersionFlutterApp, tokenValidation, BrandRoutes);
         this.app.use('/category', checkVersionFlutterApp, tokenValidation, CategoryRoutes);
         this.app.use('/role', checkVersionFlutterApp, tokenValidation, RoleRoutes);
         this.app.use('/unit', checkVersionFlutterApp, tokenValidation, UnitRoutes);
