@@ -80,7 +80,12 @@ function updateRole(req, res) {
         const role = req.body;
         const roleId = req.params.role_id;
         const roleName = role.role_name;
-        role.role_name = roleName.charAt(0).toUpperCase() + roleName.slice(1);
+        if (roleName != '' || roleName != null) {
+            role.role_name = roleName.charAt(0).toUpperCase() + roleName.slice(1);
+        }
+        else {
+            role.role_name = '';
+        }
         const queryCheckId = `SELECT * FROM role WHERE role_id = "${roleId}"`;
         return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheckId.result[0][0] == null) {

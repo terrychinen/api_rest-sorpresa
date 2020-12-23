@@ -88,7 +88,11 @@ export async function updateCategory(req: Request, res: Response) {
     const categoryId = req.params.category_id;
 
     const categoryName = category.category_name;
-    category.category_name = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+    if(categoryName != '' || categoryName != null){
+        category.category_name = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+    }else{
+        category.category_name = '';
+    }
 
     const queryCheckId = `SELECT * FROM category WHERE category_id = "${categoryId}"`;
 

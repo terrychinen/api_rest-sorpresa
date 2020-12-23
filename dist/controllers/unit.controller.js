@@ -80,7 +80,12 @@ function updateUnit(req, res) {
         const unit = req.body;
         const unitId = req.params.unit_id;
         const unitName = unit.unit_name;
-        unit.unit_name = unitName.charAt(0).toUpperCase() + unitName.slice(1);
+        if (unitName != '' || unitName != null) {
+            unit.unit_name = unitName.charAt(0).toUpperCase() + unitName.slice(1);
+        }
+        else {
+            unit.unit_name = '';
+        }
         const queryCheckId = `SELECT * FROM unit WHERE unit_id = "${unitId}"`;
         return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheckId.result[0][0] == null) {

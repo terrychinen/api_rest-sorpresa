@@ -87,7 +87,11 @@ export async function updateQuantity(req: Request, res: Response) {
     const quantityId = req.params.quantity_id;
 
     const quantityName = quantity.quantity_name;
-    quantity.quantity_name = quantityName.charAt(0).toUpperCase() + quantityName.slice(1);
+    if(quantityName != '' || quantityName != null){
+        quantity.quantity_name = quantityName.charAt(0).toUpperCase() + quantityName.slice(1);
+    }else{
+        quantity.quantity_name = '';
+    }
 
     const shortName = quantity.short_name;
 

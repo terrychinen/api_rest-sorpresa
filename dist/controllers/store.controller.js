@@ -80,7 +80,12 @@ function updateStore(req, res) {
         const store = req.body;
         const storeId = req.params.store_id;
         const storeName = store.store_name;
-        store.store_name = storeName.charAt(0).toUpperCase() + storeName.slice(1);
+        if (storeName != '' || storeName != null) {
+            store.store_name = storeName.charAt(0).toUpperCase() + storeName.slice(1);
+        }
+        else {
+            store.store_name = '';
+        }
         const queryCheckId = `SELECT * FROM store WHERE store_id = "${storeId}"`;
         return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheckId.result[0][0] == null) {

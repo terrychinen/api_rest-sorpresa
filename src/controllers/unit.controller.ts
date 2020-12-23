@@ -74,7 +74,12 @@ export async function updateUnit(req: Request, res: Response) {
     const unitId = req.params.unit_id;
 
     const unitName = unit.unit_name;
-    unit.unit_name = unitName.charAt(0).toUpperCase() + unitName.slice(1);
+    if(unitName != '' || unitName != null){
+        unit.unit_name = unitName.charAt(0).toUpperCase() + unitName.slice(1);
+    }else{
+        unit.unit_name = '';
+    }
+
 
     const queryCheckId = `SELECT * FROM unit WHERE unit_id = "${unitId}"`;
 

@@ -96,7 +96,12 @@ function updateCategory(req, res) {
         const category = req.body;
         const categoryId = req.params.category_id;
         const categoryName = category.category_name;
-        category.category_name = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+        if (categoryName != '' || categoryName != null) {
+            category.category_name = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+        }
+        else {
+            category.category_name = '';
+        }
         const queryCheckId = `SELECT * FROM category WHERE category_id = "${categoryId}"`;
         return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
             if (!dataCheckId.ok)

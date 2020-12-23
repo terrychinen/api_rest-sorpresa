@@ -71,9 +71,14 @@ export async function createStore(req: Request, res: Response) {
 export async function updateStore(req: Request, res: Response) {
     const store: IStore = req.body;
     const storeId = req.params.store_id;
+    
+    const storeName = store.store_name;
+    if(storeName != '' || storeName != null){
+        store.store_name = storeName.charAt(0).toUpperCase() + storeName.slice(1);
+    }else{
+        store.store_name = '';
+    }
 
-     const storeName = store.store_name;
-     store.store_name = storeName.charAt(0).toUpperCase() + storeName.slice(1);
 
     const queryCheckId = `SELECT * FROM store WHERE store_id = "${storeId}"`;
 
