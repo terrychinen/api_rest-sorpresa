@@ -134,7 +134,7 @@ function searchCommodity(req, res) {
             if (!data.ok)
                 return res.status(data.status).json({ ok: false, message: data.message });
             if (data.result[0][0] == null)
-                data.result[0][0] = '';
+                data.result[0][0] = null;
             return res.status(data.status).json({ ok: true, message: data.message, result: data.result[0][0] });
         });
     });
