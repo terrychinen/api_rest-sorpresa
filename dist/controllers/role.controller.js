@@ -16,6 +16,9 @@ function getRoles(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const offset = Number(req.query.offset);
         const state = Number(req.query.state);
+        if (Number.isNaN(offset) || Number.isNaN(state)) {
+            return res.status(404).json({ ok: false, message: `La variable 'offset' y 'state' es obligatorio!` });
+        }
         const queryGet = `SELECT * FROM role WHERE state = ${state} ORDER BY role_id DESC LIMIT 10 OFFSET ${offset}`;
         return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
