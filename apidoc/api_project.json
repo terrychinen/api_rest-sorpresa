@@ -1,14 +1,14 @@
 {
-  "name": "sorpresa - Rest API",
+  "name": "Almacen - Rest API",
   "version": "0.1.0",
-  "description": "Rest API for sorpresa",
-  "title": "sorpresa API",
+  "description": "Rest API para almacen",
+  "title": "almacen API",
   "sampleUrl": false,
   "defaultVersion": "0.0.0",
   "apidoc": "0.3.0",
   "generator": {
     "name": "apidoc",
-    "time": "2020-08-22T03:43:02.196Z",
+    "time": "2020-12-26T19:00:58.679Z",
     "url": "https://apidocjs.com",
     "version": "0.25.0"
   }
