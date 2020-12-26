@@ -8,6 +8,10 @@ export async function getStores(req: Request, res: Response){
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
 
+    if(Number.isNaN(offset) || Number.isNaN(state)) {
+        return res.status(404).json({ok: false, message: `La variable 'offset' y 'state' es obligatorio!`});
+    }
+
     const queryGet = `SELECT * FROM store WHERE state = ${state} ORDER BY store_id DESC`;
 
     return await query(queryGet).then(data => {

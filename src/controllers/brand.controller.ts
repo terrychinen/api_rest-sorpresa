@@ -9,6 +9,10 @@ export async function getBrands(req: Request, res: Response){
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
 
+    if(Number.isNaN(offset) || Number.isNaN(state)) {
+        return res.status(404).json({ok: false, message: `La variable 'offset' y 'state' es obligatorio!`});
+    }
+
     const queryGet = `SELECT * FROM brand WHERE state = ${state} ORDER BY brand_id DESC LIMIT 10 OFFSET ${offset}`;
 
     return await query(queryGet).then(data => {
