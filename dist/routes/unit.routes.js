@@ -167,7 +167,7 @@ router.route('/')
     .get(unit_controller_1.getUnits)
     .post(unit_controller_1.createUnit);
 /**
- * @api {get} /unit/search Buscador de unidades
+ * @api {post} /unit/search Buscador de unidades
  * @apiName BuscarUnidades
  * @apiGroup Unidad
  *

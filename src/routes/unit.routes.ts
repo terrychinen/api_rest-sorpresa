@@ -191,7 +191,7 @@ router.route('/')
 
 
 /**
- * @api {get} /unit/search Buscador de unidades
+ * @api {post} /unit/search Buscador de unidades
  * @apiName BuscarUnidades
  * @apiGroup Unidad
  * 
@@ -277,9 +277,6 @@ router.route('/')
  *
  *
  */
-
-
-
 router.route('/search')
     .post(searchUnit);
 

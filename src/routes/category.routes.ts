@@ -170,12 +170,115 @@ const router = Router();
   *     }
   * 
   */
-
-
-
 router.route('/')
     .get(getCategories)
     .post(createCategory);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * @api {post} /category/search Buscador de categoría
+ * @apiName BuscarCategorías
+ * @apiGroup Categoría
+ * 
+ * @apiHeaderExample {json} Header-Example:
+ *    {
+ *       "version": "xxxxx",
+ *       "token": "xxxx.xxxx.xxxx"
+ *    }
+ * 
+ * 
+ * @apiParam {Number} query     El nombre de la categoría
+ * @apiParam {Number} state     El estado de la categoría (0, 1)
+ *
+ * 
+ * @apiSuccess {bool}       ok          Si la petición ha sido exitosa o no
+ * @apiSuccess {String}     message     Mensaje del servidor
+ * @apiSuccess {String}     result      La lista de categorías
+ * 
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+            "ok": true,
+            "message": "Query successful",
+            "result": [
+                {
+                    "category_id": 1,
+                    "category_name": "Leche",
+                    "state": 1
+                }
+            ]
+ *     }
+ *
+ * 
+ * 
+ * @apiError UpdateApp Necesita actualizar la aplicación
+ * @apiErrorExample AppVersion: 406
+ *     HTTP/1.1 406 Version error
+ *     {
+            "ok": false,
+            "message": "Actualiza la apliación",
+ *     }
+ *
+ * 
+ * 
+ * 
+ * @apiError StateNotFound El 'state' no ha sido encontrado
+ * @apiErrorExample StateNotFound: 405
+ *     HTTP/1.1 405 Not Found
+ *     {
+            "ok": false,
+            "message": "La variable 'state' son obligatorio!"
+ *     }
+ *
+ * 
+ *
+ * @apiError JWTNotFound El 'token' no ha sido encontrado
+ * @apiErrorExample JWTNotFound: 401
+ *     HTTP/1.1 401 JWTNotFound
+ *     {
+            "ok": false,
+            "name": "TokenExpiredError",
+            "message": "jwt expired",
+            "expiredAt": "2020-12-26T16:01:48.000Z"
+ *     }
+ * 
+ * 
+ * 
+ * 
+ * @apiError ServeError Error del servidor
+ * @apiErrorExample ServeError: 500
+ *     HTTP/1.1 500 Internal Server Error
+ *     {
+            "ok": false,
+            "message": "Mensaje de error del servidor"
+ *     }
+ *
+ *
+ */ 
+router.route('/search')
+    .post(searchCategory);
+
+
+
+
+
+
+
+
+
 
 
 
@@ -183,11 +286,6 @@ router.route('/:category_id')
     .get(getCategory)
     .put(updateCategory)
     .delete(deleteCategory);
-
-
-
-router.route('/search')
-    .post(searchCategory);
 
 
 

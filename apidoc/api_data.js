@@ -1,6 +1,131 @@
 define({ "api": [
   {
     "type": "post",
+    "url": "/store/search",
+    "title": "Buscador de almacenes",
+    "name": "BuscarAlamcenes",
+    "group": "Almacen",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "query",
+            "description": "<p>El nombre del almacen</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "state",
+            "description": "<p>El estado del almacen (0, 1)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "result",
+            "description": "<p>La lista de almacenes</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n               \"store_id\": 1,\n                \"store_name\": \"Almacen A\",\n                \"state\": 1\n            }\n        ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UpdateApp",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "StateNotFound",
+            "description": "<p>El 'state' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Version error\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "StateNotFound: 405",
+          "content": "HTTP/1.1 405 Not Found\n{\n        \"ok\": false,\n        \"message\": \"La variable 'state' son obligatorio!\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/store.routes.ts",
+    "groupTitle": "Almacen"
+  },
+  {
+    "type": "post",
     "url": "/store",
     "title": "Crear almacen",
     "name": "CrearAlmacen",
@@ -552,6 +677,131 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/quantity/search",
+    "title": "Buscador de cantidades",
+    "name": "BuscarCantidades",
+    "group": "Cantidad",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "query",
+            "description": "<p>El nombre de la cantidad</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "state",
+            "description": "<p>El estado de la cantidad (0, 1)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "result",
+            "description": "<p>La lista de cantidades</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n                \"quantity_id\": 1,\n                \"quantity_name\": \"Caja\",\n                \"short_name\": \"\"\n                \"state\": 1\n            }\n        ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UpdateApp",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "StateNotFound",
+            "description": "<p>El 'state' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Version error\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "StateNotFound: 405",
+          "content": "HTTP/1.1 405 Not Found\n{\n        \"ok\": false,\n        \"message\": \"La variable 'state' son obligatorio!\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/quantity.routes.ts",
+    "groupTitle": "Cantidad"
+  },
+  {
+    "type": "post",
     "url": "/quantity",
     "title": "Crear cantidad",
     "name": "CrearCantidad",
@@ -802,6 +1052,131 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/category/search",
+    "title": "Buscador de categoría",
+    "name": "BuscarCategorías",
+    "group": "Categoría",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "query",
+            "description": "<p>El nombre de la categoría</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "state",
+            "description": "<p>El estado de la categoría (0, 1)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "result",
+            "description": "<p>La lista de categorías</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n                \"category_id\": 1,\n                \"category_name\": \"Leche\",\n                \"state\": 1\n            }\n        ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UpdateApp",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "StateNotFound",
+            "description": "<p>El 'state' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Version error\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "StateNotFound: 405",
+          "content": "HTTP/1.1 405 Not Found\n{\n        \"ok\": false,\n        \"message\": \"La variable 'state' son obligatorio!\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/category.routes.ts",
+    "groupTitle": "Categoría"
+  },
+  {
+    "type": "post",
     "url": "/unit",
     "title": "Crear categoría",
     "name": "CrearCategoría",
@@ -1042,6 +1417,131 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "src/routes/category.routes.ts",
     "groupTitle": "Categoría"
+  },
+  {
+    "type": "post",
+    "url": "/category/search",
+    "title": "Buscador de la marca",
+    "name": "BuscarMarcas",
+    "group": "Marca",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "query",
+            "description": "<p>El nombre de la marca</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "state",
+            "description": "<p>El estado de la marca (0, 1)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "result",
+            "description": "<p>La lista de marcas</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n                \"brand_id\": 1,\n                \"brand_name\": \"Gloria\",\n                \"state\": 1\n            }\n        ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UpdateApp",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "StateNotFound",
+            "description": "<p>El 'state' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Version error\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "StateNotFound: 405",
+          "content": "HTTP/1.1 405 Not Found\n{\n        \"ok\": false,\n        \"message\": \"La variable 'state' son obligatorio!\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/brand.routes.ts",
+    "groupTitle": "Marca"
   },
   {
     "type": "post",
@@ -1288,6 +1788,131 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/role/search",
+    "title": "Buscador de roles",
+    "name": "BuscarRoles",
+    "group": "Rol",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "query",
+            "description": "<p>El nombre del rol</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "state",
+            "description": "<p>El estado del rol (0, 1)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "result",
+            "description": "<p>La lista de roles</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n               \"role_id\": 1,\n               \"role_name\": \"Administrador\",\n               \"state\": 1\n            }\n        ]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UpdateApp",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "StateNotFound",
+            "description": "<p>El 'state' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Version error\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "StateNotFound: 405",
+          "content": "HTTP/1.1 405 Not Found\n{\n        \"ok\": false,\n        \"message\": \"La variable 'state' son obligatorio!\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/role.routes.ts",
+    "groupTitle": "Rol"
+  },
+  {
+    "type": "post",
     "url": "/role",
     "title": "Crear rol",
     "name": "CrearRol",
@@ -1530,7 +2155,7 @@ define({ "api": [
     "groupTitle": "Rol"
   },
   {
-    "type": "get",
+    "type": "post",
     "url": "/unit/search",
     "title": "Buscador de unidades",
     "name": "BuscarUnidades",
@@ -1593,7 +2218,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n                \"unit_id\": 1,\n                \"unit_name\": \"Metros\",\n                \"symbol\": \"m\"\n                \"state\": 1\n            },                \n            {\n                \"unit_id\": 2,\n                \"unit_name\": \"Militros\",\n                \"symbol\": \"ml\"\n                \"state\": 1\n            }\n        ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n                \"unit_id\": 5,\n                \"unit_name\": \"Metros\",\n                \"symbol\": \"m\"\n                \"state\": 1\n            },                \n            {\n                \"unit_id\": 9,\n                \"unit_name\": \"Militros\",\n                \"symbol\": \"ml\"\n                \"state\": 1\n            }\n        ]\n}",
           "type": "json"
         }
       ]
