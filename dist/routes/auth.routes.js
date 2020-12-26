@@ -5,7 +5,7 @@ const auth_controller_1 = require("../controllers/auth.controller");
 const router = express_1.Router();
 /**
  * @api {post} url/auth/signin Inciar sesión al usuario
- * @apiName PostSignin
+ * @apiName IniciarSesión
  * @apiGroup Auth
  *
  *
@@ -24,7 +24,7 @@ const router = express_1.Router();
  * @apiSuccess {String}   user.last_name    El apellido dela persona
  * @apiSuccess {String}   user.state        El estado del usuario (si está permitido loguearse o no)
  * @apiSuccess {String}   token             El token
- * @apiSuccess {String}   expires_in        La expiración del token
+ * @apiSuccess {Number}   expires_in        La expiración del token
  * @apiSuccess {String}   date              La fecha del token generado
  *
  * @apiSuccessExample Success-Response:

@@ -18,10 +18,10 @@ const router = Router();
  *    }
  * 
  * 
- * @apiParam {Number} offset Numero de indice
+ * @apiParam {Number} offset Número de índice
  * @apiParam {Number} state El estado de la marca (0, 1)
  *
- * @apiSuccess {bool} ok Si la peticion ha sido exitosa o no
+ * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
  * @apiSuccess {String} message Mensaje del servidor
  * @apiSuccess {String} result La lista de marcas
  * 
@@ -98,6 +98,9 @@ const router = Router();
  */
 
 
+
+
+
 /** 
   * @api {post} /brand Crear Marca
   * @apiName CrearMarca
@@ -113,7 +116,7 @@ const router = Router();
   * @apiParam {String} brand_name El nombre de la marca
   * @apiParam {Number} state El estado de la marca (0, 1)
   * 
-  * @apiSuccess {bool} ok Si la peticion ha sido exitosa o no
+  * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
   * @apiSuccess {String} message Mensaje del servidor
   * 
   * 

@@ -47,6 +47,9 @@ function searchUnit(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const search = req.body.query;
         const state = Number(req.body.state);
+        if (Number.isNaN(state)) {
+            return res.status(404).json({ ok: false, message: `La variable 'state' es obligatorio!` });
+        }
         const queryString = `SELECT * FROM unit WHERE unit_name LIKE "%${search}%" AND state = ${state} ORDER BY unit_name DESC`;
         return yield query_1.query(queryString).then(data => {
             if (!data.ok)
@@ -62,17 +65,23 @@ function createUnit(req, res) {
         const unit = req.body;
         const unitName = unit.unit_name;
         unit.unit_name = unitName.charAt(0).toUpperCase() + unitName.slice(1);
-        const queryCheck = `SELECT * FROM unit WHERE unit_name = "${unit.unit_name}"`;
-        return yield query_1.query(queryCheck).then((dataCheck) => __awaiter(this, void 0, void 0, function* () {
-            if (dataCheck.result[0][0] != null) {
-                return res.status(400).json({ ok: false, message: 'La unidad ya existe!' });
+        const queryCheckUnitName = `SELECT * FROM unit WHERE unit_name = "${unit.unit_name}"`;
+        return yield query_1.query(queryCheckUnitName).then((dataCheckUnitName) => __awaiter(this, void 0, void 0, function* () {
+            if (dataCheckUnitName.result[0][0] != null) {
+                return res.status(400).json({ ok: false, message: 'El nombre de la unidad ya existe!' });
             }
-            const queryInsert = `INSERT INTO unit (unit_name, symbol, state) VALUES ("${unit.unit_name}", "${unit.symbol}", "${unit.state}")`;
-            return yield query_1.query(queryInsert).then(data => {
-                if (!data.ok)
-                    return res.status(data.status).json({ ok: false, message: data.message });
-                return res.status(data.status).json({ ok: true, message: 'Unidad creado correctamente' });
-            });
+            const queryChecksymbolName = `SELECT * FROM unit WHERE symbol = "${unit.symbol}"`;
+            return yield query_1.query(queryChecksymbolName).then((dataCheckSymbolName) => __awaiter(this, void 0, void 0, function* () {
+                if (dataCheckSymbolName.result[0][0] != null) {
+                    return res.status(400).json({ ok: false, message: 'La abreviatura de la unidad ya existe!' });
+                }
+                const queryInsert = `INSERT INTO unit (unit_name, symbol, state) VALUES ("${unit.unit_name}", "${unit.symbol}", "${unit.state}")`;
+                return yield query_1.query(queryInsert).then(data => {
+                    if (!data.ok)
+                        return res.status(data.status).json({ ok: false, message: data.message });
+                    return res.status(data.status).json({ ok: true, message: 'Unidad creado correctamente' });
+                });
+            }));
         }));
     });
 }

@@ -15,10 +15,10 @@ const router = express_1.Router();
  *    }
  *
  *
- * @apiParam {Number} offset Numero de indice
+ * @apiParam {Number} offset Número de índice
  * @apiParam {Number} state El estado del rol (0, 1)
  *
- * @apiSuccess {bool} ok Si la peticion ha sido exitosa o no
+ * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
  * @apiSuccess {String} message Mensaje del servidor
  * @apiSuccess {String} result La lista de roles
  *
@@ -102,7 +102,7 @@ const router = express_1.Router();
  * @apiParam {String} rol_name El nombre del rol
  * @apiParam {Number} state El estado del rol (0, 1)
  *
- * @apiSuccess {bool} ok Si la peticion ha sido exitosa o no
+ * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
  * @apiSuccess {String} message Mensaje del servidor
  *
  *
