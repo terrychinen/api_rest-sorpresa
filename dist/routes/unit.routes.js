@@ -46,7 +46,7 @@ const router = express_1.Router();
  *
  *
  *
- * @apiError UpdateApp Necesita actualizar la aplicación
+ * @apiError AppVersion Necesita actualizar la aplicación
  * @apiErrorExample AppVersion: 406
  *     HTTP/1.1 406 Version error
  *     {
@@ -104,7 +104,7 @@ const router = express_1.Router();
  *
  *
  * @apiParam {String}      unit_name    El nombre de la unidad
- * @apiParam {String}      symbol       El simbolo de la unidad
+ * @apiParam {String}      symbol       El símbolo de la unidad
  * @apiParam {Number}      state        El estado de la unidad (0, 1)
  *
  * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
@@ -117,6 +117,10 @@ const router = express_1.Router();
            "ok": true,
            "message": "Unidad creado correctamente"
  *     }
+ *
+ *
+ *
+ *
  *
  *
  *
@@ -143,8 +147,8 @@ const router = express_1.Router();
  *
  *
  *
- * @apiError UpdateApp Necesita actualizar la aplicación
- * @apiErrorExample UpdateApp: 406
+ * @apiError AppVersion Necesita actualizar la aplicación
+ * @apiErrorExample AppVersion: 406
  *     HTTP/1.1 406 Need to update
  *     {
            "ok": false,
@@ -209,7 +213,7 @@ router.route('/')
  *
  *
  *
- * @apiError UpdateApp Necesita actualizar la aplicación
+ * @apiError AppVersion Necesita actualizar la aplicación
  * @apiErrorExample AppVersion: 406
  *     HTTP/1.1 406 Version error
  *     {
@@ -255,6 +259,176 @@ router.route('/')
  */
 router.route('/search')
     .post(unit_controller_1.searchUnit);
+/**
+  * @api {put} /unit/:unit_id Actualizar Unidad
+  * @apiName ActualizarUnidad
+  * @apiGroup Unidad
+  *
+  * @apiHeaderExample {json} Header-Example:
+  *    {
+  *       "version": "xxxxx",
+  *       "token": "xxxx.xxxx.xxxx"
+  *    }
+  *
+  *
+  * @apiParam {Number} unit_id El ID de la unidad (este ID tiene que ir en el URL)
+  * @apiParam {String} unit_name El nombre de la unidad
+  * @apiParam {String} symbol El símbolo de la unidad
+  * @apiParam {Number} state El estado de la unidad (0, 1)
+  *
+  * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
+  * @apiSuccess {String} message Mensaje del servidor
+  *
+  *
+  * @apiSuccessExample Success-Response:
+  *     HTTP/1.1 200 OK
+  *     {
+            "ok": true,
+            "message": "Unidad actualizado correctamente"
+  *     }
+  *
+  *
+  *
+  *
+  *
+  *
+  *
+  *
+  *
+  * @apiError UnitExists Ya existe la unidad
+  * @apiErrorExample UnitExists: 400
+  *     HTTP/1.1 400 Unit exists
+  *     {
+            "ok": false,
+            "message": "La unidad ya existe!",
+  *     }
+  *
+  *
+  *
+  * @apiError JWTNotFound El 'token' no ha sido encontrado
+  * @apiErrorExample JWTNotFound: 401
+  *     HTTP/1.1 401 JWTNotFound
+  *     {
+            "ok": false,
+            "name": "TokenExpiredError",
+            "message": "jwt expired",
+            "expiredAt": "2020-12-26T16:01:48.000Z"
+  *     }
+  *
+  *
+  *
+  *
+  * @apiError UnitIDNotFound El ID de la unidad no existe
+  * @apiErrorExample UnitIDNotFound: 405
+  *     HTTP/1.1 405 Unit ID Not Found
+  *     {
+            "ok": false,
+            "message": "EL ID de la unidad no existe!",
+  *     }
+  *
+  *
+  *
+  *
+  * @apiError AppVersion Necesita actualizar la aplicación
+  * @apiErrorExample AppVersion: 406
+  *     HTTP/1.1 406 Need to update
+  *     {
+            "ok": false,
+            "message": "Actualiza la apliación",
+  *     }
+  *
+  *
+  *
+  *
+  * @apiError ServeError Error del servidor
+  * @apiErrorExample ServeError: 500
+  *     HTTP/1.1 500 Internal Server Error
+  *     {
+            "ok": false,
+            "message": "Mensaje de error del servidor",
+  *     }
+  *
+  */
+/**
+  * @api {delete} /unit/:unit_id Eliminar Unidad
+  * @apiName EliminarUnidad
+  * @apiGroup Unidad
+  *
+  * @apiHeaderExample {json} Header-Example:
+  *    {
+  *       "version": "xxxxx",
+  *       "token": "xxxx.xxxx.xxxx"
+  *    }
+  *
+  *
+  * @apiParam {Number} unit_id El ID de la unidad (este ID tiene que ir en el URL)
+  *
+  * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
+  * @apiSuccess {String} message Mensaje del servidor
+  *
+  *
+  * @apiSuccessExample Success-Response:
+  *     HTTP/1.1 200 OK
+  *     {
+            "ok": true,
+            "message": "La unidad ha sido eliminado correctamente"
+  *     }
+  *
+  *
+  *
+  *
+  *
+  *
+  *
+  *
+  *
+  *
+  *
+  * @apiError JWTNotFound El 'token' no ha sido encontrado
+  * @apiErrorExample JWTNotFound: 401
+  *     HTTP/1.1 401 JWTNotFound
+  *     {
+            "ok": false,
+            "name": "TokenExpiredError",
+            "message": "jwt expired",
+            "expiredAt": "2020-12-26T16:01:48.000Z"
+  *     }
+  *
+  *
+  *
+  *
+  * @apiError UnitIDNotFound El ID de la unidad no existe
+  * @apiErrorExample UnitIDNotFound: 405
+  *     HTTP/1.1 405 Unit ID Not Found
+  *     {
+            "ok": false,
+            "message": "EL ID de la unidad no existe!",
+  *     }
+  *
+  *
+  *
+  *
+  *
+  * @apiError AppVersion Necesita actualizar la aplicación
+  * @apiErrorExample AppVersion: 406
+  *     HTTP/1.1 406 Need to update
+  *     {
+            "ok": false,
+            "message": "Actualiza la apliación",
+  *     }
+  *
+  *
+  *
+  *
+  * @apiError ServeError Error del servidor
+  * @apiErrorExample ServeError: 500
+  *     HTTP/1.1 500 Internal Server Error
+  *     {
+            "ok": false,
+            "message": "Mensaje de error del servidor",
+  *     }
+  *
+  */
 router.route('/:unit_id')
     .get(unit_controller_1.getUnit)
     .put(unit_controller_1.updateUnit)

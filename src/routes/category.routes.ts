@@ -6,7 +6,7 @@ const router = Router();
 
 
 /**
- * @api {get} /role?offset=0&state=1 Obtener todas las categorías
+ * @api {get} /category?offset=0&state=1 Obtener todas las categorías
  * @apiName ObtenerCategorías
  * @apiGroup Categoría
  * 
@@ -45,7 +45,12 @@ const router = Router();
  *
  * 
  * 
- * @apiError UpdateApp Necesita actualizar la aplicación
+ * 
+ * 
+ * 
+ * 
+ * 
+ * @apiError AppVersion Necesita actualizar la aplicación
  * @apiErrorExample AppVersion: 406
  *     HTTP/1.1 406 Version error
  *     {
@@ -98,7 +103,7 @@ const router = Router();
  
 
  /** 
-  * @api {post} /unit Crear categoría
+  * @api {post} /category Crear categoría
   * @apiName CrearCategoría
   * @apiGroup Categoría
   * 
@@ -109,7 +114,7 @@ const router = Router();
   *    }
   * 
   * 
-  * @apiParam {String} unit_name El nombre de la categoría
+  * @apiParam {String} category_name El nombre de la categoría
   * @apiParam {Number} state El estado de la categoría (0, 1)
   * 
   * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
@@ -125,9 +130,13 @@ const router = Router();
   *
   * 
   * 
-  * @apiError UnitExists Ya existe el nombre de la categoría
-  * @apiErrorExample UnitExists: 400
-  *     HTTP/1.1 406 Unit exists
+  * 
+  *
+  * 
+  * 
+  * @apiError CategoryExists Ya existe el nombre de la categoría
+  * @apiErrorExample CategoryExists: 400
+  *     HTTP/1.1 406 Category exists
   *     {
             "ok": false,
             "message": "La categoría ya existe!",
@@ -148,9 +157,8 @@ const router = Router();
   * 
   * 
   * 
-  * @apiError UpdateApp Necesita actualizar la aplicación
-  *
-  * @apiErrorExample UpdateApp: 406
+  * @apiError AppVersion Necesita actualizar la aplicación
+  * @apiErrorExample AppVersion: 406
   *     HTTP/1.1 406 Need to update
   *     {
             "ok": false,
@@ -161,7 +169,6 @@ const router = Router();
   * 
   * 
   * @apiError ServeError Error del servidor
-  *
   * @apiErrorExample ServeError: 500
   *     HTTP/1.1 500 Internal Server Error
   *     {
@@ -189,7 +196,7 @@ router.route('/')
 
 
 /**
- * @api {post} /category/search Buscador de categoría
+ * @api {post} /category/search Buscador de categorías
  * @apiName BuscarCategorías
  * @apiGroup Categoría
  * 
@@ -224,7 +231,11 @@ router.route('/')
  *
  * 
  * 
- * @apiError UpdateApp Necesita actualizar la aplicación
+ * 
+ * 
+ * 
+ * 
+ * @apiError AppVersion Necesita actualizar la aplicación
  * @apiErrorExample AppVersion: 406
  *     HTTP/1.1 406 Version error
  *     {
@@ -281,11 +292,191 @@ router.route('/search')
 
 
 
+ /** 
+  * @api {put} /category/:category_id Actualizar Categoría
+  * @apiName ActualizarCategoría
+  * @apiGroup Categoría
+  * 
+  * @apiHeaderExample {json} Header-Example:
+  *    {
+  *       "version": "xxxxx",
+  *       "token": "xxxx.xxxx.xxxx"
+  *    }
+  * 
+  * 
+  * @apiParam {Number} category_id El ID de la categoría (este ID tiene que ir en el URL)
+  * @apiParam {String} category_name El nombre de la categoría
+  * @apiParam {Number} state El estado de la categoría (0, 1)
+  * 
+  * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
+  * @apiSuccess {String} message Mensaje del servidor
+  * 
+  * 
+  * @apiSuccessExample Success-Response:
+  *     HTTP/1.1 200 OK
+  *     {
+            "ok": true,
+            "message": "Categoría actualizado correctamente"
+  *     }
+  *
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  * @apiError CategoryExists Ya existe la categoría
+  * @apiErrorExample CategoryExists: 400
+  *     HTTP/1.1 400 Category exists
+  *     {
+            "ok": false,
+            "message": "La categoría ya existe!",
+  *     }
+  * 
+  *
+  * 
+  * @apiError JWTNotFound El 'token' no ha sido encontrado
+  * @apiErrorExample JWTNotFound: 401
+  *     HTTP/1.1 401 JWTNotFound
+  *     {
+            "ok": false,
+            "name": "TokenExpiredError",
+            "message": "jwt expired",
+            "expiredAt": "2020-12-26T16:01:48.000Z"
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * 
+  * @apiError CategoyIDNotFound El ID de la categoría no existe
+  * @apiErrorExample CategoryIDNotFound: 405
+  *     HTTP/1.1 405 Category ID Not Found
+  *     {
+            "ok": false,
+            "message": "EL ID de la categoría no existe!",
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * @apiError AppVersion Necesita actualizar la aplicación
+  * @apiErrorExample AppVersion: 406
+  *     HTTP/1.1 406 Need to update
+  *     {
+            "ok": false,
+            "message": "Actualiza la apliación",
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * @apiError ServeError Error del servidor
+  * @apiErrorExample ServeError: 500
+  *     HTTP/1.1 500 Internal Server Error
+  *     {
+            "ok": false,
+            "message": "Mensaje de error del servidor",
+  *     }
+  * 
+  */ 
 
+
+
+
+
+  /** 
+  * @api {delete} /category/:category_id Eliminar Categoría
+  * @apiName EliminarCategoría
+  * @apiGroup Categoría
+  * 
+  * @apiHeaderExample {json} Header-Example:
+  *    {
+  *       "version": "xxxxx",
+  *       "token": "xxxx.xxxx.xxxx"
+  *    }
+  * 
+  * 
+  * @apiParam {Number} category_id El ID de la categoría (este ID tiene que ir en el URL)
+  * 
+  * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
+  * @apiSuccess {String} message Mensaje del servidor
+  * 
+  * 
+  * @apiSuccessExample Success-Response:
+  *     HTTP/1.1 200 OK
+  *     {
+            "ok": true,
+            "message": "La Categoría ha sido eliminado correctamente"
+  *     }
+  *
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  *
+  * 
+  * @apiError JWTNotFound El 'token' no ha sido encontrado
+  * @apiErrorExample JWTNotFound: 401
+  *     HTTP/1.1 401 JWTNotFound
+  *     {
+            "ok": false,
+            "name": "TokenExpiredError",
+            "message": "jwt expired",
+            "expiredAt": "2020-12-26T16:01:48.000Z"
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * @apiError CategoryIDNotFound El ID de la categoría no existe
+  * @apiErrorExample CategoryIDNotFound: 405
+  *     HTTP/1.1 405 Category ID Not Found
+  *     {
+            "ok": false,
+            "message": "EL ID de la categoría no existe!",
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * 
+  * @apiError AppVersion Necesita actualizar la aplicación
+  * @apiErrorExample AppVersion: 406
+  *     HTTP/1.1 406 Need to update
+  *     {
+            "ok": false,
+            "message": "Actualiza la apliación",
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * @apiError ServeError Error del servidor
+  * @apiErrorExample ServeError: 500
+  *     HTTP/1.1 500 Internal Server Error
+  *     {
+            "ok": false,
+            "message": "Mensaje de error del servidor",
+  *     }
+  * 
+  */
 router.route('/:category_id')
     .get(getCategory)
     .put(updateCategory)
     .delete(deleteCategory);
+
+
+
+
+
+
+
+
 
 
 

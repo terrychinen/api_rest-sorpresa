@@ -69,17 +69,10 @@ const router = Router();
  *
  *
  */
-
-
-
-
-
-
-
-
-
 router.route('/refresh')
     .post(refreshToken);
 
+
+    
 
 export default router;

@@ -67,9 +67,9 @@ const router = express_1.Router();
             "state": 0
 *      }
 
-* @apiError UpdateApp Necesita actualizar la aplicación
+* @apiError AppVersion Necesita actualizar la aplicación
 *
-* @apiErrorExample UpdateApp: 406
+* @apiErrorExample AppVersion: 406
 *     HTTP/1.1 406 Need to update
 *     {
             "ok": false,

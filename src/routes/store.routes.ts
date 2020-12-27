@@ -11,7 +11,7 @@ const router = Router();
 /**
  * @api {get} /store?offset=0&state=1 Obtener todos los almacenes
  * @apiName ObtenerAlmacenes
- * @apiGroup Almacen
+ * @apiGroup Almacén
  * 
  * @apiHeaderExample {json} Header-Example:
  *    {
@@ -21,7 +21,7 @@ const router = Router();
  * 
  * 
  * @apiParam {Number} offset Número de índice
- * @apiParam {Number} state El estado del almacen (0, 1)
+ * @apiParam {Number} state El estado del almacén (0, 1)
  *
  * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
  * @apiSuccess {String} message Mensaje del servidor
@@ -35,12 +35,12 @@ const router = Router();
             "result": [
                 {
                     "store_id": 1,
-                    "store_name": "Almacen A",
+                    "store_name": "Almacén A",
                     "state": 1
                 },                
                 {
                     "store_id": 2,
-                    "store_name": "Almacen B",
+                    "store_name": "Almacén B",
                     "state": 1
                 }
             ]
@@ -48,7 +48,10 @@ const router = Router();
  *
  * 
  * 
- * @apiError UpdateApp Necesita actualizar la aplicación
+ * 
+ * 
+ * 
+ * @apiError AppVersion Necesita actualizar la aplicación
  * @apiErrorExample AppVersion: 406
  *     HTTP/1.1 406 Version error
  *     {
@@ -103,9 +106,9 @@ const router = Router();
 
 
  /** 
-  * @api {post} /store Crear almacen
-  * @apiName CrearAlmacen
-  * @apiGroup Almacen
+  * @api {post} /store Crear almacén
+  * @apiName CrearAlmacén
+  * @apiGroup Almacén
   * 
   * @apiHeaderExample {json} Header-Example:
   *    {
@@ -114,8 +117,8 @@ const router = Router();
   *    }
   * 
   * 
-  * @apiParam {String} store_name El nombre del almacen
-  * @apiParam {Number} state El estado del almacen (0, 1)
+  * @apiParam {String} store_name El nombre del almacén
+  * @apiParam {Number} state El estado del almacén (0, 1)
   * 
   * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
   * @apiSuccess {String} message Mensaje del servidor
@@ -125,17 +128,17 @@ const router = Router();
   *     HTTP/1.1 200 OK
   *     {
             "ok": true,
-            "message": "Almacen creado correctamente"
+            "message": "Almacén creado correctamente"
   *     }
   *
   * 
   * 
-  * @apiError UnitExists Ya existe el almacen
-  * @apiErrorExample QuantityExists: 400
-  *     HTTP/1.1 406 Quantity exists
+  * @apiError StoreExists Ya existe el almacén
+  * @apiErrorExample StoreExists: 400
+  *     HTTP/1.1 406 Store exists
   *     {
             "ok": false,
-            "message": "El almacen ya existe!",
+            "message": "El almacén ya existe!",
   *     }
   * 
   *
@@ -153,9 +156,8 @@ const router = Router();
   * 
   * 
   * 
-  * @apiError UpdateApp Necesita actualizar la aplicación
-  *
-  * @apiErrorExample UpdateApp: 406
+  * @apiError AppVersion Necesita actualizar la aplicación
+  * @apiErrorExample AppVersion: 406
   *     HTTP/1.1 406 Need to update
   *     {
             "ok": false,
@@ -195,7 +197,7 @@ router.route('/')
 /**
  * @api {post} /store/search Buscador de almacenes
  * @apiName BuscarAlamcenes
- * @apiGroup Almacen
+ * @apiGroup Almacén
  * 
  * @apiHeaderExample {json} Header-Example:
  *    {
@@ -204,8 +206,8 @@ router.route('/')
  *    }
  * 
  * 
- * @apiParam {Number} query     El nombre del almacen
- * @apiParam {Number} state     El estado del almacen (0, 1)
+ * @apiParam {Number} query     El nombre del almacén
+ * @apiParam {Number} state     El estado del almacén (0, 1)
  *
  * 
  * @apiSuccess {bool}       ok          Si la petición ha sido exitosa o no
@@ -220,7 +222,7 @@ router.route('/')
             "result": [
                 {
                    "store_id": 1,
-                    "store_name": "Almacen A",
+                    "store_name": "Almacén A",
                     "state": 1
                 }
             ]
@@ -228,7 +230,7 @@ router.route('/')
  *
  * 
  * 
- * @apiError UpdateApp Necesita actualizar la aplicación
+ * @apiError AppVersion Necesita actualizar la aplicación
  * @apiErrorExample AppVersion: 406
  *     HTTP/1.1 406 Version error
  *     {
@@ -278,13 +280,200 @@ router.route('/search')
 
 
 
-router.route('/commodity')
-    .get(getStoresByCommodityId);
 
-router.route('/:store_id')
+
+
+
+
+
+/** 
+  * @api {put} /store/:store_id Actualizar Almacén
+  * @apiName ActualizarAlmacén
+  * @apiGroup Almacén
+  * 
+  * @apiHeaderExample {json} Header-Example:
+  *    {
+  *       "version": "xxxxx",
+  *       "token": "xxxx.xxxx.xxxx"
+  *    }
+  * 
+  * 
+  * @apiParam {Number} store_id El ID del almacén (este ID tiene que ir en el URL)
+  * @apiParam {String} store_name El nombre del almacén
+  * @apiParam {Number} state El estado del almacén (0, 1)
+  * 
+  * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
+  * @apiSuccess {String} message Mensaje del servidor
+  * 
+  * 
+  * @apiSuccessExample Success-Response:
+  *     HTTP/1.1 200 OK
+  *     {
+            "ok": true,
+            "message": "Almacén actualizado correctamente"
+  *     }
+  *
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  * @apiError StoreExists Ya existe el almacén
+  * @apiErrorExample StoreExists: 400
+  *     HTTP/1.1 400 Store exists
+  *     {
+            "ok": false,
+            "message": "El almacén ya existe!",
+  *     }
+  * 
+  *
+  * 
+  * @apiError JWTNotFound El 'token' no ha sido encontrado
+  * @apiErrorExample JWTNotFound: 401
+  *     HTTP/1.1 401 JWTNotFound
+  *     {
+            "ok": false,
+            "name": "TokenExpiredError",
+            "message": "jwt expired",
+            "expiredAt": "2020-12-26T16:01:48.000Z"
+  *     }
+  * 
+  * 
+  * 
+  * @apiError StoreIDNotFound El ID del almacén no existe
+  * @apiErrorExample StoreIDNotFound: 405
+  *     HTTP/1.1 405 Store ID Not Found
+  *     {
+            "ok": false,
+            "message": "EL ID del almacén no existe!",
+  *     }
+  *  
+  * 
+  * 
+  * 
+  * 
+  * @apiError AppVersion Necesita actualizar la aplicación
+  * @apiErrorExample AppVersion: 406
+  *     HTTP/1.1 406 Need to update
+  *     {
+            "ok": false,
+            "message": "Actualiza la apliación",
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * @apiError ServeError Error del servidor
+  * @apiErrorExample ServeError: 500
+  *     HTTP/1.1 500 Internal Server Error
+  *     {
+            "ok": false,
+            "message": "Mensaje de error del servidor",
+  *     }
+  * 
+  */
+
+
+
+
+
+  /** 
+  * @api {delete} /store/:store_id Eliminar Almacén
+  * @apiName EliminarAlmacén
+  * @apiGroup Almacén
+  * 
+  * @apiHeaderExample {json} Header-Example:
+  *    {
+  *       "version": "xxxxx",
+  *       "token": "xxxx.xxxx.xxxx"
+  *    }
+  * 
+  * 
+  * @apiParam {Number} store_id El ID del almacén (este ID tiene que ir en el URL)
+  * 
+  * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
+  * @apiSuccess {String} message Mensaje del servidor
+  * 
+  * 
+  * @apiSuccessExample Success-Response:
+  *     HTTP/1.1 200 OK
+  *     {
+            "ok": true,
+            "message": "El almacén ha sido eliminado correctamente"
+  *     }
+  *
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  *
+  * 
+  * @apiError JWTNotFound El 'token' no ha sido encontrado
+  * @apiErrorExample JWTNotFound: 401
+  *     HTTP/1.1 401 JWTNotFound
+  *     {
+            "ok": false,
+            "name": "TokenExpiredError",
+            "message": "jwt expired",
+            "expiredAt": "2020-12-26T16:01:48.000Z"
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * @apiError StoreIDNotFound El ID del almacén no existe
+  * @apiErrorExample StoreIDNotFound: 405
+  *     HTTP/1.1 405 Store ID Not Found
+  *     {
+            "ok": false,
+            "message": "EL ID del almacén no existe!",
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * 
+  * @apiError AppVersion Necesita actualizar la aplicación
+  * @apiErrorExample AppVersion: 406
+  *     HTTP/1.1 406 Need to update
+  *     {
+            "ok": false,
+            "message": "Actualiza la apliación",
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * @apiError ServeError Error del servidor
+  * @apiErrorExample ServeError: 500
+  *     HTTP/1.1 500 Internal Server Error
+  *     {
+            "ok": false,
+            "message": "Mensaje de error del servidor",
+  *     }
+  * 
+  */
+ router.route('/:store_id')
     .get(getStore)
     .put(updateStore)
     .delete(deleteStore);
+
+
+
+
+
+
+
+
+router.route('/commodity')
+    .get(getStoresByCommodityId);
+
 
 router.route('/order/by_storeid')
     .get(getStoresOrderById);

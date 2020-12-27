@@ -108,7 +108,7 @@ export async function updateCategory(req: Request, res: Response) {
 
         return await query(queryCheck).then(async dataCheck => {
             if(!dataCheck.ok) return res.status(500).json({ok: false, message: dataCheck.message});
-            if(dataCheck.result[0][0] != null) return res.status(400).json({ok: false, message: 'La categoría ya existe!'});
+            if(dataCheck.result[0][0] != null) return res.status(406).json({ok: false, message: 'La categoría ya existe!'});
 
             const queryUpdate = `UPDATE category SET category_name="${category.category_name}", state = "${category.state}" WHERE category_id = "${categoryId}"`;    
 

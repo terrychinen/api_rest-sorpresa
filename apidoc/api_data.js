@@ -1,10 +1,146 @@
 define({ "api": [
   {
+    "type": "put",
+    "url": "/store/:store_id",
+    "title": "Actualizar Almacén",
+    "name": "ActualizarAlmacén",
+    "group": "Almacén",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "store_id",
+            "description": "<p>El ID del almacén (este ID tiene que ir en el URL)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "store_name",
+            "description": "<p>El nombre del almacén</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "state",
+            "description": "<p>El estado del almacén (0, 1)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Almacén actualizado correctamente\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "StoreExists",
+            "description": "<p>Ya existe el almacén</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "StoreIDNotFound",
+            "description": "<p>El ID del almacén no existe</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "AppVersion",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "StoreExists: 400",
+          "content": "HTTP/1.1 400 Store exists\n{\n        \"ok\": false,\n        \"message\": \"El almacén ya existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "StoreIDNotFound: 405",
+          "content": "HTTP/1.1 405 Store ID Not Found\n{\n        \"ok\": false,\n        \"message\": \"EL ID del almacén no existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/store.routes.ts",
+    "groupTitle": "Almacén"
+  },
+  {
     "type": "post",
     "url": "/store/search",
     "title": "Buscador de almacenes",
     "name": "BuscarAlamcenes",
-    "group": "Almacen",
+    "group": "Almacén",
     "header": {
       "examples": [
         {
@@ -22,14 +158,14 @@ define({ "api": [
             "type": "Number",
             "optional": false,
             "field": "query",
-            "description": "<p>El nombre del almacen</p>"
+            "description": "<p>El nombre del almacén</p>"
           },
           {
             "group": "Parameter",
             "type": "Number",
             "optional": false,
             "field": "state",
-            "description": "<p>El estado del almacen (0, 1)</p>"
+            "description": "<p>El estado del almacén (0, 1)</p>"
           }
         ]
       }
@@ -63,7 +199,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n               \"store_id\": 1,\n                \"store_name\": \"Almacen A\",\n                \"state\": 1\n            }\n        ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n               \"store_id\": 1,\n                \"store_name\": \"Almacén A\",\n                \"state\": 1\n            }\n        ]\n}",
           "type": "json"
         }
       ]
@@ -74,7 +210,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -122,14 +258,14 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "src/routes/store.routes.ts",
-    "groupTitle": "Almacen"
+    "groupTitle": "Almacén"
   },
   {
     "type": "post",
     "url": "/store",
-    "title": "Crear almacen",
-    "name": "CrearAlmacen",
-    "group": "Almacen",
+    "title": "Crear almacén",
+    "name": "CrearAlmacén",
+    "group": "Almacén",
     "header": {
       "examples": [
         {
@@ -147,14 +283,14 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "store_name",
-            "description": "<p>El nombre del almacen</p>"
+            "description": "<p>El nombre del almacén</p>"
           },
           {
             "group": "Parameter",
             "type": "Number",
             "optional": false,
             "field": "state",
-            "description": "<p>El estado del almacen (0, 1)</p>"
+            "description": "<p>El estado del almacén (0, 1)</p>"
           }
         ]
       }
@@ -181,7 +317,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Almacen creado correctamente\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Almacén creado correctamente\"\n}",
           "type": "json"
         }
       ]
@@ -192,8 +328,8 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UnitExists",
-            "description": "<p>Ya existe el almacen</p>"
+            "field": "StoreExists",
+            "description": "<p>Ya existe el almacén</p>"
           },
           {
             "group": "Error 4xx",
@@ -204,7 +340,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -217,8 +353,8 @@ define({ "api": [
       },
       "examples": [
         {
-          "title": "QuantityExists: 400",
-          "content": "HTTP/1.1 406 Quantity exists\n{\n        \"ok\": false,\n        \"message\": \"El almacen ya existe!\",\n}",
+          "title": "StoreExists: 400",
+          "content": "HTTP/1.1 406 Store exists\n{\n        \"ok\": false,\n        \"message\": \"El almacén ya existe!\",\n}",
           "type": "json"
         },
         {
@@ -227,7 +363,7 @@ define({ "api": [
           "type": "json"
         },
         {
-          "title": "UpdateApp: 406",
+          "title": "AppVersion: 406",
           "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
           "type": "json"
         },
@@ -240,14 +376,125 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "src/routes/store.routes.ts",
-    "groupTitle": "Almacen"
+    "groupTitle": "Almacén"
+  },
+  {
+    "type": "delete",
+    "url": "/store/:store_id",
+    "title": "Eliminar Almacén",
+    "name": "EliminarAlmacén",
+    "group": "Almacén",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "store_id",
+            "description": "<p>El ID del almacén (este ID tiene que ir en el URL)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"El almacén ha sido eliminado correctamente\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "StoreIDNotFound",
+            "description": "<p>El ID del almacén no existe</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "AppVersion",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "StoreIDNotFound: 405",
+          "content": "HTTP/1.1 405 Store ID Not Found\n{\n        \"ok\": false,\n        \"message\": \"EL ID del almacén no existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/store.routes.ts",
+    "groupTitle": "Almacén"
   },
   {
     "type": "get",
     "url": "/store?offset=0&state=1",
     "title": "Obtener todos los almacenes",
     "name": "ObtenerAlmacenes",
-    "group": "Almacen",
+    "group": "Almacén",
     "header": {
       "examples": [
         {
@@ -272,7 +519,7 @@ define({ "api": [
             "type": "Number",
             "optional": false,
             "field": "state",
-            "description": "<p>El estado del almacen (0, 1)</p>"
+            "description": "<p>El estado del almacén (0, 1)</p>"
           }
         ]
       }
@@ -306,7 +553,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n                \"store_id\": 1,\n                \"store_name\": \"Almacen A\",\n                \"state\": 1\n            },                \n            {\n                \"store_id\": 2,\n                \"store_name\": \"Almacen B\",\n                \"state\": 1\n            }\n        ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n                \"store_id\": 1,\n                \"store_name\": \"Almacén A\",\n                \"state\": 1\n            },                \n            {\n                \"store_id\": 2,\n                \"store_name\": \"Almacén B\",\n                \"state\": 1\n            }\n        ]\n}",
           "type": "json"
         }
       ]
@@ -317,7 +564,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -365,7 +612,7 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "src/routes/store.routes.ts",
-    "groupTitle": "Almacen"
+    "groupTitle": "Almacén"
   },
   {
     "type": "post",
@@ -522,7 +769,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -545,7 +792,7 @@ define({ "api": [
           "type": "json"
         },
         {
-          "title": "UpdateApp: 406",
+          "title": "AppVersion: 406",
           "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
           "type": "json"
         },
@@ -676,6 +923,149 @@ define({ "api": [
     "groupTitle": "Auth"
   },
   {
+    "type": "put",
+    "url": "/quantity/:quantity_id",
+    "title": "Actualizar Cantidad",
+    "name": "ActualizarQuantity",
+    "group": "Cantidad",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "quantity_id",
+            "description": "<p>El ID de la cantidad (este ID tiene que ir en el URL)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "quantity_name",
+            "description": "<p>El nombre de la cantidad</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "short_name",
+            "description": "<p>La abreviatura de la cantidad</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "state",
+            "description": "<p>El estado de la cantidad (0, 1)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Cantidad actualizado correctamente\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "QuantityExists",
+            "description": "<p>Ya existe la cantidad</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "QuantityIDNotFound",
+            "description": "<p>El ID de la cantidad no existe</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "AppVersion",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "QuantityExists: 400",
+          "content": "HTTP/1.1 400 Quantity exists\n{\n        \"ok\": false,\n        \"message\": \"La cantidad ya existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "QuantityIDNotFound: 405",
+          "content": "HTTP/1.1 405 Quantity ID Not Found\n{\n        \"ok\": false,\n        \"message\": \"EL ID de la cantidad no existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/quantity.routes.ts",
+    "groupTitle": "Cantidad"
+  },
+  {
     "type": "post",
     "url": "/quantity/search",
     "title": "Buscador de cantidades",
@@ -739,7 +1129,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n                \"quantity_id\": 1,\n                \"quantity_name\": \"Caja\",\n                \"short_name\": \"\"\n                \"state\": 1\n            }\n        ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n         \"ok\": true,\n         \"message\": \"Query successful\",\n         \"result\": [\n             {\n                 \"quantity_id\": 1,\n                 \"quantity_name\": \"Caja\",\n                 \"short_name\": \"\"\n                 \"state\": 1\n             }\n         ]\n}",
           "type": "json"
         }
       ]
@@ -750,7 +1140,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -776,22 +1166,22 @@ define({ "api": [
       "examples": [
         {
           "title": "AppVersion: 406",
-          "content": "HTTP/1.1 406 Version error\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "content": "HTTP/1.1 406 Version error\n{\n         \"ok\": false,\n         \"message\": \"Actualiza la apliación\",\n}",
           "type": "json"
         },
         {
           "title": "StateNotFound: 405",
-          "content": "HTTP/1.1 405 Not Found\n{\n        \"ok\": false,\n        \"message\": \"La variable 'state' son obligatorio!\"\n}",
+          "content": "HTTP/1.1 405 Not Found\n{\n         \"ok\": false,\n         \"message\": \"La variable 'state' son obligatorio!\"\n}",
           "type": "json"
         },
         {
           "title": "JWTNotFound: 401",
-          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n         \"ok\": false,\n         \"name\": \"TokenExpiredError\",\n         \"message\": \"jwt expired\",\n         \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
           "type": "json"
         },
         {
           "title": "ServeError: 500",
-          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\"\n}",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n         \"ok\": false,\n         \"message\": \"Mensaje de error del servidor\"\n}",
           "type": "json"
         }
       ]
@@ -875,7 +1265,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UnitExists",
+            "field": "QuantityExists",
             "description": "<p>Ya existe la cantidad</p>"
           },
           {
@@ -887,7 +1277,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -910,7 +1300,118 @@ define({ "api": [
           "type": "json"
         },
         {
-          "title": "UpdateApp: 406",
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/quantity.routes.ts",
+    "groupTitle": "Cantidad"
+  },
+  {
+    "type": "delete",
+    "url": "/quantity/:quanitity_id",
+    "title": "Eliminar Cantidad",
+    "name": "EliminarCantidad",
+    "group": "Cantidad",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "quantity_id",
+            "description": "<p>El ID de la cantidad (este ID tiene que ir en el URL)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"La cantidad ha sido eliminado correctamente\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "QuantityIDNotFound",
+            "description": "<p>El ID de la cantidad no existe</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "AppVersion",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "QuantityIDNotFound: 405",
+          "content": "HTTP/1.1 405 Quantity ID Not Found\n{\n        \"ok\": false,\n        \"message\": \"EL ID de la cantidad no existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "AppVersion: 406",
           "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
           "type": "json"
         },
@@ -1000,7 +1501,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -1051,9 +1552,145 @@ define({ "api": [
     "groupTitle": "Cantidad"
   },
   {
+    "type": "put",
+    "url": "/category/:category_id",
+    "title": "Actualizar Categoría",
+    "name": "ActualizarCategoría",
+    "group": "Categoría",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "category_id",
+            "description": "<p>El ID de la categoría (este ID tiene que ir en el URL)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "category_name",
+            "description": "<p>El nombre de la categoría</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "state",
+            "description": "<p>El estado de la categoría (0, 1)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Categoría actualizado correctamente\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "CategoryExists",
+            "description": "<p>Ya existe la categoría</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "CategoyIDNotFound",
+            "description": "<p>El ID de la categoría no existe</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "AppVersion",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "CategoryExists: 400",
+          "content": "HTTP/1.1 400 Category exists\n{\n        \"ok\": false,\n        \"message\": \"La categoría ya existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "CategoryIDNotFound: 405",
+          "content": "HTTP/1.1 405 Category ID Not Found\n{\n        \"ok\": false,\n        \"message\": \"EL ID de la categoría no existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/category.routes.ts",
+    "groupTitle": "Categoría"
+  },
+  {
     "type": "post",
     "url": "/category/search",
-    "title": "Buscador de categoría",
+    "title": "Buscador de categorías",
     "name": "BuscarCategorías",
     "group": "Categoría",
     "header": {
@@ -1125,7 +1762,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -1177,7 +1814,7 @@ define({ "api": [
   },
   {
     "type": "post",
-    "url": "/unit",
+    "url": "/category",
     "title": "Crear categoría",
     "name": "CrearCategoría",
     "group": "Categoría",
@@ -1197,7 +1834,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "unit_name",
+            "field": "category_name",
             "description": "<p>El nombre de la categoría</p>"
           },
           {
@@ -1243,7 +1880,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UnitExists",
+            "field": "CategoryExists",
             "description": "<p>Ya existe el nombre de la categoría</p>"
           },
           {
@@ -1255,7 +1892,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -1268,8 +1905,8 @@ define({ "api": [
       },
       "examples": [
         {
-          "title": "UnitExists: 400",
-          "content": "HTTP/1.1 406 Unit exists\n{\n        \"ok\": false,\n        \"message\": \"La categoría ya existe!\",\n}",
+          "title": "CategoryExists: 400",
+          "content": "HTTP/1.1 406 Category exists\n{\n        \"ok\": false,\n        \"message\": \"La categoría ya existe!\",\n}",
           "type": "json"
         },
         {
@@ -1278,7 +1915,118 @@ define({ "api": [
           "type": "json"
         },
         {
-          "title": "UpdateApp: 406",
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/category.routes.ts",
+    "groupTitle": "Categoría"
+  },
+  {
+    "type": "delete",
+    "url": "/category/:category_id",
+    "title": "Eliminar Categoría",
+    "name": "EliminarCategoría",
+    "group": "Categoría",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "category_id",
+            "description": "<p>El ID de la categoría (este ID tiene que ir en el URL)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"La Categoría ha sido eliminado correctamente\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "CategoryIDNotFound",
+            "description": "<p>El ID de la categoría no existe</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "AppVersion",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "CategoryIDNotFound: 405",
+          "content": "HTTP/1.1 405 Category ID Not Found\n{\n        \"ok\": false,\n        \"message\": \"EL ID de la categoría no existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "AppVersion: 406",
           "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
           "type": "json"
         },
@@ -1295,7 +2043,7 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/role?offset=0&state=1",
+    "url": "/category?offset=0&state=1",
     "title": "Obtener todas las categorías",
     "name": "ObtenerCategorías",
     "group": "Categoría",
@@ -1368,7 +2116,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -1419,8 +2167,144 @@ define({ "api": [
     "groupTitle": "Categoría"
   },
   {
+    "type": "put",
+    "url": "/brand/:brand_id",
+    "title": "Actualizar Marca",
+    "name": "ActualizarMarca",
+    "group": "Marca",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "brand_id",
+            "description": "<p>El ID de la marca (este ID tiene que ir en el URL)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "brand_name",
+            "description": "<p>El nombre de la marca</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "state",
+            "description": "<p>El estado de la marca (0, 1)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Marca actualizado correctamente\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "BrandExists",
+            "description": "<p>Ya existe la marca</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "BrandIDNotFound",
+            "description": "<p>El ID de la marca no existe</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "AppVersion",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "BrandExists: 400",
+          "content": "HTTP/1.1 400 Brand exists\n{\n        \"ok\": false,\n        \"message\": \"La marca ya existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "BrandIDNotFound: 405",
+          "content": "HTTP/1.1 405 Brand ID Not Found\n{\n        \"ok\": false,\n        \"message\": \"EL ID de la marca no existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/brand.routes.ts",
+    "groupTitle": "Marca"
+  },
+  {
     "type": "post",
-    "url": "/category/search",
+    "url": "/brand/search",
     "title": "Buscador de la marca",
     "name": "BuscarMarcas",
     "group": "Marca",
@@ -1493,7 +2377,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -1623,7 +2507,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -1646,7 +2530,118 @@ define({ "api": [
           "type": "json"
         },
         {
-          "title": "UpdateApp: 406",
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/brand.routes.ts",
+    "groupTitle": "Marca"
+  },
+  {
+    "type": "delete",
+    "url": "/brand/:brand_id",
+    "title": "Eliminar Marca",
+    "name": "EliminarMarca",
+    "group": "Marca",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "brand_id",
+            "description": "<p>El ID de la marca (este ID tiene que ir en el URL)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"La Marca ha sido eliminado correctamente\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "BrandIDNotFound",
+            "description": "<p>El ID de la marca no existe</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "AppVersion",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "BrandIDNotFound: 405",
+          "content": "HTTP/1.1 405 Brand ID Not Found\n{\n        \"ok\": false,\n        \"message\": \"EL ID de la marca no existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "AppVersion: 406",
           "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
           "type": "json"
         },
@@ -1736,7 +2731,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -1785,6 +2780,142 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "src/routes/brand.routes.ts",
     "groupTitle": "Marca"
+  },
+  {
+    "type": "put",
+    "url": "/role/:role_id",
+    "title": "Actualizar Rol",
+    "name": "ActualizarRol",
+    "group": "Rol",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "role_id",
+            "description": "<p>El ID del rol (este ID tiene que ir en el URL)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "role_name",
+            "description": "<p>El nombre del rol</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "state",
+            "description": "<p>El estado del rol (0, 1)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Rol actualizado correctamente\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "RoleExists",
+            "description": "<p>Ya existe el rol</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "RoleIDNotFound",
+            "description": "<p>El ID del rol no existe</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "AppVersion",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "RoleExists: 400",
+          "content": "HTTP/1.1 400 Role exists\n{\n        \"ok\": false,\n        \"message\": \"El rol ya existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "RoleIDNotFound: 405",
+          "content": "HTTP/1.1 405 Role ID Not Found\n{\n        \"ok\": false,\n        \"message\": \"EL ID de la rol no existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/role.routes.ts",
+    "groupTitle": "Rol"
   },
   {
     "type": "post",
@@ -1850,7 +2981,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Query successful\",\n        \"result\": [\n            {\n               \"role_id\": 1,\n               \"role_name\": \"Administrador\",\n               \"state\": 1\n            }\n        ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n         \"ok\": true,\n         \"message\": \"Query successful\",\n         \"result\": [\n             {\n                \"role_id\": 1,\n                \"role_name\": \"Administrador\",\n                \"state\": 1\n             }\n         ]\n}",
           "type": "json"
         }
       ]
@@ -1861,7 +2992,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -1887,12 +3018,12 @@ define({ "api": [
       "examples": [
         {
           "title": "AppVersion: 406",
-          "content": "HTTP/1.1 406 Version error\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "content": "HTTP/1.1 406 Version error\n{\n         \"ok\": false,\n         \"message\": \"Actualiza la apliación\",\n}",
           "type": "json"
         },
         {
           "title": "StateNotFound: 405",
-          "content": "HTTP/1.1 405 Not Found\n{\n        \"ok\": false,\n        \"message\": \"La variable 'state' son obligatorio!\"\n}",
+          "content": "HTTP/1.1 405 Not Found\n{\n         \"ok\": false,\n         \"message\": \"La variable 'state' son obligatorio!\"\n}",
           "type": "json"
         },
         {
@@ -1902,7 +3033,7 @@ define({ "api": [
         },
         {
           "title": "ServeError: 500",
-          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\"\n}",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n         \"ok\": false,\n         \"message\": \"Mensaje de error del servidor\"\n}",
           "type": "json"
         }
       ]
@@ -1991,7 +3122,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -2014,7 +3145,118 @@ define({ "api": [
           "type": "json"
         },
         {
-          "title": "UpdateApp: 406",
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/role.routes.ts",
+    "groupTitle": "Rol"
+  },
+  {
+    "type": "delete",
+    "url": "/role/:role_id",
+    "title": "Eliminar Rol",
+    "name": "EliminarRol",
+    "group": "Rol",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "role_id",
+            "description": "<p>El ID del rol (este ID tiene que ir en el URL)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"El rol ha sido eliminado correctamente\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "RoleIDNotFound",
+            "description": "<p>El ID del rol no existe</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "AppVersion",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "RoleIDNotFound: 405",
+          "content": "HTTP/1.1 405 Role ID Not Found\n{\n        \"ok\": false,\n        \"message\": \"EL ID del rol no existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "AppVersion: 406",
           "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
           "type": "json"
         },
@@ -2104,7 +3346,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -2153,6 +3395,149 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "src/routes/role.routes.ts",
     "groupTitle": "Rol"
+  },
+  {
+    "type": "put",
+    "url": "/unit/:unit_id",
+    "title": "Actualizar Unidad",
+    "name": "ActualizarUnidad",
+    "group": "Unidad",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "unit_id",
+            "description": "<p>El ID de la unidad (este ID tiene que ir en el URL)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "unit_name",
+            "description": "<p>El nombre de la unidad</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "symbol",
+            "description": "<p>El símbolo de la unidad</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "state",
+            "description": "<p>El estado de la unidad (0, 1)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"Unidad actualizado correctamente\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UnitExists",
+            "description": "<p>Ya existe la unidad</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UnitIDNotFound",
+            "description": "<p>El ID de la unidad no existe</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "AppVersion",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "UnitExists: 400",
+          "content": "HTTP/1.1 400 Unit exists\n{\n        \"ok\": false,\n        \"message\": \"La unidad ya existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "UnitIDNotFound: 405",
+          "content": "HTTP/1.1 405 Unit ID Not Found\n{\n        \"ok\": false,\n        \"message\": \"EL ID de la unidad no existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/unit.routes.ts",
+    "groupTitle": "Unidad"
   },
   {
     "type": "post",
@@ -2229,7 +3614,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -2309,7 +3694,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "symbol",
-            "description": "<p>El simbolo de la unidad</p>"
+            "description": "<p>El símbolo de la unidad</p>"
           },
           {
             "group": "Parameter",
@@ -2366,7 +3751,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {
@@ -2389,7 +3774,118 @@ define({ "api": [
           "type": "json"
         },
         {
-          "title": "UpdateApp: 406",
+          "title": "AppVersion: 406",
+          "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "ServeError: 500",
+          "content": "HTTP/1.1 500 Internal Server Error\n{\n        \"ok\": false,\n        \"message\": \"Mensaje de error del servidor\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/routes/unit.routes.ts",
+    "groupTitle": "Unidad"
+  },
+  {
+    "type": "delete",
+    "url": "/unit/:unit_id",
+    "title": "Eliminar Unidad",
+    "name": "EliminarUnidad",
+    "group": "Unidad",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n   \"version\": \"xxxxx\",\n   \"token\": \"xxxx.xxxx.xxxx\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "unit_id",
+            "description": "<p>El ID de la unidad (este ID tiene que ir en el URL)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "bool",
+            "optional": false,
+            "field": "ok",
+            "description": "<p>Si la petición ha sido exitosa o no</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Mensaje del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n        \"ok\": true,\n        \"message\": \"La unidad ha sido eliminado correctamente\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "JWTNotFound",
+            "description": "<p>El 'token' no ha sido encontrado</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UnitIDNotFound",
+            "description": "<p>El ID de la unidad no existe</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "AppVersion",
+            "description": "<p>Necesita actualizar la aplicación</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ServeError",
+            "description": "<p>Error del servidor</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "JWTNotFound: 401",
+          "content": "HTTP/1.1 401 JWTNotFound\n{\n        \"ok\": false,\n        \"name\": \"TokenExpiredError\",\n        \"message\": \"jwt expired\",\n        \"expiredAt\": \"2020-12-26T16:01:48.000Z\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "UnitIDNotFound: 405",
+          "content": "HTTP/1.1 405 Unit ID Not Found\n{\n        \"ok\": false,\n        \"message\": \"EL ID de la unidad no existe!\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "AppVersion: 406",
           "content": "HTTP/1.1 406 Need to update\n{\n        \"ok\": false,\n        \"message\": \"Actualiza la apliación\",\n}",
           "type": "json"
         },
@@ -2479,7 +3975,7 @@ define({ "api": [
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UpdateApp",
+            "field": "AppVersion",
             "description": "<p>Necesita actualizar la aplicación</p>"
           },
           {

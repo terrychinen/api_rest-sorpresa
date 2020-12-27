@@ -48,8 +48,7 @@ const router = Router();
  * 
  * 
  * 
- * @apiError UpdateApp Necesita actualizar la aplicación
- *
+ * @apiError AppVersion Necesita actualizar la aplicación
  * @apiErrorExample AppVersion: 406
  *     HTTP/1.1 406 Version error
  *     {
@@ -61,7 +60,6 @@ const router = Router();
  * 
  * 
  * @apiError OffsetOrStateNotFound El 'offset' o 'state' no ha sido encontrado
- *
  * @apiErrorExample OffsetOrStateNotFound: 405
  *     HTTP/1.1 405 Not Found
  *     {
@@ -72,7 +70,6 @@ const router = Router();
  * 
  *
  * @apiError JWTNotFound El 'token' no ha sido encontrado
- *
  * @apiErrorExample JWTNotFound: 401
  *     HTTP/1.1 401 JWTNotFound
  *     {
@@ -86,7 +83,6 @@ const router = Router();
  * 
  * 
  * @apiError ServeError Error del servidor
- *
  * @apiErrorExample ServeError: 500
  *     HTTP/1.1 500 Internal Server Error
  *     {
@@ -152,9 +148,8 @@ const router = Router();
   * 
   * 
   * 
-  * @apiError UpdateApp Necesita actualizar la aplicación
-  *
-  * @apiErrorExample UpdateApp: 406
+  * @apiError AppVersion Necesita actualizar la aplicación
+  * @apiErrorExample AppVersion: 406
   *     HTTP/1.1 406 Need to update
   *     {
             "ok": false,
@@ -174,7 +169,9 @@ const router = Router();
   *     }
   * 
   */
-
+ router.route('/')
+    .get(getBrands)
+    .post(createBrand);
 
 
 
@@ -188,7 +185,7 @@ const router = Router();
 
 
   /**
- * @api {post} /category/search Buscador de la marca
+ * @api {post} /brand/search Buscador de la marca
  * @apiName BuscarMarcas
  * @apiGroup Marca
  * 
@@ -223,7 +220,10 @@ const router = Router();
  *
  * 
  * 
- * @apiError UpdateApp Necesita actualizar la aplicación
+ * 
+ * 
+ * 
+ * @apiError AppVersion Necesita actualizar la aplicación
  * @apiErrorExample AppVersion: 406
  *     HTTP/1.1 406 Version error
  *     {
@@ -272,11 +272,187 @@ const router = Router();
 
 
 
-router.route('/')
-    .get(getBrands)
-    .post(createBrand);
 
 
+
+
+
+
+
+ /** 
+  * @api {put} /brand/:brand_id Actualizar Marca
+  * @apiName ActualizarMarca
+  * @apiGroup Marca
+  * 
+  * @apiHeaderExample {json} Header-Example:
+  *    {
+  *       "version": "xxxxx",
+  *       "token": "xxxx.xxxx.xxxx"
+  *    }
+  * 
+  * 
+  * @apiParam {Number} brand_id El ID de la marca (este ID tiene que ir en el URL)
+  * @apiParam {String} brand_name El nombre de la marca
+  * @apiParam {Number} state El estado de la marca (0, 1)
+  * 
+  * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
+  * @apiSuccess {String} message Mensaje del servidor
+  * 
+  * 
+  * @apiSuccessExample Success-Response:
+  *     HTTP/1.1 200 OK
+  *     {
+            "ok": true,
+            "message": "Marca actualizado correctamente"
+  *     }
+  *
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  * @apiError BrandExists Ya existe la marca
+  * @apiErrorExample BrandExists: 400
+  *     HTTP/1.1 400 Brand exists
+  *     {
+            "ok": false,
+            "message": "La marca ya existe!",
+  *     }
+  * 
+  *
+  * 
+  * @apiError JWTNotFound El 'token' no ha sido encontrado
+  * @apiErrorExample JWTNotFound: 401
+  *     HTTP/1.1 401 JWTNotFound
+  *     {
+            "ok": false,
+            "name": "TokenExpiredError",
+            "message": "jwt expired",
+            "expiredAt": "2020-12-26T16:01:48.000Z"
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * @apiError BrandIDNotFound El ID de la marca no existe
+  * @apiErrorExample BrandIDNotFound: 405
+  *     HTTP/1.1 405 Brand ID Not Found
+  *     {
+            "ok": false,
+            "message": "EL ID de la marca no existe!",
+  *     }
+  * 
+  * 
+  * 
+  * @apiError AppVersion Necesita actualizar la aplicación
+  * @apiErrorExample AppVersion: 406
+  *     HTTP/1.1 406 Need to update
+  *     {
+            "ok": false,
+            "message": "Actualiza la apliación",
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * @apiError ServeError Error del servidor
+  * @apiErrorExample ServeError: 500
+  *     HTTP/1.1 500 Internal Server Error
+  *     {
+            "ok": false,
+            "message": "Mensaje de error del servidor",
+  *     }
+  * 
+  */
+
+
+
+
+
+
+  
+ /** 
+  * @api {delete} /brand/:brand_id Eliminar Marca
+  * @apiName EliminarMarca
+  * @apiGroup Marca
+  * 
+  * @apiHeaderExample {json} Header-Example:
+  *    {
+  *       "version": "xxxxx",
+  *       "token": "xxxx.xxxx.xxxx"
+  *    }
+  * 
+  * 
+  * @apiParam {Number} brand_id El ID de la marca (este ID tiene que ir en el URL)
+  * 
+  * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
+  * @apiSuccess {String} message Mensaje del servidor
+  * 
+  * 
+  * @apiSuccessExample Success-Response:
+  *     HTTP/1.1 200 OK
+  *     {
+            "ok": true,
+            "message": "La Marca ha sido eliminado correctamente"
+  *     }
+  *
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  * 
+  *
+  * 
+  * @apiError JWTNotFound El 'token' no ha sido encontrado
+  * @apiErrorExample JWTNotFound: 401
+  *     HTTP/1.1 401 JWTNotFound
+  *     {
+            "ok": false,
+            "name": "TokenExpiredError",
+            "message": "jwt expired",
+            "expiredAt": "2020-12-26T16:01:48.000Z"
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * @apiError BrandIDNotFound El ID de la marca no existe
+  * @apiErrorExample BrandIDNotFound: 405
+  *     HTTP/1.1 405 Brand ID Not Found
+  *     {
+            "ok": false,
+            "message": "EL ID de la marca no existe!",
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * 
+  * @apiError AppVersion Necesita actualizar la aplicación
+  * @apiErrorExample AppVersion: 406
+  *     HTTP/1.1 406 Need to update
+  *     {
+            "ok": false,
+            "message": "Actualiza la apliación",
+  *     }
+  * 
+  * 
+  * 
+  * 
+  * @apiError ServeError Error del servidor
+  * @apiErrorExample ServeError: 500
+  *     HTTP/1.1 500 Internal Server Error
+  *     {
+            "ok": false,
+            "message": "Mensaje de error del servidor",
+  *     }
+  * 
+  */
 router.route('/:brand_id')
     .put(updateBrand)
     .delete(deleteBrand);

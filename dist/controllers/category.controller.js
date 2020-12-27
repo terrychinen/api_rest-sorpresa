@@ -116,7 +116,7 @@ function updateCategory(req, res) {
                 if (!dataCheck.ok)
                     return res.status(500).json({ ok: false, message: dataCheck.message });
                 if (dataCheck.result[0][0] != null)
-                    return res.status(400).json({ ok: false, message: 'La categoría ya existe!' });
+                    return res.status(406).json({ ok: false, message: 'La categoría ya existe!' });
                 const queryUpdate = `UPDATE category SET category_name="${category.category_name}", state = "${category.state}" WHERE category_id = "${categoryId}"`;
                 return yield query_1.query(queryUpdate).then((dataUpdate) => __awaiter(this, void 0, void 0, function* () {
                     if (!dataUpdate.ok)
