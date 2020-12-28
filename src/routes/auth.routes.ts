@@ -9,6 +9,16 @@ const router = Router();
  * @apiGroup Auth
  * 
  * 
+ * 
+ @apiHeaderExample {json} Header-Example:
+ *   {
+ *      "version": "xxxxx",
+ *      "token": "xxxx.xxxx.xxxx"
+ *   }
+ * 
+ * 
+ * 
+ * 
  * @apiParam {String} username Nombre del usuario
  * @apiParam {String} password Clave del usuario
  *
