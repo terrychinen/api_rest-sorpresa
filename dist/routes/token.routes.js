@@ -10,7 +10,7 @@ const router = express_1.Router();
  *
  * @apiHeaderExample {json} Header-Example:
  *    {
- *       "token": "xxxx.xxxx.xxxx"
+ *       "version": "xxxx.xxxx.xxxx"
  *    }
  *
  *

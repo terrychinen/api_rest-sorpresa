@@ -13,7 +13,7 @@ const router = Router();
  * 
  * @apiHeaderExample {json} Header-Example:
  *    {
- *       "token": "xxxx.xxxx.xxxx"
+ *       "version": "xxxx.xxxx.xxxx"
  *    }
  * 
  * 

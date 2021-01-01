@@ -10,7 +10,7 @@ const router = Router();
  * 
  * 
  * 
- @apiHeaderExample {json} Header-Example:
+ * @apiHeaderExample {json} Header-Example:
  *   {
  *      "version": "xxxxx",
  *   }
