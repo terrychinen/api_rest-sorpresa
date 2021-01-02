@@ -30,7 +30,7 @@ function saveNewToken(user, token) {
             }
             const jwt = new token_model_1.TokenModel();
             jwt.token_key = token;
-            jwt.created_at = moment_1.default().format('YYYY-MM-DD hh:mm:ss');
+            jwt.created_at = moment_1.default().format('YYYY-MM-DD HH:mm:ss');
             jwt.expires_in = Number(process.env.TOKEN_EXPIRATION);
             const queryUpdate = `UPDATE token SET token_key='${jwt.token_key}', created_at='${jwt.created_at}', 
                              expires_in='${jwt.expires_in}' WHERE token_id = ${user.token_id}`;
@@ -85,7 +85,7 @@ function updateToken(res, tokenID, newToken, expiresIn) {
     return __awaiter(this, void 0, void 0, function* () {
         let token = new token_model_1.TokenModel();
         token.token_key = newToken;
-        token.created_at = moment_1.default().format('YYYY-MM-DD hh:mm:ss');
+        token.created_at = moment_1.default().format('YYYY-MM-DD HH:mm:ss');
         token.expires_in = expiresIn;
         const queryUpdate = `UPDATE token SET token_key = "${token.token_key}", created_at = "${token.created_at}",  
                         expires_in = "${token.expires_in}" WHERE token_id = "${tokenID}"`;

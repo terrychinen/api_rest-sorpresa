@@ -19,7 +19,7 @@ export async function saveNewToken(user: IUser, token) {
 
         const jwt = new TokenModel();
         jwt.token_key = token;
-        jwt.created_at = moment().format('YYYY-MM-DD hh:mm:ss')
+        jwt.created_at = moment().format('YYYY-MM-DD HH:mm:ss')
         jwt.expires_in = Number(process.env.TOKEN_EXPIRATION); 
     
 
@@ -80,7 +80,7 @@ export async function refreshToken(req: Request, res: Response) {
 async function updateToken(res: Response, tokenID: String, newToken: string, expiresIn: Number) {
     let token = new TokenModel();
     token.token_key = newToken;
-    token.created_at = moment().format('YYYY-MM-DD hh:mm:ss');
+    token.created_at = moment().format('YYYY-MM-DD HH:mm:ss');
     token.expires_in = expiresIn;
 
     const queryUpdate = `UPDATE token SET token_key = "${token.token_key}", created_at = "${token.created_at}",  
