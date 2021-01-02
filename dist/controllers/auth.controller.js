@@ -53,7 +53,7 @@ function signIn(req, res) {
                         user: userDB,
                         token,
                         expires_in: process.env.TOKEN_EXPIRATION,
-                        date: moment_1.default().format('YYYY-MM-DD h:mm:ss')
+                        date: moment_1.default().format('YYYY-MM-DD hh:mm:ss')
                     });
                 });
             }
@@ -105,7 +105,7 @@ function signUp(req, res) {
                         }, process.env.SECRET, { expiresIn: process.env.TOKEN_EXPIRATION });
                         let token = new token_model_1.TokenModel();
                         token.token_key = jwt;
-                        token.created_at = moment_1.default().format('YYYY-MM-DD h:mm:ss');
+                        token.created_at = moment_1.default().format('YYYY-MM-DD hh:mm:ss');
                         token.expires_in = Number(process.env.TOKEN_EXPIRATION);
                         const queryInsertToken = `INSERT INTO token (token_key, created_at, expires_in, state)
                                               VALUES ('${token.token_key}', '${token.created_at}', '${token.expires_in}', '1')`;
