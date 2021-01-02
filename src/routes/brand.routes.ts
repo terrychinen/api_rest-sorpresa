@@ -1,29 +1,28 @@
 import { Router } from 'express';
-import { getQuantity, getQuantities, searchQuantity, createQuantity, updateQuantity, deleteQuantity } from '../controllers/quantity.controller';
+import { getBrands, createBrand, updateBrand, deleteBrand, searchBrand } from '../controllers/brand.controller';
+
 
 const router = Router();
 
 
 
-
 /**
- * @api {get} /quantity?offset=0&state=1 Obtener todas las cantidades
- * @apiName ObtenerCantidades
- * @apiGroup Cantidad
+ * @api {get} /brand?offset=0&state=1 Obtener todas las marcas
+ * @apiName ObtenerMarcas
+ * @apiGroup Marca
  * 
  * @apiHeaderExample {json} Header-Example:
  *    {
  *       "version": "xxxxx",
- *       "token": "xxxx.xxxx.xxxx"
  *    }
  * 
  * 
  * @apiParam {Number} offset Número de índice
- * @apiParam {Number} state El estado de la cantidad (0, 1)
+ * @apiParam {Number} state El estado de la marca (0, 1)
  *
  * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
  * @apiSuccess {String} message Mensaje del servidor
- * @apiSuccess {String} result La lista de cantidades
+ * @apiSuccess {String} result La lista de marcas
  * 
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
@@ -32,24 +31,18 @@ const router = Router();
             "message": "Query successful",
             "result": [
                 {
-                    "quantity_id": 1,
-                    "quantity_name": "Caja",
-                    "short_name": ""
+                    "brand_id": 1,
+                    "brand_name": "Gloria",
                     "state": 1
                 },                
                 {
-                    "quantity_id": 2,
-                    "quantity_name": "Paquete",
-                    "short_name": "paq"
+                    "brand_id": 2,
+                    "brand_name": "Otto kunz",
                     "state": 1
                 }
             ]
  *     }
  *
- * 
- * 
- * 
- * 
  * 
  * 
  * 
@@ -103,13 +96,10 @@ const router = Router();
 
 
 
-
-
-
 /** 
-  * @api {post} /quantity Crear cantidad
-  * @apiName CrearCantidad
-  * @apiGroup Cantidad
+  * @api {post} /brand Crear Marca
+  * @apiName CrearMarca
+  * @apiGroup Marca
   * 
   * @apiHeaderExample {json} Header-Example:
   *    {
@@ -118,9 +108,8 @@ const router = Router();
   *    }
   * 
   * 
-  * @apiParam {String} quantity_name El nombre de la cantidad
-  * @apiParam {String} short_name La abreviatura de la cantidad 
-  * @apiParam {Number} state El estado de la cantidad (0, 1)
+  * @apiParam {String} brand_name El nombre de la marca
+  * @apiParam {Number} state El estado de la marca (0, 1)
   * 
   * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
   * @apiSuccess {String} message Mensaje del servidor
@@ -130,22 +119,17 @@ const router = Router();
   *     HTTP/1.1 200 OK
   *     {
             "ok": true,
-            "message": "Cantidad creado correctamente"
+            "message": "Marca creado correctamente"
   *     }
   *
   * 
   * 
-  * 
-  * 
-  * 
-  * 
-  * 
-  * @apiError QuantityExists Ya existe la cantidad
-  * @apiErrorExample QuantityExists: 400
-  *     HTTP/1.1 406 Quantity exists
+  * @apiError BrandExists Ya existe la marca
+  * @apiErrorExample BrandExists: 400
+  *     HTTP/1.1 406 Brand exists
   *     {
             "ok": false,
-            "message": "La cantidad ya existe!",
+            "message": "La marca ya existe!",
   *     }
   * 
   *
@@ -175,6 +159,7 @@ const router = Router();
   * 
   * 
   * @apiError ServeError Error del servidor
+  *
   * @apiErrorExample ServeError: 500
   *     HTTP/1.1 500 Internal Server Error
   *     {
@@ -183,104 +168,9 @@ const router = Router();
   *     }
   * 
   */
-router.route('/')
-    .get(getQuantities)
-    .post(createQuantity)
-
-
-
-
-
-
-
-
-
-/**
-  * @api {post} /quantity/search Buscador de cantidades
-  * @apiName BuscarCantidades
-  * @apiGroup Cantidad
-  * 
-  * @apiHeaderExample {json} Header-Example:
-  *    {
-  *       "version": "xxxxx",
-  *       "token": "xxxx.xxxx.xxxx"
-  *    }
-  * 
-  * 
-  * @apiParam {Number} query     El nombre de la cantidad
-  * @apiParam {Number} state     El estado de la cantidad (0, 1)
-  *
-  * 
-  * @apiSuccess {bool}       ok          Si la petición ha sido exitosa o no
-  * @apiSuccess {String}     message     Mensaje del servidor
-  * @apiSuccess {String}     result      La lista de cantidades
-  * 
-  * @apiSuccessExample Success-Response:
-  *     HTTP/1.1 200 OK
-  *     {
-             "ok": true,
-             "message": "Query successful",
-             "result": [
-                 {
-                     "quantity_id": 1,
-                     "quantity_name": "Caja",
-                     "short_name": ""
-                     "state": 1
-                 }
-             ]
-  *     }
-  *
-  * 
-  * 
-  * 
-  * 
-  * 
-  * @apiError AppVersion Necesita actualizar la aplicación
-  * @apiErrorExample AppVersion: 406
-  *     HTTP/1.1 406 Version error
-  *     {
-             "ok": false,
-             "message": "Actualiza la apliación",
-  *     }
-  *
-  * 
-  * 
-  * 
-  * @apiError StateNotFound El 'state' no ha sido encontrado
-  * @apiErrorExample StateNotFound: 405
-  *     HTTP/1.1 405 Not Found
-  *     {
-             "ok": false,
-             "message": "La variable 'state' son obligatorio!"
-  *     }
-  *
-  * 
-  *
-  * @apiError JWTNotFound El 'token' no ha sido encontrado
-  * @apiErrorExample JWTNotFound: 401
-  *     HTTP/1.1 401 JWTNotFound
-  *     {
-             "ok": false,
-             "name": "TokenExpiredError",
-             "message": "jwt expired",
-             "expiredAt": "2020-12-26T16:01:48.000Z"
-  *     }
-  * 
-  * 
-  * 
-  * 
-  * @apiError ServeError Error del servidor
-  * @apiErrorExample ServeError: 500
-  *     HTTP/1.1 500 Internal Server Error
-  *     {
-             "ok": false,
-             "message": "Mensaje de error del servidor"
-  *     }
-  *
-  *
-  */ 
-router.route('/search')
-    .post(searchQuantity)
+ router.route('/')
+    .get(getBrands)
+    .post(createBrand);
 
 
 
@@ -292,11 +182,106 @@ router.route('/search')
 
 
 
- 
+
+  /**
+ * @api {post} /brand/search Buscador de la marca
+ * @apiName BuscarMarcas
+ * @apiGroup Marca
+ * 
+ * @apiHeaderExample {json} Header-Example:
+ *    {
+ *       "version": "xxxxx",
+ *       "token": "xxxx.xxxx.xxxx"
+ *    }
+ * 
+ * 
+ * @apiParam {Number} query     El nombre de la marca
+ * @apiParam {Number} state     El estado de la marca (0, 1)
+ *
+ * 
+ * @apiSuccess {bool}       ok          Si la petición ha sido exitosa o no
+ * @apiSuccess {String}     message     Mensaje del servidor
+ * @apiSuccess {String}     result      La lista de marcas
+ * 
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+            "ok": true,
+            "message": "Query successful",
+            "result": [
+                {
+                    "brand_id": 1,
+                    "brand_name": "Gloria",
+                    "state": 1
+                }
+            ]
+ *     }
+ *
+ * 
+ * 
+ * 
+ * 
+ * 
+ * @apiError AppVersion Necesita actualizar la aplicación
+ * @apiErrorExample AppVersion: 406
+ *     HTTP/1.1 406 Version error
+ *     {
+            "ok": false,
+            "message": "Actualiza la apliación",
+ *     }
+ *
+ * 
+ * 
+ * 
+ * @apiError StateNotFound El 'state' no ha sido encontrado
+ * @apiErrorExample StateNotFound: 405
+ *     HTTP/1.1 405 Not Found
+ *     {
+            "ok": false,
+            "message": "La variable 'state' son obligatorio!"
+ *     }
+ *
+ * 
+ *
+ * @apiError JWTNotFound El 'token' no ha sido encontrado
+ * @apiErrorExample JWTNotFound: 401
+ *     HTTP/1.1 401 JWTNotFound
+ *     {
+            "ok": false,
+            "name": "TokenExpiredError",
+            "message": "jwt expired",
+            "expiredAt": "2020-12-26T16:01:48.000Z"
+ *     }
+ * 
+ * 
+ * 
+ * 
+ * @apiError ServeError Error del servidor
+ * @apiErrorExample ServeError: 500
+ *     HTTP/1.1 500 Internal Server Error
+ *     {
+            "ok": false,
+            "message": "Mensaje de error del servidor"
+ *     }
+ *
+ *
+ */
+ router.route('/search')
+ .post(searchBrand);
+
+
+
+
+
+
+
+
+
+
  /** 
-  * @api {put} /quantity/:quantity_id Actualizar Cantidad
-  * @apiName ActualizarQuantity
-  * @apiGroup Cantidad
+  * @api {put} /brand/:brand_id Actualizar Marca
+  * @apiName ActualizarMarca
+  * @apiGroup Marca
   * 
   * @apiHeaderExample {json} Header-Example:
   *    {
@@ -305,10 +290,9 @@ router.route('/search')
   *    }
   * 
   * 
-  * @apiParam {Number} quantity_id El ID de la cantidad (este ID tiene que ir en el URL)
-  * @apiParam {String} quantity_name El nombre de la cantidad
-  * @apiParam {String} short_name La abreviatura de la cantidad
-  * @apiParam {Number} state El estado de la cantidad (0, 1)
+  * @apiParam {Number} brand_id El ID de la marca (este ID tiene que ir en el URL)
+  * @apiParam {String} brand_name El nombre de la marca
+  * @apiParam {Number} state El estado de la marca (0, 1)
   * 
   * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
   * @apiSuccess {String} message Mensaje del servidor
@@ -318,7 +302,7 @@ router.route('/search')
   *     HTTP/1.1 200 OK
   *     {
             "ok": true,
-            "message": "Cantidad actualizado correctamente"
+            "message": "Marca actualizado correctamente"
   *     }
   *
   * 
@@ -327,12 +311,13 @@ router.route('/search')
   * 
   * 
   * 
-  * @apiError QuantityExists Ya existe la cantidad
-  * @apiErrorExample QuantityExists: 400
-  *     HTTP/1.1 400 Quantity exists
+  * 
+  * @apiError BrandExists Ya existe la marca
+  * @apiErrorExample BrandExists: 400
+  *     HTTP/1.1 400 Brand exists
   *     {
             "ok": false,
-            "message": "La cantidad ya existe!",
+            "message": "La marca ya existe!",
   *     }
   * 
   *
@@ -350,12 +335,12 @@ router.route('/search')
   * 
   * 
   * 
-  * @apiError QuantityIDNotFound El ID de la cantidad no existe
-  * @apiErrorExample QuantityIDNotFound: 405
-  *     HTTP/1.1 405 Quantity ID Not Found
+  * @apiError BrandIDNotFound El ID de la marca no existe
+  * @apiErrorExample BrandIDNotFound: 405
+  *     HTTP/1.1 405 Brand ID Not Found
   *     {
             "ok": false,
-            "message": "EL ID de la cantidad no existe!",
+            "message": "EL ID de la marca no existe!",
   *     }
   * 
   * 
@@ -379,17 +364,18 @@ router.route('/search')
             "message": "Mensaje de error del servidor",
   *     }
   * 
-  */       
+  */
 
 
 
 
 
 
-  /** 
-  * @api {delete} /quantity/:quanitity_id Eliminar Cantidad
-  * @apiName EliminarCantidad
-  * @apiGroup Cantidad
+  
+ /** 
+  * @api {delete} /brand/:brand_id Eliminar Marca
+  * @apiName EliminarMarca
+  * @apiGroup Marca
   * 
   * @apiHeaderExample {json} Header-Example:
   *    {
@@ -398,7 +384,7 @@ router.route('/search')
   *    }
   * 
   * 
-  * @apiParam {Number} quantity_id El ID de la cantidad (este ID tiene que ir en el URL)
+  * @apiParam {Number} brand_id El ID de la marca (este ID tiene que ir en el URL)
   * 
   * @apiSuccess {bool} ok Si la petición ha sido exitosa o no
   * @apiSuccess {String} message Mensaje del servidor
@@ -408,11 +394,14 @@ router.route('/search')
   *     HTTP/1.1 200 OK
   *     {
             "ok": true,
-            "message": "La cantidad ha sido eliminado correctamente"
+            "message": "La Marca ha sido eliminado correctamente"
   *     }
-  * 
-  * 
   *
+  * 
+  * 
+  * 
+  * 
+  * 
   * 
   * 
   * 
@@ -431,12 +420,12 @@ router.route('/search')
   * 
   * 
   * 
-  * @apiError QuantityIDNotFound El ID de la cantidad no existe
-  * @apiErrorExample QuantityIDNotFound: 405
-  *     HTTP/1.1 405 Quantity ID Not Found
+  * @apiError BrandIDNotFound El ID de la marca no existe
+  * @apiErrorExample BrandIDNotFound: 405
+  *     HTTP/1.1 405 Brand ID Not Found
   *     {
             "ok": false,
-            "message": "EL ID de la cantidad no existe!",
+            "message": "EL ID de la marca no existe!",
   *     }
   * 
   * 
@@ -463,10 +452,10 @@ router.route('/search')
   *     }
   * 
   */
-router.route('/:quantity_id')
-    .get(getQuantity)
-    .put(updateQuantity)
-    .delete(deleteQuantity)
+router.route('/:brand_id')
+    .put(updateBrand)
+    .delete(deleteBrand);
+
 
 
 export default router;

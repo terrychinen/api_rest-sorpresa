@@ -16,6 +16,9 @@ function getQuantities(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const offset = Number(req.query.offset);
         const state = Number(req.query.state);
+        if (Number.isNaN(offset) || Number.isNaN(state)) {
+            return res.status(404).json({ ok: false, message: `La variable 'offset' y 'state' es obligatorio!` });
+        }
         const queryGet = `SELECT * FROM quantity WHERE state = ${state} ORDER BY quantity_id DESC LIMIT 10 OFFSET ${offset}`;
         return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
@@ -95,7 +98,12 @@ function updateQuantity(req, res) {
         const quantity = req.body;
         const quantityId = req.params.quantity_id;
         const quantityName = quantity.quantity_name;
-        quantity.quantity_name = quantityName.charAt(0).toUpperCase() + quantityName.slice(1);
+        if (quantityName != '' || quantityName != null) {
+            quantity.quantity_name = quantityName.charAt(0).toUpperCase() + quantityName.slice(1);
+        }
+        else {
+            quantity.quantity_name = '';
+        }
         const shortName = quantity.short_name;
         if (shortName == '') {
             quantity.short_name = shortName.charAt(0).toUpperCase() + shortName.slice(1);

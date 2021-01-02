@@ -4,141 +4,97 @@ const express_1 = require("express");
 const auth_controller_1 = require("../controllers/auth.controller");
 const router = express_1.Router();
 /**
- * @api {post} url/auth/signin/ Allow the user to Sign In
- * @apiName PostSignin
+ * @api {post} url/auth/signin Inciar sesión al usuario
+ * @apiName IniciarSesión
  * @apiGroup Auth
  *
+ *
+ *
  * @apiHeaderExample {json} Header-Example:
- *    {
- *       "flutter_key": "xxxxx",
- *       "token": "xxxx.xxxx.xxxx"
- *    }
+ *   {
+ *      "version": "xxxxx",
+ *   }
  *
- * @apiParam {String} username Authentication name.
- * @apiParam {String} password Authentication password.
  *
- * @apiSuccess {Boolean}  ok                Success of the petition.
- * @apiSuccess {String}   message           Message of the petition.
- * @apiSuccess {Object}   user              user model.
- * @apiSuccess {String}   user.user_id      The user id.
- * @apiSuccess {String}   user.role_id      The role id.
- * @apiSuccess {String}   user.token_id     The token id.
- * @apiSuccess {String}   user.first_name   Firstname of the user.
- * @apiSuccess {String}   user.last_name    Lastname of the user.
- * @apiSuccess {String}   user.username     Username for login.
- * @apiSuccess {String}   user.phone        User's phone.
- * @apiSuccess {String}   user.email        User's email.
- * @apiSuccess {int}      user.state        User's state.
- * @apiSuccess {String}   token             Token for user.
- * @apiSuccess {String}   expire_in         Token expiration date.
- * @apiSuccess {Date}     saved_date        Token saved date.
+ *
+ *
+ * @apiParam {String} username Nombre del usuario
+ * @apiParam {String} password Clave del usuario
+ *
+ * @apiSuccess {Boolean}  ok                Si la peticion ha sido exitosa o no
+ * @apiSuccess {String}   message           Mensaje del servidor
+ * @apiSuccess {Object}   user              Modelo usuario
+ * @apiSuccess {String}   user.user_id      El ID del usuario
+ * @apiSuccess {String}   user.token_id     El ID del token
+ * @apiSuccess {String}   user.role_id      El ID del rol
+ * @apiSuccess {String}   user.role_name    El nombre del rol
+ * @apiSuccess {String}   user.username     El nombre del usuario
+ * @apiSuccess {String}   user.first_name   El nombre de la persona
+ * @apiSuccess {String}   user.last_name    El apellido dela persona
+ * @apiSuccess {String}   user.state        El estado del usuario (si está permitido loguearse o no)
+ * @apiSuccess {String}   token             El token
+ * @apiSuccess {Number}   expires_in        La expiración del token
+ * @apiSuccess {String}   date              La fecha del token generado
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
  *     {
- *         "ok": true,
+            "ok": true,
             "message": "Login successful!",
             "user": {
                 "user_id": 0,
+                "token_id": 0,
                 "role_id": 0,
-                "token_id":0,
+                "role_name": 0,
                 "first_name": "xxxxx",
                 "last_name": "xxxxx",
                 "username": "xxxx",
-                "phone": "xxxxxxxxxxxx",
-                "email": "xxxxx@gmail.com",
                 "state": 1
             },
             "token": "xxxxxxx.xxxxxx-xxxxx&xxxxxxx",
             "expireIn": "0000000",
-            "savedDate": "xxxx-xx-xx x:xx:xx"
+            "date": "xxxx-xx-xx x:xx:xx"
  *     }
  *
- * @apiError UserNotFound Username was not found.
+ * @apiError UserNotFound El nombre del usuario no fue encontrado
  *
  * @apiErrorExample UserNotFound: 400
  *     HTTP/1.1 400 Not Found
  *     {
             "ok": false,
-            "message": "The username or password is not correct"
+            "message": "El nombre del usuario o la clave es incorrecta!"
  *     }
  *
- * @apiError UserWasDelete Username was deleted.
+ * @apiError UserDisabled El usuario ha sido desactivado
  *
- * @apiErrorExample UserWasDelete: 403
- *     HTTP/1.1 403 Was Deleted
+ * @apiErrorExample UserDisabled: 403
+ *     HTTP/1.1 403 Disabled
  *     {
             "ok": false,
-            "message": "User deleted",
+            "message": "Usuario desactivado",
             "username": "juan",
             "state": 0
 *      }
 
-* @apiError UpdateApp Need to update the application
+* @apiError AppVersion Necesita actualizar la aplicación
 *
-* @apiErrorExample UpdateApp: 406
+* @apiErrorExample AppVersion: 406
 *     HTTP/1.1 406 Need to update
 *     {
             "ok": false,
-            "message": "Update the app",
+            "message": "Actualiza la apliación",
 *     }
 *
-* @apiError ServeError Internal Server Error
+* @apiError ServeError Error del servidor
 *
 * @apiErrorExample ServeError: 500
 *     HTTP/1.1 500 Internal Server Error
 *     {
             "ok": false,
-            "message": "Server's message",
+            "message": "Mensaje de error del servidor",
 *     }
 *
 */
 router.route('/signin').post(auth_controller_1.signIn);
-/**
- * @api {post} url/auth/signup/ Create new account
- * @apiName PostSignup
- * @apiGroup Auth
- *
- *
- * @apiSuccess {Boolean}  ok                Success of the petition.
- * @apiSuccess {String}   message           Message of the petition.
- *
- *
- * @apiSuccessExample Success-Response: 200
- *     HTTP/1.1 200 OK
- *     {
- *         "ok": true,
- *         "message": "User created successfully"
- *     }
- *
- *
- *
- * @apiError InsertUpdate Insert or Update query error
- * @apiErrorExample InsertUpdate: 400
- *     HTTP/1.1 400 Insert or Update error
- *     {
-            "ok": false,
-            "message": "INSERT or UPDATE error",
-            error
- *     }
- *
- * @apiError UpdateApp Need to update the application
- *
- * @apiErrorExample UpdateApp: 406
- *     HTTP/1.1 403 Need to update
- *     {
-            "ok": false,
-            "message": "Update the app",
- *     }
- *
- * @apiError ServeError Internal Server Error
- * @apiErrorExample ServeError: 500
- *     HTTP/1.1 500 Internal Server Errpr
- *     {
-            "ok": false,
-            "message": "Server's message",
- *     }
- *
- */
 router.route('/signup').post(auth_controller_1.signUp);
 exports.default = router;

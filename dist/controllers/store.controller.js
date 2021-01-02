@@ -16,6 +16,9 @@ function getStores(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const offset = Number(req.query.offset);
         const state = Number(req.query.state);
+        if (Number.isNaN(offset) || Number.isNaN(state)) {
+            return res.status(404).json({ ok: false, message: `La variable 'offset' y 'state' es obligatorio!` });
+        }
         const queryGet = `SELECT * FROM store WHERE state = ${state} ORDER BY store_id DESC`;
         return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
@@ -80,7 +83,12 @@ function updateStore(req, res) {
         const store = req.body;
         const storeId = req.params.store_id;
         const storeName = store.store_name;
-        store.store_name = storeName.charAt(0).toUpperCase() + storeName.slice(1);
+        if (storeName != '' || storeName != null) {
+            store.store_name = storeName.charAt(0).toUpperCase() + storeName.slice(1);
+        }
+        else {
+            store.store_name = '';
+        }
         const queryCheckId = `SELECT * FROM store WHERE store_id = "${storeId}"`;
         return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheckId.result[0][0] == null) {

@@ -8,6 +8,10 @@ export async function getStores(req: Request, res: Response){
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
 
+    if(Number.isNaN(offset) || Number.isNaN(state)) {
+        return res.status(404).json({ok: false, message: `La variable 'offset' y 'state' es obligatorio!`});
+    }
+
     const queryGet = `SELECT * FROM store WHERE state = ${state} ORDER BY store_id DESC`;
 
     return await query(queryGet).then(data => {
@@ -71,9 +75,14 @@ export async function createStore(req: Request, res: Response) {
 export async function updateStore(req: Request, res: Response) {
     const store: IStore = req.body;
     const storeId = req.params.store_id;
+    
+    const storeName = store.store_name;
+    if(storeName != '' || storeName != null){
+        store.store_name = storeName.charAt(0).toUpperCase() + storeName.slice(1);
+    }else{
+        store.store_name = '';
+    }
 
-     const storeName = store.store_name;
-     store.store_name = storeName.charAt(0).toUpperCase() + storeName.slice(1);
 
     const queryCheckId = `SELECT * FROM store WHERE store_id = "${storeId}"`;
 

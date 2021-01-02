@@ -16,6 +16,9 @@ function getRoles(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const offset = Number(req.query.offset);
         const state = Number(req.query.state);
+        if (Number.isNaN(offset) || Number.isNaN(state)) {
+            return res.status(404).json({ ok: false, message: `La variable 'offset' y 'state' es obligatorio!` });
+        }
         const queryGet = `SELECT * FROM role WHERE state = ${state} ORDER BY role_id DESC LIMIT 10 OFFSET ${offset}`;
         return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
@@ -80,7 +83,12 @@ function updateRole(req, res) {
         const role = req.body;
         const roleId = req.params.role_id;
         const roleName = role.role_name;
-        role.role_name = roleName.charAt(0).toUpperCase() + roleName.slice(1);
+        if (roleName != '' || roleName != null) {
+            role.role_name = roleName.charAt(0).toUpperCase() + roleName.slice(1);
+        }
+        else {
+            role.role_name = '';
+        }
         const queryCheckId = `SELECT * FROM role WHERE role_id = "${roleId}"`;
         return yield query_1.query(queryCheckId).then((dataCheckId) => __awaiter(this, void 0, void 0, function* () {
             if (dataCheckId.result[0][0] == null) {

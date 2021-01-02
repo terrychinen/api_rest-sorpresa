@@ -9,6 +9,10 @@ export async function getUnits(req: Request, res: Response) {
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
 
+    if(Number.isNaN(offset) || Number.isNaN(state)) {
+        return res.status(404).json({ok: false, message: `La variable 'offset' y 'state' es obligatorio!`});
+    }
+
     const queryGet = `SELECT * FROM unit WHERE state = ${state} ORDER BY unit_id DESC LIMIT 10 OFFSET ${offset}`;
 
     return await query(queryGet).then(data => {
@@ -37,6 +41,10 @@ export async function searchUnit(req: Request, res: Response){
     const search = req.body.query;
     const state = Number(req.body.state);
 
+    if(Number.isNaN(state)) {
+        return res.status(404).json({ok: false, message: `La variable 'state' es obligatorio!`});
+    }
+
     const queryString = `SELECT * FROM unit WHERE unit_name LIKE "%${search}%" AND state = ${state} ORDER BY unit_name DESC`;
 
     return await query(queryString).then( data => {
@@ -54,16 +62,24 @@ export async function createUnit(req: Request, res: Response) {
     unit.unit_name = unitName.charAt(0).toUpperCase() + unitName.slice(1);
 
 
-    const queryCheck = `SELECT * FROM unit WHERE unit_name = "${unit.unit_name}"`;
+    const queryCheckUnitName = `SELECT * FROM unit WHERE unit_name = "${unit.unit_name}"`;
    
-    return await query(queryCheck).then(async dataCheck => {
-        if(dataCheck.result[0][0] != null) {return res.status(400).json({ok: false, message: 'La unidad ya existe!'});}
-        const queryInsert = `INSERT INTO unit (unit_name, symbol, state) VALUES ("${unit.unit_name}", "${unit.symbol}", "${unit.state}")`;
+    return await query(queryCheckUnitName).then(async dataCheckUnitName => {
+        if(dataCheckUnitName.result[0][0] != null) {return res.status(400).json({ok: false, message: 'El nombre de la unidad ya existe!'});}
 
-        return await query(queryInsert).then(data => {
-            if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
-            return res.status(data.status).json({ok: true, message: 'Unidad creado correctamente'});
+        const queryChecksymbolName = `SELECT * FROM unit WHERE symbol = "${unit.symbol}"`;
+
+        return await query(queryChecksymbolName).then(async dataCheckSymbolName => {
+            if(dataCheckSymbolName.result[0][0] != null) {return res.status(400).json({ok: false, message: 'La abreviatura de la unidad ya existe!'});}
+
+            const queryInsert = `INSERT INTO unit (unit_name, symbol, state) VALUES ("${unit.unit_name}", "${unit.symbol}", "${unit.state}")`;
+
+            return await query(queryInsert).then(data => {
+                if(!data.ok) return res.status(data.status).json({ok: false, message: data.message})
+                return res.status(data.status).json({ok: true, message: 'Unidad creado correctamente'});
+            });
         });
+       
     });
 }
 
@@ -74,7 +90,12 @@ export async function updateUnit(req: Request, res: Response) {
     const unitId = req.params.unit_id;
 
     const unitName = unit.unit_name;
-    unit.unit_name = unitName.charAt(0).toUpperCase() + unitName.slice(1);
+    if(unitName != '' || unitName != null){
+        unit.unit_name = unitName.charAt(0).toUpperCase() + unitName.slice(1);
+    }else{
+        unit.unit_name = '';
+    }
+
 
     const queryCheckId = `SELECT * FROM unit WHERE unit_id = "${unitId}"`;
 

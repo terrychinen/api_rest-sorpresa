@@ -8,6 +8,10 @@ export async function getRoles(req: Request, res: Response) {
     const offset = Number(req.query.offset);
     const state = Number(req.query.state);
 
+    if(Number.isNaN(offset) || Number.isNaN(state)) {
+        return res.status(404).json({ok: false, message: `La variable 'offset' y 'state' es obligatorio!`});
+    }
+
     const queryGet = `SELECT * FROM role WHERE state = ${state} ORDER BY role_id DESC LIMIT 10 OFFSET ${offset}`;
 
     return await query(queryGet).then(data => {
@@ -72,7 +76,12 @@ export async function updateRole(req: Request, res: Response) {
     const roleId = req.params.role_id;
 
     const roleName = role.role_name;
-    role.role_name = roleName.charAt(0).toUpperCase() + roleName.slice(1);
+    
+    if(roleName != '' || roleName != null){
+        role.role_name = roleName.charAt(0).toUpperCase() + roleName.slice(1);
+    }else{
+        role.role_name = '';
+    }
 
     const queryCheckId = `SELECT * FROM role WHERE role_id = "${roleId}"`;
 
