@@ -44,7 +44,7 @@ export async function signIn(req: Request, res: Response) {
                     user: userDB,
                     token,
                     expires_in: process.env.TOKEN_EXPIRATION,
-                    date: moment().format('YYYY-MM-DD hh:mm:ss')
+                    date: moment().format('YYYY-MM-DD HH:mm:ss')
                 });
             });   
         }catch(e){
@@ -99,7 +99,7 @@ export async function signUp(req: Request, res: Response) {
 
                     let token = new TokenModel();
                     token.token_key = jwt;
-                    token.created_at = moment().format('YYYY-MM-DD hh:mm:ss');
+                    token.created_at = moment().format('YYYY-MM-DD HH:mm:ss');
                     token.expires_in = Number(process.env.TOKEN_EXPIRATION); 
 
                     const queryInsertToken = `INSERT INTO token (token_key, created_at, expires_in, state)
