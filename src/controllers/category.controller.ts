@@ -24,7 +24,7 @@ export async function getCategories(req: Request, res: Response){
 //================== OBTENER UNA CATEGORIA POR SU ID ==================//
 export async function getCategory(req: Request, res: Response) {
     const search = req.params.category_id;
-    const state = req.params.state;
+    const state = req.query.state;
 
     const queryGet = `SELECT * FROM category WHERE category_id = "${search}" AND state = ${state}`;
 

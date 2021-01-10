@@ -32,7 +32,7 @@ exports.getCategories = getCategories;
 function getCategory(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const search = req.params.category_id;
-        const state = req.params.state;
+        const state = req.query.state;
         const queryGet = `SELECT * FROM category WHERE category_id = "${search}" AND state = ${state}`;
         return yield query_1.query(queryGet).then(data => {
             if (!data.ok)
