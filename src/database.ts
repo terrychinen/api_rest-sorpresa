@@ -6,7 +6,7 @@ export async function connect() {
         host: '0.0.0.0',
         port: 3306,
         user: 'root',
-        password: 'Di.ta.lux&29',
+        password: '****',
         database: 'sorpresa_db',
         waitForConnections: true,
         connectionLimit: 10,
